@@ -27,9 +27,9 @@ BBN_PLCP::~BBN_PLCP()
 	if (d_table) 
 		delete d_table;
 }
-BBN_PLCP::sptr BBN_PLCP::Create(gr_msg_queue_sptr target_queue)
+BBN_PLCP::sptr BBN_PLCP::Create(gr_msg_queue_sptr target_queue, bool check)
 {
-	return sptr(new BBN_PLCP(target_queue));
+	return sptr(new BBN_PLCP(target_queue, check));
 }
 uchar BBN_PLCP::ReverseBits(uchar c) 
 {

@@ -16,7 +16,7 @@ typedef struct oob_hdr_struct
 {
 	long long timestamp; /* Relative time in microseconds */
 	ushort length;
-	char rssi; /* dB Scale */
+	signed char rssi; /* dB Scale */
 	char rate; /* Receive rate in units of 100 kBps */
 } oob_hdr_t;);
 
@@ -26,7 +26,7 @@ class BBN_PLCP : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<BBN_PLCP> sptr;
-		static sptr Create(gr_msg_queue_sptr);
+		static sptr Create(gr_msg_queue_sptr, bool = true);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		void forecast(int, gr_vector_int &);
 		static uchar ReverseBits(uchar);
