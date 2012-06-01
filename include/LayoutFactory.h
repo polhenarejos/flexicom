@@ -4,6 +4,7 @@
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 
+class MainWindow;
 class LayoutFactory : boost::noncopyable
 {
 	private:
@@ -13,7 +14,7 @@ class LayoutFactory : boost::noncopyable
 		virtual const char *Name() = 0;
 		typedef boost::shared_ptr<LayoutFactory> sptr;
 		static sptr Create();
-		virtual void Run() = 0;
+		virtual void Run(MainWindow * = NULL) = 0;
 		virtual void Stop() = 0;
 };
 

@@ -118,7 +118,17 @@ Rx80211b::sptr Rx80211b::Create()
 }
 Rx80211b::~Rx80211b()
 {
-	rxth->quit();
+	stop();
+}
+void Rx80211b::stop()
+{
+	if (rxth)
+	{
+		rxth->terminate();
+		rxth->wait();
+		delete rxth;
+		rxth = NULL;
+	}
 }
 std::vector<float> Rx80211b::BarkerTaps(int sample_rate)
 {

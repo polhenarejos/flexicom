@@ -21,6 +21,7 @@ class Rx80211b : public gr_hier_block2
 		static sptr Create();
 		~Rx80211b();
 		static std::vector<float> BarkerTaps(int);
+		void stop();
 		
 	private:
 		Rx80211b();
