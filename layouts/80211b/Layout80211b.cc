@@ -6,21 +6,20 @@
 
 const char *Layout80211b::name = "802.11b";
 
-Layout80211b::Layout80211b()
-	: LayoutFactory()
+Layout80211b::Layout80211b(MainWindow *_mw, int _radioID) :
+	LayoutFactory(), mw(_mw), radioID(_radioID)
 {
 }
 const char *Layout80211b::Name()
 {
 	return name;
 }
-LayoutFactory::sptr Layout80211b::Create()
+LayoutFactory::sptr Layout80211b::Create(MainWindow *_mw, int _radioID)
 {
-	return LayoutFactory::sptr(new Layout80211b());
+	return LayoutFactory::sptr(new Layout80211b(_mw, _radioID));
 }
-void Layout80211b::Run(MainWindow *_mw)
+void Layout80211b::Run()
 {
-	mw = _mw;
 	grTop = gr_make_top_block(std::string(name));
 	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)

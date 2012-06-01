@@ -14,12 +14,13 @@ class Layout80211b : public LayoutFactory
 		Rx80211b::sptr rx;
 		boost::shared_ptr<uhd_usrp_source> usrp;
 		MainWindow *mw;
+		int radioID;
 		
 	public:
-		Layout80211b();
-		const char *Name();
-		static LayoutFactory::sptr Create();
-		void Run(MainWindow *);
+		Layout80211b(MainWindow *, int);
+		static const char *Name();
+		static LayoutFactory::sptr Create(MainWindow *, int);
+		void Run();
 		void Stop();
 };
 

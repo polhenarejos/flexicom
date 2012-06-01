@@ -2,17 +2,17 @@
 
 const char *LayoutVLC::name = "VLC";
 
-LayoutVLC::LayoutVLC()
-	: LayoutFactory()
+LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
+	LayoutFactory()
 {
 }
 const char *LayoutVLC::Name()
 {
 	return name;
 }
-LayoutFactory::sptr LayoutVLC::Create()
+LayoutFactory::sptr LayoutVLC::Create(MainWindow *_mw, int _radioID)
 {
-	return LayoutFactory::sptr(new LayoutVLC());
+	return LayoutFactory::sptr(new LayoutVLC(_mw, _radioID));
 }
 void LayoutVLC::Run()
 {

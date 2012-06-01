@@ -8,9 +8,9 @@ class LayoutVLC : public LayoutFactory
 	private:
 		static const char *name;
 	public:
-		LayoutVLC();
-		const char *Name();
-		static LayoutFactory::sptr Create();
+		LayoutVLC(MainWindow *, int);
+		static const char *Name();
+		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();
 };

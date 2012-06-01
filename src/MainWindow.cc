@@ -9,11 +9,17 @@
 #include <QRegExpValidator>
 #include <QSettings>
 
-typedef LayoutFactory::sptr (*CreateFunc)();
-CreateFunc layouts[] = {
-	Layout80211b::Create,
-	LayoutVLC::Create,
-	NULL
+typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
+typedef const char *(*NameFunc)();
+typedef struct 
+{
+	CreateFunc f;
+	NameFunc n;	
+}LayoutCreator;
+LayoutCreator layouts[] = {
+	{ Layout80211b::Create, Layout80211b::Name },
+	{ LayoutVLC::Create, LayoutVLC::Name },
+	{ NULL, NULL }
 };
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -56,14 +62,14 @@ void MainWindow::RunLayout()
 	{
 		if (panel->layout_radio[i]->isChecked())
 		{
-			layoutFactory = layouts[i]();
+			layoutFactory = layouts[i].f(this, i);
 			break;
 		}
 	}
 	if (layoutFactory)
 	{
 		//printf("Running layout %s\n", layoutFactory->Name());
-		layoutFactory->Run(this);
+		layoutFactory->Run();
 	}
 }
 void MainWindow::StopLayout()
@@ -138,9 +144,9 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	QWidget *p = new QWidget(w);
 	QGroupBox *gBox = new QGroupBox(tr("Available layouts"));
 	QVBoxLayout *vBox = new QVBoxLayout;
-	for (uint i = 0; layouts[i]; i++)
+	for (uint i = 0; layouts[i].f; i++)
 	{
-		layout_radio.push_back(new QRadioButton(tr(layouts[i]()->Name())));
+		layout_radio.push_back(new QRadioButton(tr(layouts[i].n())));
 		vBox->addWidget(layout_radio.back());
 		if (i == 0)
 			layout_radio.back()->setChecked(true);
