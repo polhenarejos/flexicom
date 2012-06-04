@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QComboBox>
 #include <QLabel>
 #include <QCloseEvent>
 #include "LayoutFactory.h"
@@ -41,6 +42,7 @@ class Panel : public QTabWidget
 	private:
 		QWidget *CreateLayoutTab(QWidget * = NULL);
 		QWidget *CreateUHDTab(QWidget * = NULL);
+		QWidget *CreateVariablesTab(QWidget * = NULL);
 		QWidget *parent;
 		
 	public:
@@ -53,9 +55,11 @@ class Panel : public QTabWidget
 		std::vector<QRadioButton *> layout_radio;
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
+		QComboBox *cp_chain; //to see whether we want to receive or transmit
 	
 	public slots:
 		void SetDevs(int);
+		void SetVariables();
 };
 
 #endif //_INC_MAINWINDOW_H_

@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
 #include <QSettings>
+#include <QComboBox>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
 typedef const char *(*NameFunc)();
@@ -138,12 +139,21 @@ Panel::Panel(QWidget *w) :
 	setTabPosition(QTabWidget::North);
 	addTab(CreateLayoutTab(this), "Layouts");
 	addTab(CreateUHDTab(this), "UHD");
+	addTab(CreateVariablesTab(this),"Variables");
 }
 QWidget *Panel::CreateLayoutTab(QWidget *w)
 {
 	QWidget *p = new QWidget(w);
 	QGroupBox *gBox = new QGroupBox(tr("Available layouts"));
+	QGroupBox *gBoxchain = new QGroupBox(tr("Communication chain"));
 	QVBoxLayout *vBox = new QVBoxLayout;
+	QVBoxLayout *cBox = new QVBoxLayout;
+	cp_chain = new QComboBox();
+	cp_chain->addItem(tr("Transmitter"));
+    cp_chain->addItem(tr("Receiver"));
+    cBox->addWidget(cp_chain);
+    gBoxchain->setLayout(cBox);
+	
 	for (uint i = 0; layouts[i].f; i++)
 	{
 		layout_radio.push_back(new QRadioButton(tr(layouts[i].n())));
@@ -155,6 +165,13 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	gBox->setLayout(vBox);
 	QGridLayout *grid = new QGridLayout(p);
 	grid->addWidget(gBox, 0, 0);
+	grid->addWidget(gBoxchain, 1, 0);
+	
+	for (uint i=0; layouts[i].f; i++)
+	{
+		QObject::connect(layout_radio[i], SIGNAL(pressed()), this, SLOT(SetVariables()));
+	}
+	
 	return p;
 }
 QWidget *Panel::CreateUHDTab(QWidget *w)
@@ -179,6 +196,16 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	QObject::connect(sp_devs, SIGNAL(valueChanged(int)), this, SLOT(SetDevs(int)));
 	return p;
 }
+
+QWidget *Panel::CreateVariablesTab( QWidget *w)
+{
+	QWidget *p = new QWidget(w);
+	/*for (uint i = 0; i < panel->layout_radio.size(); i++)
+	{
+		
+	}*/
+	return p;
+}
 void Panel::SetDevs(int devs)
 {
 	for (int i = 0; i < devs; i++)
@@ -195,3 +222,17 @@ void Panel::SetDevs(int devs)
 		parent->resize(parent->sizeHint());
 }
 
+void Panel::SetVariables()
+{
+	/*switch (system)
+	{
+		case 0:
+			printf("Hola 80211b\n");	
+			break;
+		case 1:
+			printf("Hola VLC\n");	
+			break;
+				
+	};*/
+	printf("Cambio a layout\n");	
+}
