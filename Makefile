@@ -10,7 +10,7 @@ MT=mt
 LIBT=lib
 RM=@del /F /Q
 COPY=@copy /Y
-MOC=C:\Qt\4.8.1\bin\moc
+MOC=C:\Qt\4.8.2\bin\moc
 
 ## Script for detecting W64 system or not. It sets IS64 to 1 if is x64 or 0 otherwise
 !if [tools\Is64.cmd >Makefile.auto]
@@ -24,17 +24,17 @@ PREF=w32
 !endif
 
 ## QT
-QT_INC_DIR=C:\Qt\4.8.1\include
-QT_LIB_DIR=C:\Qt\4.8.1\lib
+QT_INC_DIR=C:\Qt\4.8.2\include
+QT_LIB_DIR=C:\Qt\4.8.2\lib
 ## QWT
 QWT_INC_DIR=C:\CTTC\qwt\src
 QWT_LIB_DIR=C:\CTTC\qwt\lib\$(PREF)
 ## Boost
-BOOST_INC_DIR=C:\CTTC\boost_1_44_0
-BOOST_LIB_DIR=C:\CTTC\boost_1_44_0\stage\lib
+BOOST_INC_DIR="C:\Archivos de programa\boost\boost_1_44"
+BOOST_LIB_DIR="C:\Archivos de programa\boost\boost_1_44\lib"
 ## Gnuradio
-GR_INC_DIR=C:\cygwin\home\Pol\gnuradio\gnuradio\include
-GR_LIB_DIR=C:\cygwin\home\Pol\gnuradio\gnuradio\lib
+GR_INC_DIR=C:\cttc\gnuradio\include
+GR_LIB_DIR=C:\cttc\gnuradio\lib
 ## UHD
 UHD_INC_DIR=C:\CTTC\UHD\include
 UHD_LIB_DIR=C:\CTTC\UHD\lib
@@ -60,9 +60,9 @@ QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib
 EIGEN_INC=/I $(EIGEN_INC_DIR)
 QWT_INC=/I $(QWT_INC_DIR)
 !if $(DEBUG) == 1
-QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) qwtd.lib
+QWT_LIB=/LIBPATH:$(QWT_LIB_DIR)
 !else
-QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) qwt.lib
+QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) 
 !endif
 !if $(CMDLINE) == 0
 CMDLINE_LFLAG=/subsystem:windows
@@ -100,8 +100,8 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/LayoutFactory.obj
 
-LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/BBN_Slicer.obj \
-		$(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
+LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
+        $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
 
 all: exe
 	$(RM) Makefile.auto
