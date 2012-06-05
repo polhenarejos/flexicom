@@ -92,6 +92,7 @@ void MainWindow::readSettings()
 	resize(s.value("mw/size", QSize(300,50)).toSize());
 	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
 	panel->layout_radio[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
+	panel->cb_chain->setCurrentIndex(s.value("layout/chain", 0).toInt());
 	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
 	for (int i = 0; i < s.beginReadArray("uhd/ip"); i++)
 	{
@@ -116,6 +117,7 @@ void MainWindow::writeSettings()
 		}
 	}
 	s.setValue("layout/layout", lay);
+	s.setValue("layout/chain", panel->cb_chain->currentIndex());
 	s.setValue("uhd/devs", panel->sp_devs->value());
 	s.beginWriteArray("uhd/ip");
 	for (int i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
@@ -127,9 +129,10 @@ void MainWindow::writeSettings()
 }
 
 //Panel
-Panel::Panel(QWidget *w) :
+Panel::Panel(MainWindow *w) :
 	QTabWidget(w), parent(w)
 {
+	w->panel = this; //trick for being accessible from now
 	setTabPosition(QTabWidget::North);
 	addTab(CreateLayoutTab(this), "Layouts");
 	addTab(CreateUHDTab(this), "UHD");
@@ -142,21 +145,19 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	QGroupBox *gBoxchain = new QGroupBox(tr("Communication chain"));
 	QVBoxLayout *vBox = new QVBoxLayout;
 	QVBoxLayout *cBox = new QVBoxLayout;
-	cp_chain = new QComboBox();
-	cp_chain->addItem(tr("Transmitter"));
-    cp_chain->addItem(tr("Receiver"));
-    cBox->addWidget(cp_chain);
+	cb_chain = new QComboBox();
+	cb_chain->addItem(tr("Transmitter"));
+    cb_chain->addItem(tr("Receiver"));
+    cBox->addWidget(cb_chain);
     gBoxchain->setLayout(cBox);
 	for (uint i = 0; layouts[i]; i++)
 	{
 		RadioLayout *r = new RadioLayout;
-		r->layout = layouts[i]((MainWindow *)parent, i);
-		r->bt = new QRadioButton(tr(r->layout->Name()));
-		QObject::connect(r->bt, SIGNAL(pressed()), this, SLOT(SetVariables()));
 		layout_radio.push_back(r);
+		r->bt = new QRadioButton;
+		r->layout = layouts[i](parent, i);
+		r->bt->setText(tr(r->layout->Name()));
 		vBox->addWidget(layout_radio.back()->bt);
-		if (i == 0)
-			layout_radio.back()->bt->setChecked(true);
 	}
 	vBox->addStretch(1);
 	gBox->setLayout(vBox);
@@ -211,19 +212,4 @@ void Panel::SetDevs(int devs)
 	}
 	if (((MainWindow *)parent)->initd)
 		parent->resize(parent->sizeHint());
-}
-
-void Panel::SetVariables()
-{
-	/*switch (system)
-	{
-		case 0:
-			printf("Hola 80211b\n");	
-			break;
-		case 1:
-			printf("Hola VLC\n");	
-			break;
-				
-	};*/
-	printf("Cambio a layout\n");	
 }

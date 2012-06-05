@@ -9,7 +9,7 @@ class LayoutFactory : boost::noncopyable
 {
 	private:
 	protected:
-		LayoutFactory();
+		LayoutFactory() {};
 	public:
 		virtual const char *Name() = 0;
 		typedef boost::shared_ptr<LayoutFactory> sptr;

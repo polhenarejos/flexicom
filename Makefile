@@ -106,9 +106,9 @@ DBGCFLAG=/MD /Zi /Ox /W1
 DBGLFLAG=/debug
 !endif
 
-OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/LayoutFactory.obj
+OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
-LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
+LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
         $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
 
 all: exe install_deps
@@ -143,8 +143,11 @@ $(OBJ_DIR)/MainWindow_moc.obj: $(INC_DIR)/MainWindow.h
 	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(SRC_DIR)/MainWindow_moc.cc
 
 #Layouts
-{layouts/80211b}.cc{$(OBJ_DIR)}.obj:
+{$(LAYOUT_DIR)/80211b}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
+$(OBJ_DIR)/Layout80211b_moc.obj: $(LAYOUT_DIR)/80211b/Layout80211b.h
+	$(MOC) $(LAYOUT_DIR)/80211b/Layout80211b.h -o $(LAYOUT_DIR)/80211b/Layout80211b_moc.cc
+	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/80211b/Layout80211b_moc.cc
 	
-{layouts/VLC}.cc{$(OBJ_DIR)}.obj:
+{$(LAYOUT_DIR)/VLC}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<

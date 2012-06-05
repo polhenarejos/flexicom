@@ -43,7 +43,7 @@ class Panel : public QTabWidget
 		QWidget *CreateLayoutTab(QWidget * = NULL);
 		QWidget *CreateUHDTab(QWidget * = NULL);
 		QWidget *CreateVariablesTab(QWidget * = NULL);
-		QWidget *parent;
+		MainWindow *parent;
 		
 	public:
 		typedef struct
@@ -56,15 +56,14 @@ class Panel : public QTabWidget
 			QRadioButton *bt;
 			LayoutFactory::sptr layout;
 		}RadioLayout;
-		Panel(QWidget * = NULL);
+		Panel(MainWindow * = NULL);
 		std::vector<RadioLayout *> layout_radio;
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
-		QComboBox *cp_chain; //to see whether we want to receive or transmit
+		QComboBox *cb_chain; //to see whether we want to receive or transmit
 	
 	public slots:
 		void SetDevs(int);
-		void SetVariables();
 };
 
 #endif //_INC_MAINWINDOW_H_

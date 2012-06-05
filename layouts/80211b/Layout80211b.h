@@ -4,11 +4,14 @@
 #include "LayoutFactory.h"
 #include "Rx80211b.h"
 #include <gr_top_block.h>
+#include <QObject>
 class uhd_usrp_source;
 class MainWindow;
 
-class Layout80211b : public LayoutFactory
+class Layout80211b : public QObject, public LayoutFactory
 {
+	Q_OBJECT 
+	
 	private:
 		static const char *name;
 		gr_top_block_sptr grTop;
@@ -17,6 +20,8 @@ class Layout80211b : public LayoutFactory
 		boost::shared_ptr<uhd_usrp_source> usrp;
 		MainWindow *mw;
 		int radioID;
+		std::vector<int> tabs;
+		QWidget *CreateTabOpts(QWidget * = NULL);
 		
 	public:
 		Layout80211b(MainWindow *, int);
@@ -24,6 +29,9 @@ class Layout80211b : public LayoutFactory
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();
+		
+	public slots:
+		void RadioPressed(bool);
 };
 
 #endif //_INC_LAYOUT80211B_H_
