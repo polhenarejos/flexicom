@@ -8,7 +8,6 @@
 #include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
-#include <QSettings>
 #include <QComboBox>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
@@ -54,11 +53,11 @@ void MainWindow::clickMainButtons(QAbstractButton *b)
 }
 void MainWindow::RunLayout()
 {
-	for (uint i = 0; i < panel->layout_radio.size(); i++)
+	for (uint i = 0; i < panel->rb_layout.size(); i++)
 	{
-		if (panel->layout_radio[i]->bt->isChecked())
+		if (panel->rb_layout[i]->bt->isChecked())
 		{
-			layoutFactory = panel->layout_radio[i]->layout;
+			layoutFactory = panel->rb_layout[i]->layout;
 			break;
 		}
 	}
@@ -89,10 +88,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 void MainWindow::readSettings()
 {
-	QSettings s;
 	resize(s.value("mw/size", QSize(300,50)).toSize());
 	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
-	panel->layout_radio[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
+	panel->rb_layout[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
 	panel->rb_chain[s.value("layout/chain", 0).toInt()]->setChecked(true);
 	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
 	int siz = s.beginReadArray("uhd/ip");
@@ -106,13 +104,12 @@ void MainWindow::readSettings()
 }
 void MainWindow::writeSettings()
 {
-	QSettings s;
 	s.setValue("mw/size", size());
 	s.setValue("mw/pos", pos());
 	s.setValue("mw/fullScreen", isFullScreen());
-	for (int i = 0; i < panel->layout_radio.size(); i++)
+	for (int i = 0; i < panel->rb_layout.size(); i++)
 	{
-		if (panel->layout_radio[i]->bt->isChecked())
+		if (panel->rb_layout[i]->bt->isChecked())
 		{
 			s.setValue("layout/layout", i);
 			break;
@@ -135,6 +132,7 @@ void MainWindow::writeSettings()
 	}
 	s.endArray();
 	s.setValue("uhd/gain", panel->sp_gain->value());
+	emit SaveSettings(s);
 }
 
 //Panel
@@ -161,11 +159,11 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	for (uint i = 0; layouts[i]; i++)
 	{
 		RadioLayout *r = new RadioLayout;
-		layout_radio.push_back(r);
+		rb_layout.push_back(r);
 		r->bt = new QRadioButton;
 		r->layout = layouts[i](parent, i);
 		r->bt->setText(tr(r->layout->Name()));
-		vBox->addWidget(layout_radio.back()->bt);
+		vBox->addWidget(rb_layout.back()->bt);
 	}
 	vBox->addStretch(1);
 	gBox->setLayout(vBox);

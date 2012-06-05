@@ -10,7 +10,7 @@ const char *LayoutVLC::name = "VLC";
 LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
 	LayoutFactory(),mw(_mw), radioID(_radioID)
 {
-	QObject::connect(mw->panel->layout_radio[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
+	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 }
 const char *LayoutVLC::Name()
 {

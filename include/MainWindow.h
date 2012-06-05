@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QCloseEvent>
+#include <QSettings>
 #include "LayoutFactory.h"
 
 class Panel;
@@ -32,9 +33,13 @@ class MainWindow : public QMainWindow
 		bool initd;
 		Panel *panel;
 		void closeEvent(QCloseEvent *);
+		QSettings s;
 		
 	public slots:
 		void clickMainButtons(QAbstractButton *);
+		
+	signals:
+		void SaveSettings(QSettings &);
 		
 };
 class Panel : public QTabWidget
@@ -58,7 +63,7 @@ class Panel : public QTabWidget
 			LayoutFactory::sptr layout;
 		}RadioLayout;
 		Panel(MainWindow * = NULL);
-		std::vector<RadioLayout *> layout_radio;
+		std::vector<RadioLayout *> rb_layout;
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
 		QSpinBox *sp_gain;

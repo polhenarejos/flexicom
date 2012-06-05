@@ -6,6 +6,7 @@
 #include <gr_top_block.h>
 #include <QObject>
 #include <QComboBox>
+#include <QSettings>
 class uhd_usrp_source;
 class MainWindow;
 
@@ -24,6 +25,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		std::vector<int> tabs;
 		QWidget *CreateTabOpts(QWidget * = NULL);
 		QComboBox *cb_chans;
+		void ReadSettings();
 		
 	public:
 		Layout80211b(MainWindow *, int);
@@ -34,6 +36,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		
 	public slots:
 		void RadioPressed(bool);
+		void SaveSettings(QSettings &);
 };
 
 #endif //_INC_LAYOUT80211B_H_

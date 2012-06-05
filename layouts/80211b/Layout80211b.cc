@@ -17,7 +17,7 @@ int channels [] = {
 Layout80211b::Layout80211b(MainWindow *_mw, int _radioID) :
 	LayoutFactory(), mw(_mw), radioID(_radioID)
 {
-	QObject::connect(mw->panel->layout_radio[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
+	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 }
 const char *Layout80211b::Name()
 {
@@ -59,15 +59,19 @@ void Layout80211b::RadioPressed(bool check)
 		mw->panel->rb_chain[RB_TX]->setEnabled(false);
 		mw->panel->rb_chain[RB_RX]->setEnabled(true);
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
+		ReadSettings();
+		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
 	}
 	else
 	{
+		SaveSettings(mw->s);
 		for (int i = 0; i < tabs.size(); i++)
 		{
 			mw->panel->widget(tabs[i])->deleteLater();
 			mw->panel->removeTab(tabs[i]);
 		}
 		tabs.clear();
+		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
 	}
 }
 QWidget *Layout80211b::CreateTabOpts(QWidget *w)
@@ -83,4 +87,12 @@ QWidget *Layout80211b::CreateTabOpts(QWidget *w)
 	QGridLayout *grid = new QGridLayout(p);
 	grid->addWidget(gBox, 0, 0);
 	return p;
+}
+void Layout80211b::SaveSettings(QSettings &s)
+{
+	s.setValue("80211b/chan", cb_chans->currentIndex());
+}
+void Layout80211b::ReadSettings()
+{
+	cb_chans->setCurrentIndex(mw->s.value("80211b/chan").toInt());
 }
