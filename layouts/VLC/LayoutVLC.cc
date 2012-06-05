@@ -21,14 +21,11 @@ LayoutFactory::sptr LayoutVLC::Create(MainWindow *_mw, int _radioID)
 }
 void LayoutVLC::Run()
 {
-	int chain;
 	grTop = gr_make_top_block(std::string(name));
 	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
-	
-	chain= mw->panel->cp_chain->currentIndex();
-	switch (chain)
+	switch (mw->panel->cb_chain->currentIndex())
 	{
 		case 0: //transmitter
 			printf("Transmitter chain is not available\n");
@@ -50,9 +47,7 @@ void LayoutVLC::Run()
 }
 void LayoutVLC::Stop()
 {
-	int chain= mw->panel->cp_chain->currentIndex();
-	if (chain)
-		rx->stop();
+	rx->stop();
 	grTop->stop();
 	grTop->wait();
 	grTop.reset();

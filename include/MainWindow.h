@@ -42,7 +42,6 @@ class Panel : public QTabWidget
 	private:
 		QWidget *CreateLayoutTab(QWidget * = NULL);
 		QWidget *CreateUHDTab(QWidget * = NULL);
-		QWidget *CreateVariablesTab(QWidget * = NULL);
 		MainWindow *parent;
 		
 	public:
@@ -60,6 +59,7 @@ class Panel : public QTabWidget
 		std::vector<RadioLayout *> layout_radio;
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
+		QSpinBox *sp_gain;
 		QComboBox *cb_chain; //to see whether we want to receive or transmit
 	
 	public slots:

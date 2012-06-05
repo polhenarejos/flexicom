@@ -94,12 +94,14 @@ void MainWindow::readSettings()
 	panel->layout_radio[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
 	panel->cb_chain->setCurrentIndex(s.value("layout/chain", 0).toInt());
 	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
-	for (int i = 0; i < s.beginReadArray("uhd/ip"); i++)
+	int siz = s.beginReadArray("uhd/ip");
+	for (int i = 0; i < siz; i++)
 	{
 		s.setArrayIndex(i);
 		panel->ipfield[i].ip->setText(s.value("ip", "0.0.0.0").toString());
 	}
 	s.endArray();
+	panel->sp_gain->setValue(s.value("uhd/gain", 40).toInt());
 }
 void MainWindow::writeSettings()
 {
@@ -126,6 +128,7 @@ void MainWindow::writeSettings()
 		s.setValue("ip", panel->ipfield[i].ip->text().remove(' '));
 	}
 	s.endArray();
+	s.setValue("uhd/gain", panel->sp_gain->value());
 }
 
 //Panel
@@ -136,7 +139,6 @@ Panel::Panel(MainWindow *w) :
 	setTabPosition(QTabWidget::North);
 	addTab(CreateLayoutTab(this), "Layouts");
 	addTab(CreateUHDTab(this), "UHD");
-	addTab(CreateVariablesTab(this),"Variables");
 }
 QWidget *Panel::CreateLayoutTab(QWidget *w)
 {
@@ -173,29 +175,26 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	sp_devs->setRange(1, 4);
 	QGridLayout *grid = new QGridLayout(p);
 	QRegExpValidator *v = new QRegExpValidator(QRegExp("^[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]$"), this);
-	for (int i = 0; i < sizeof(ipfield)/sizeof(IPField); i++)
+	int i = 0;
+	for (; i < sizeof(ipfield)/sizeof(IPField); i++)
 	{
 		ipfield[i].ip = new QLineEdit("0.0.0.0", p);
 		//ipfield[i].ip->setInputMask(QString("000.000.000.000"));
 		ipfield[i].ip->setValidator(v);
-		ipfield[i].label = new QLabel(QString("IP Address %1").arg(i+1), p);
+		ipfield[i].label = new QLabel(tr("IP Address %1").arg(i+1), p);
 		grid->addWidget(ipfield[i].label, i+1, 0);
 		grid->addWidget(ipfield[i].ip, i+1, 1);
 	}
-	grid->addWidget(new QLabel("# USRPs"), 0, 0);
+	i++;
+	sp_gain = new QSpinBox(p);
+	sp_gain->setRange(10, 70);
+	sp_gain->setSingleStep(5);
+	grid->addWidget(new QLabel(tr("# USRPs")), 0, 0);
 	grid->addWidget(sp_devs, 0, 1);
+	grid->addWidget(new QLabel(tr("Gain")), i, 0);
+	grid->addWidget(sp_gain, i++, 1);
 	SetDevs(sp_devs->value());
 	QObject::connect(sp_devs, SIGNAL(valueChanged(int)), this, SLOT(SetDevs(int)));
-	return p;
-}
-
-QWidget *Panel::CreateVariablesTab( QWidget *w)
-{
-	QWidget *p = new QWidget(w);
-	/*for (uint i = 0; i < panel->layout_radio.size(); i++)
-	{
-		
-	}*/
 	return p;
 }
 void Panel::SetDevs(int devs)
@@ -210,6 +209,4 @@ void Panel::SetDevs(int devs)
 		ipfield[i].ip->setHidden(true);
 		ipfield[i].label->setHidden(true);
 	}
-	if (((MainWindow *)parent)->initd)
-		parent->resize(parent->sizeHint());
 }
