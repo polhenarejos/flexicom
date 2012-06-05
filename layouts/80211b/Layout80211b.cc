@@ -9,6 +9,10 @@
 #include <iostream>
 
 const char *Layout80211b::name = "802.11b";
+int channels [] = { 
+	2412, 2417, 2422, 2427, 2432, 2437, 2442, 
+	2447, 2452, 2457, 2462, 2467, 2472, 2484
+};
 
 Layout80211b::Layout80211b(MainWindow *_mw, int _radioID) :
 	LayoutFactory(), mw(_mw), radioID(_radioID)
@@ -33,7 +37,7 @@ void Layout80211b::Run()
 	{
 		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 		usrp->set_samp_rate(10e6);
-		usrp->set_center_freq(2462e6);
+		usrp->set_center_freq(channels[cb_chans->currentIndex()]*1e6);
 		usrp->set_gain(mw->panel->sp_gain->value());
 		rx = Rx80211b::Create();
 		grTop->connect(usrp, 0, rx, 0);
@@ -71,21 +75,9 @@ QWidget *Layout80211b::CreateTabOpts(QWidget *w)
 	QWidget *p = new QWidget(w);
 	QGroupBox *gBox = new QGroupBox(tr("Channels"));
 	QGridLayout *vBox = new QGridLayout;
-	QComboBox *cb_chans = new QComboBox(p);
-	cb_chans->addItem(tr("Channel 1: 2412 MHz"));
-	cb_chans->addItem(tr("Channel 2: 2417 MHz"));
-	cb_chans->addItem(tr("Channel 3: 2422 MHz"));
-	cb_chans->addItem(tr("Channel 4: 2427 MHz"));
-	cb_chans->addItem(tr("Channel 5: 2432 MHz"));
-	cb_chans->addItem(tr("Channel 6: 2437 MHz"));
-	cb_chans->addItem(tr("Channel 7: 2442 MHz"));
-	cb_chans->addItem(tr("Channel 8: 2447 MHz"));
-	cb_chans->addItem(tr("Channel 9: 2452 MHz"));
-	cb_chans->addItem(tr("Channel 10: 2457 MHz"));
-	cb_chans->addItem(tr("Channel 11: 2462 MHz"));
-	cb_chans->addItem(tr("Channel 12: 2467 MHz"));
-	cb_chans->addItem(tr("Channel 13: 2472 MHz"));
-	cb_chans->addItem(tr("Channel 14: 2484 MHz"));
+	cb_chans = new QComboBox(p);
+	for (int i = 0; i < sizeof(channels)/sizeof(int); i++)
+		cb_chans->addItem(QString("Channel %1: %2 MHz").arg(i+1).arg(channels[i]));
 	vBox->addWidget(cb_chans);
 	gBox->setLayout(vBox);
 	QGridLayout *grid = new QGridLayout(p);

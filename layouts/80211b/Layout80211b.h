@@ -5,6 +5,7 @@
 #include "Rx80211b.h"
 #include <gr_top_block.h>
 #include <QObject>
+#include <QComboBox>
 class uhd_usrp_source;
 class MainWindow;
 
@@ -22,6 +23,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		int radioID;
 		std::vector<int> tabs;
 		QWidget *CreateTabOpts(QWidget * = NULL);
+		QComboBox *cb_chans;
 		
 	public:
 		Layout80211b(MainWindow *, int);
