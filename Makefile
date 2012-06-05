@@ -10,7 +10,6 @@ MT=mt
 LIBT=lib
 RM=@del /F /Q
 COPY=@copy /Y
-MOC=C:\Qt\4.8.2\bin\moc
 
 ## Script for detecting W64 system or not. It sets IS64 to 1 if is x64 or 0 otherwise
 !if [tools\Is64.cmd >Makefile.auto]
@@ -18,26 +17,35 @@ MOC=C:\Qt\4.8.2\bin\moc
 !endif
 !include makefile.auto
 !if $(IS64) == 1
-PREF=w64
+PREF=x64
 !else
-PREF=w32
+PREF=x32
 !endif
 
 ## QT
-QT_INC_DIR=C:\Qt\4.8.2\include
-QT_LIB_DIR=C:\Qt\4.8.2\lib
+QT_DIR=deps\Qt
+QT_INC_DIR=$(QT_DIR)\include
+QT_LIB_DIR=$(QT_DIR)\lib\$(PREF)
+QT_BIN_DIR=$(QT_DIR)\bin\$(PREF)
+MOC=deps\Qt\bin\$(PREF)\moc.exe
 ## QWT
-QWT_INC_DIR=C:\CTTC\qwt\src
-QWT_LIB_DIR=C:\CTTC\qwt\lib\$(PREF)
+QWT_INC_DIR=deps\Qwt\include
+QWT_LIB_DIR=deps\Qwt\lib\$(PREF)
 ## Boost
-BOOST_INC_DIR="C:\Archivos de programa\boost\boost_1_44"
-BOOST_LIB_DIR="C:\Archivos de programa\boost\boost_1_44\lib"
+BOOST_DIR=deps\boost
+BOOST_INC_DIR=$(BOOST_DIR)\include
+BOOST_LIB_DIR=$(BOOST_DIR)\lib\$(PREF)
+BOOST_BIN_DIR=$(BOOST_DIR)\bin\$(PREF)
 ## Gnuradio
-GR_INC_DIR=C:\cttc\gnuradio\include
-GR_LIB_DIR=C:\cttc\gnuradio\lib
+GR_DIR=deps\gnuradio
+GR_INC_DIR=$(GR_DIR)\include
+GR_LIB_DIR=$(GR_DIR)\lib\$(PREF)
+GR_BIN_DIR=$(GR_DIR)\bin\$(PREF)
 ## UHD
-UHD_INC_DIR=C:\CTTC\UHD\include
-UHD_LIB_DIR=C:\CTTC\UHD\lib
+UHD_DIR=deps\UHD
+UHD_INC_DIR=$(UHD_DIR)\include
+UHD_LIB_DIR=$(UHD_DIR)\lib\$(PREF)
+UHD_BIN_DIR=$(UHD_DIR)\bin\$(PREF)
 
 ###############################
 
@@ -103,11 +111,21 @@ OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/Lay
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
         $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
 
-all: exe
+all: exe install_deps
 	$(RM) Makefile.auto
 	$(MT) /nologo -outputresource:"$(TARGET).exe;1" -manifest $(TARGET).exe.manifest
 	$(RM) $(TARGET).exe.manifest $(TARGET).map $(TARGET).exp
-	
+
+install_deps:
+		$(COPY) $(QT_BIN_DIR)\QtGui4.dll QtGui4.dll	>nul
+		$(COPY) $(QT_BIN_DIR)\QtCore4.dll QtCore4.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-core.dll gnuradio-core.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-uhd.dll gnuradio-uhd.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gruel.dll gruel.dll >nul
+		$(COPY) $(GR_BIN_DIR)\volk.dll volk.dll >nul
+		$(COPY) $(GR_BIN_DIR)\libfftw3f-3.dll libfftw3f-3.dll >nul
+		$(COPY) $(UHD_BIN_DIR)\uhd.dll uhd.dll >nul
+		
 exe: objs $(OBJ_DIR)/main.obj
 	$(LINK) $(LFLAGS) $(OBJ_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj /MAP /OUT:$(TARGET).exe
 	
