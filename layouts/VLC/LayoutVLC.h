@@ -20,7 +20,7 @@ class LayoutVLC : public LayoutFactory
 		int radioID;
 	public:
 		LayoutVLC(MainWindow *, int);
-		static const char *Name();
+		const char *Name();
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();

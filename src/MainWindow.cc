@@ -11,16 +11,10 @@
 #include <QComboBox>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
-typedef const char *(*NameFunc)();
-typedef struct 
-{
-	CreateFunc f;
-	NameFunc n;	
-}LayoutCreator;
-LayoutCreator layouts[] = {
-	{ Layout80211b::Create, Layout80211b::Name },
-	{ LayoutVLC::Create, LayoutVLC::Name },
-	{ NULL, NULL }
+CreateFunc layouts[] = {
+	Layout80211b::Create,
+	LayoutVLC::Create,
+	NULL
 };
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -61,9 +55,9 @@ void MainWindow::RunLayout()
 {
 	for (uint i = 0; i < panel->layout_radio.size(); i++)
 	{
-		if (panel->layout_radio[i]->isChecked())
+		if (panel->layout_radio[i]->bt->isChecked())
 		{
-			layoutFactory = layouts[i].f(this, i);
+			layoutFactory = panel->layout_radio[i]->layout;
 			break;
 		}
 	}
@@ -97,7 +91,7 @@ void MainWindow::readSettings()
 	QSettings s;
 	resize(s.value("mw/size", QSize(300,50)).toSize());
 	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
-	panel->layout_radio[s.value("layout/layout", 0).toInt()]->setChecked(true);
+	panel->layout_radio[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
 	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
 	for (int i = 0; i < s.beginReadArray("uhd/ip"); i++)
 	{
@@ -115,7 +109,7 @@ void MainWindow::writeSettings()
 	int lay = 0;
 	for (int i = 1; i < panel->layout_radio.size(); i++)
 	{
-		if (panel->layout_radio[i]->isChecked())
+		if (panel->layout_radio[i]->bt->isChecked())
 		{
 			lay = i;
 			break;
@@ -153,25 +147,22 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
     cp_chain->addItem(tr("Receiver"));
     cBox->addWidget(cp_chain);
     gBoxchain->setLayout(cBox);
-	
-	for (uint i = 0; layouts[i].f; i++)
+	for (uint i = 0; layouts[i]; i++)
 	{
-		layout_radio.push_back(new QRadioButton(tr(layouts[i].n())));
-		vBox->addWidget(layout_radio.back());
+		RadioLayout *r = new RadioLayout;
+		r->layout = layouts[i]((MainWindow *)parent, i);
+		r->bt = new QRadioButton(tr(r->layout->Name()));
+		QObject::connect(r->bt, SIGNAL(pressed()), this, SLOT(SetVariables()));
+		layout_radio.push_back(r);
+		vBox->addWidget(layout_radio.back()->bt);
 		if (i == 0)
-			layout_radio.back()->setChecked(true);
+			layout_radio.back()->bt->setChecked(true);
 	}
 	vBox->addStretch(1);
 	gBox->setLayout(vBox);
 	QGridLayout *grid = new QGridLayout(p);
 	grid->addWidget(gBox, 0, 0);
 	grid->addWidget(gBoxchain, 1, 0);
-	
-	for (uint i=0; layouts[i].f; i++)
-	{
-		QObject::connect(layout_radio[i], SIGNAL(pressed()), this, SLOT(SetVariables()));
-	}
-	
 	return p;
 }
 QWidget *Panel::CreateUHDTab(QWidget *w)

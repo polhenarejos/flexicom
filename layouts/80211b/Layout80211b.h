@@ -20,7 +20,7 @@ class Layout80211b : public LayoutFactory
 		
 	public:
 		Layout80211b(MainWindow *, int);
-		static const char *Name();
+		const char *Name();
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();

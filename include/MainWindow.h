@@ -51,8 +51,13 @@ class Panel : public QTabWidget
 			QLineEdit *ip;
 			QLabel *label;
 		}IPField;
+		typedef struct
+		{
+			QRadioButton *bt;
+			LayoutFactory::sptr layout;
+		}RadioLayout;
 		Panel(QWidget * = NULL);
-		std::vector<QRadioButton *> layout_radio;
+		std::vector<RadioLayout *> layout_radio;
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
 		QComboBox *cp_chain; //to see whether we want to receive or transmit

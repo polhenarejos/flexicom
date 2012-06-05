@@ -11,7 +11,7 @@ class LayoutFactory : boost::noncopyable
 	protected:
 		LayoutFactory();
 	public:
-		const char *Name();
+		virtual const char *Name() = 0;
 		typedef boost::shared_ptr<LayoutFactory> sptr;
 		static sptr Create(MainWindow * = NULL, int = 0);
 		virtual void Run() = 0;
