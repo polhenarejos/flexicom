@@ -29,25 +29,16 @@ void Layout80211b::Run()
 	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
-	switch (mw->panel->cb_chain->currentIndex())
+	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		case 0: //transmitter
-			printf("Transmitter chain is not available\n");
-			exit(-1);
-		break;
-		case 1: //receiver
-			usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-			usrp->set_samp_rate(10e6);
-			usrp->set_center_freq(2462e6);
-			usrp->set_gain(50);
-			rx = Rx80211b::Create();
-			grTop->connect(usrp, 0, rx, 0);
-			grTop->start();
-		break;
-		default:
-			printf("Option not available\n");
-			exit(-1);
-	};	
+		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		usrp->set_samp_rate(10e6);
+		usrp->set_center_freq(2462e6);
+		usrp->set_gain(mw->panel->sp_gain->value());
+		rx = Rx80211b::Create();
+		grTop->connect(usrp, 0, rx, 0);
+		grTop->start();
+	}
 }
 void Layout80211b::Stop()
 {
@@ -61,6 +52,9 @@ void Layout80211b::RadioPressed(bool check)
 	if (check)
 	{
 		tabs.push_back(mw->panel->addTab(CreateTabOpts(mw->panel), "Options"));
+		mw->panel->rb_chain[RB_TX]->setEnabled(false);
+		mw->panel->rb_chain[RB_RX]->setEnabled(true);
+		mw->panel->rb_chain[RB_RX]->setChecked(true);
 	}
 	else
 	{

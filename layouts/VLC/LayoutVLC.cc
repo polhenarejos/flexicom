@@ -10,6 +10,7 @@ const char *LayoutVLC::name = "VLC";
 LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
 	LayoutFactory(),mw(_mw), radioID(_radioID)
 {
+	QObject::connect(mw->panel->layout_radio[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 }
 const char *LayoutVLC::Name()
 {
@@ -25,25 +26,16 @@ void LayoutVLC::Run()
 	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
-	switch (mw->panel->cb_chain->currentIndex())
+	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		case 0: //transmitter
-			printf("Transmitter chain is not available\n");
-			exit(-1);
-		break;
-		case 1: //receiver
-			usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-			usrp->set_samp_rate(10e6);
-			usrp->set_center_freq(2462e6);
-			usrp->set_gain(50);
-			rx = RxVLC::Create();
-			grTop->connect(usrp, 0, rx, 0);
-			grTop->start();
-		break;
-		default:
-			printf("Option not available\n");
-			exit(-1);
-	};
+		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		usrp->set_samp_rate(10e6);
+		usrp->set_center_freq(2462e6);
+		usrp->set_gain(mw->panel->sp_gain->value());
+		rx = RxVLC::Create();
+		grTop->connect(usrp, 0, rx, 0);
+		grTop->start();
+	}
 }
 void LayoutVLC::Stop()
 {
@@ -51,4 +43,12 @@ void LayoutVLC::Stop()
 	grTop->stop();
 	grTop->wait();
 	grTop.reset();
+}
+void LayoutVLC::RadioPressed(bool checked)
+{
+	if (checked)
+	{
+		mw->panel->rb_chain[RB_TX]->setEnabled(true);
+		mw->panel->rb_chain[RB_RX]->setEnabled(true);
+	}
 }

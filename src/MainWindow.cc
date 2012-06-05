@@ -4,6 +4,7 @@
 #include "Layout80211b.h"
 #include <QGroupBox>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
@@ -92,7 +93,7 @@ void MainWindow::readSettings()
 	resize(s.value("mw/size", QSize(300,50)).toSize());
 	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
 	panel->layout_radio[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
-	panel->cb_chain->setCurrentIndex(s.value("layout/chain", 0).toInt());
+	panel->rb_chain[s.value("layout/chain", 0).toInt()]->setChecked(true);
 	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
 	int siz = s.beginReadArray("uhd/ip");
 	for (int i = 0; i < siz; i++)
@@ -109,17 +110,22 @@ void MainWindow::writeSettings()
 	s.setValue("mw/size", size());
 	s.setValue("mw/pos", pos());
 	s.setValue("mw/fullScreen", isFullScreen());
-	int lay = 0;
-	for (int i = 1; i < panel->layout_radio.size(); i++)
+	for (int i = 0; i < panel->layout_radio.size(); i++)
 	{
 		if (panel->layout_radio[i]->bt->isChecked())
 		{
-			lay = i;
+			s.setValue("layout/layout", i);
 			break;
 		}
 	}
-	s.setValue("layout/layout", lay);
-	s.setValue("layout/chain", panel->cb_chain->currentIndex());
+	for (int i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
+	{
+		if (panel->rb_chain[i]->isChecked())
+		{
+			s.setValue("layout/chain", i);
+			break;
+		}
+	}
 	s.setValue("uhd/devs", panel->sp_devs->value());
 	s.beginWriteArray("uhd/ip");
 	for (int i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
@@ -146,11 +152,11 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	QGroupBox *gBox = new QGroupBox(tr("Available layouts"));
 	QGroupBox *gBoxchain = new QGroupBox(tr("Communication chain"));
 	QVBoxLayout *vBox = new QVBoxLayout;
-	QVBoxLayout *cBox = new QVBoxLayout;
-	cb_chain = new QComboBox();
-	cb_chain->addItem(tr("Transmitter"));
-    cb_chain->addItem(tr("Receiver"));
-    cBox->addWidget(cb_chain);
+	QHBoxLayout *cBox = new QHBoxLayout;
+	rb_chain[0] = new QRadioButton(tr("Transmitter"), this);
+	rb_chain[1] = new QRadioButton(tr("Receiver"), this);
+    cBox->addWidget(rb_chain[0]);
+    cBox->addWidget(rb_chain[1]);
     gBoxchain->setLayout(cBox);
 	for (uint i = 0; layouts[i]; i++)
 	{

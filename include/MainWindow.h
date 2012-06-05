@@ -13,6 +13,8 @@
 #include "LayoutFactory.h"
 
 class Panel;
+#define RB_TX 0
+#define RB_RX 1
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -60,7 +62,7 @@ class Panel : public QTabWidget
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
 		QSpinBox *sp_gain;
-		QComboBox *cb_chain; //to see whether we want to receive or transmit
+		QRadioButton *rb_chain[2];
 	
 	public slots:
 		void SetDevs(int);

@@ -108,7 +108,8 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
-LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
+LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
+		$(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
         $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
 
 all: exe install_deps
@@ -151,3 +152,6 @@ $(OBJ_DIR)/Layout80211b_moc.obj: $(LAYOUT_DIR)/80211b/Layout80211b.h
 	
 {$(LAYOUT_DIR)/VLC}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
+$(OBJ_DIR)/LayoutVLC_moc.obj: $(LAYOUT_DIR)/VLC/LayoutVLC.h
+	$(MOC) $(LAYOUT_DIR)/VLC/LayoutVLC.h -o $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
+	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc

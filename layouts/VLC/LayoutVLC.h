@@ -5,11 +5,14 @@
 #include "RxVLC.h"
 #include "TxVLC.h"
 #include <gr_top_block.h>
+#include <QObject>
 class uhd_usrp_source;
 class MainWindow;
 
-class LayoutVLC : public LayoutFactory
+class LayoutVLC : public QObject , public LayoutFactory
 {
+	Q_OBJECT
+	
 	private:
 		static const char *name;
 		gr_top_block_sptr grTop;
@@ -24,6 +27,9 @@ class LayoutVLC : public LayoutFactory
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();
+		
+	public slots:
+		void RadioPressed(bool);
 };
 
 #endif //_INC_LAYOUTVLC_H_
