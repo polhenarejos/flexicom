@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QCloseEvent>
 #include <QSettings>
+#include <QGridLayout>
 #include "LayoutFactory.h"
 
 class Panel;
@@ -34,6 +35,7 @@ class MainWindow : public QMainWindow
 		Panel *panel;
 		void closeEvent(QCloseEvent *);
 		QSettings s;
+		QGridLayout *plotGrid;
 		
 	public slots:
 		void clickMainButtons(QAbstractButton *);

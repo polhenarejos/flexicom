@@ -5,7 +5,6 @@
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
 #include <QComboBox>
@@ -30,7 +29,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	QGridLayout *grid = new QGridLayout(w);
 	panel = new Panel(this);
 	grid->addWidget(panel, 0, 0);
-	grid->addWidget(qDBB, 1, 0);
+	QGroupBox *plotBox = new QGroupBox(tr(""));
+	plotGrid = new QGridLayout;
+	plotBox->setLayout(plotGrid);
+	grid->addWidget(plotBox, 0, 1);
+	grid->addWidget(qDBB, 1, 1);
 	setWindowTitle(tr("FlexiCom"));
 	readSettings(s);
 	initd = true;

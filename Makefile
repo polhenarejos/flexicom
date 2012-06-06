@@ -29,8 +29,10 @@ QT_LIB_DIR=$(QT_DIR)\lib\$(PREF)
 QT_BIN_DIR=$(QT_DIR)\bin\$(PREF)
 MOC=deps\Qt\bin\$(PREF)\moc.exe
 ## QWT
-QWT_INC_DIR=deps\Qwt\include
-QWT_LIB_DIR=deps\Qwt\lib\$(PREF)
+QWT_DIR=deps\Qwt
+QWT_INC_DIR=$(QWT_DIR)\include
+QWT_LIB_DIR=$(QWT_DIR)\lib\$(PREF)
+QWT_BIN_DIR=$(QWT_DIR)\bin\$(PREF)
 ## Boost
 BOOST_DIR=deps\boost
 BOOST_INC_DIR=$(BOOST_DIR)\include
@@ -53,8 +55,9 @@ OUT_DIR=out
 OBJ_DIR=$(OUT_DIR)
 SRC_DIR=src
 INC_DIR=include
+MOD_DIR=modules
 LAYOUT_DIR=$(SRC_DIR)/layouts
-LAYOUT_INC=/I $(LAYOUT_DIR)/80211b /I $(LAYOUT_DIR)/VLC
+LAYOUT_INC=/I $(LAYOUT_DIR)/80211b /I $(LAYOUT_DIR)/VLC /I $(INC_DIR)/$(MOD_DIR)
 TARGET=flexicom
 
 QT_CORE_DIR=$(QT_INC_DIR)\QtCore
@@ -65,13 +68,8 @@ QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib
 !else
 QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib 
 !endif
-EIGEN_INC=/I $(EIGEN_INC_DIR)
 QWT_INC=/I $(QWT_INC_DIR)
-!if $(DEBUG) == 1
-QWT_LIB=/LIBPATH:$(QWT_LIB_DIR)
-!else
-QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) 
-!endif
+QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) qwt.lib
 !if $(CMDLINE) == 0
 CMDLINE_LFLAG=/subsystem:windows
 !else
@@ -79,7 +77,7 @@ CMDLINE_CFLAG=/D CMDLINE
 !endif
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
-GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio
+GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk /D LV_HAVE_SSE2
 GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
@@ -108,6 +106,8 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
+MOD_FILES=$(OBJ_DIR)/Qt.obj
+
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
         $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
@@ -126,11 +126,12 @@ install_deps:
 		$(COPY) $(GR_BIN_DIR)\volk.dll volk.dll >nul
 		$(COPY) $(GR_BIN_DIR)\libfftw3f-3.dll libfftw3f-3.dll >nul
 		$(COPY) $(UHD_BIN_DIR)\uhd.dll uhd.dll >nul
+		$(COPY) $(QWT_BIN_DIR)\qwt.dll qwt.dll >nul
 		
 exe: objs $(OBJ_DIR)/main.obj
-	$(LINK) $(LFLAGS) $(OBJ_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj /MAP /OUT:$(TARGET).exe
+	$(LINK) $(LFLAGS) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj /MAP /OUT:$(TARGET).exe
 	
-objs: $(OBJ_FILES) $(LAYOUTS)
+objs: $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS)
 
 clean:
 	$(RM) "$(OBJ_DIR)\*.obj" 
@@ -142,6 +143,10 @@ clean:
 $(OBJ_DIR)/MainWindow_moc.obj: $(INC_DIR)/MainWindow.h
 	$(MOC) $(INC_DIR)/MainWindow.h -o $(SRC_DIR)/MainWindow_moc.cc
 	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(SRC_DIR)/MainWindow_moc.cc
+	
+#Modules
+{$(SRC_DIR)/$(MOD_DIR)}.cc{$(OBJ_DIR)}.obj:
+	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
 
 #Layouts
 {$(LAYOUT_DIR)/80211b}.cc{$(OBJ_DIR)}.obj:
