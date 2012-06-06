@@ -53,7 +53,7 @@ OUT_DIR=out
 OBJ_DIR=$(OUT_DIR)
 SRC_DIR=src
 INC_DIR=include
-LAYOUT_DIR=layouts
+LAYOUT_DIR=$(SRC_DIR)/layouts
 LAYOUT_INC=/I $(LAYOUT_DIR)/80211b /I $(LAYOUT_DIR)/VLC
 TARGET=flexicom
 
