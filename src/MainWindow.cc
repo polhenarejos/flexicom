@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	grid->addWidget(panel, 0, 0);
 	grid->addWidget(qDBB, 1, 0);
 	setWindowTitle(tr("FlexiCom"));
-	readSettings();
+	readSettings(s);
 	initd = true;
 }
 void MainWindow::clickMainButtons(QAbstractButton *b)
@@ -80,13 +80,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	//if (userReallyWantsToQuit()) 
 	{
 		StopLayout();
-		writeSettings();
+		writeSettings(s);
 		event->accept();
 	}
 	//else
 	//	event->ignore();
 }
-void MainWindow::readSettings()
+void MainWindow::readSettings(QSettings &s)
 {
 	resize(s.value("mw/size", QSize(300,50)).toSize());
 	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
@@ -102,7 +102,7 @@ void MainWindow::readSettings()
 	s.endArray();
 	panel->sp_gain->setValue(s.value("uhd/gain", 40).toInt());
 }
-void MainWindow::writeSettings()
+void MainWindow::writeSettings(QSettings &s)
 {
 	s.setValue("mw/size", size());
 	s.setValue("mw/pos", pos());

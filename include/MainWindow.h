@@ -25,8 +25,8 @@ class MainWindow : public QMainWindow
 		LayoutFactory::sptr layoutFactory;
 		void RunLayout();
 		void StopLayout();
-		void writeSettings();
-		void readSettings();
+		void writeSettings(QSettings &);
+		void readSettings(QSettings &);
 		
 	public:
 		MainWindow(QWidget * = NULL);
