@@ -39,7 +39,7 @@ void Layout80211b::Run()
 		usrp->set_samp_rate(10e6);
 		usrp->set_center_freq(channels[cb_chans->currentIndex()]*1e6);
 		usrp->set_gain(mw->panel->sp_gain->value());
-		rx = Rx80211b::Create();
+		rx = Rx80211b::Create(this);
 		grTop->connect(usrp, 0, rx, 0);
 		grTop->start();
 	}
@@ -61,6 +61,7 @@ void Layout80211b::RadioPressed(bool check)
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
 		ReadSettings();
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
+		DrawPlots();
 	}
 	else
 	{
@@ -95,4 +96,9 @@ void Layout80211b::SaveSettings(QSettings &s)
 void Layout80211b::ReadSettings()
 {
 	cb_chans->setCurrentIndex(mw->s.value("80211b/chan").toInt());
+}
+void Layout80211b::DrawPlots()
+{
+	pl_osc = new QwtPlot;
+	mw->plotGrid->addWidget(pl_osc, 0, 0);
 }

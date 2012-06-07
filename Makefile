@@ -77,7 +77,7 @@ CMDLINE_CFLAG=/D CMDLINE
 !endif
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
-GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk /D LV_HAVE_SSE2
+GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk /D LV_HAVE_SSE2 /D LV_HAVE_GENERIC
 GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
@@ -106,7 +106,7 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
-MOD_FILES=$(OBJ_DIR)/Qt.obj
+MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
@@ -147,6 +147,9 @@ $(OBJ_DIR)/MainWindow_moc.obj: $(INC_DIR)/MainWindow.h
 #Modules
 {$(SRC_DIR)/$(MOD_DIR)}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
+$(OBJ_DIR)/QtBlock_moc.obj: $(INC_DIR)/$(MOD_DIR)/QtBlock.h
+	$(MOC) $(INC_DIR)/$(MOD_DIR)/QtBlock.h -o $(SRC_DIR)/$(MOD_DIR)/QtBlock_moc.cc
+	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(SRC_DIR)/$(MOD_DIR)/QtBlock_moc.cc
 
 #Layouts
 {$(LAYOUT_DIR)/80211b}.cc{$(OBJ_DIR)}.obj:

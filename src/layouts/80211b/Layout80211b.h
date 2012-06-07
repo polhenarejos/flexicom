@@ -3,6 +3,7 @@
 
 #include "LayoutFactory.h"
 #include "Rx80211b.h"
+#include <qwt_plot.h>
 #include <gr_top_block.h>
 #include <QObject>
 #include <QComboBox>
@@ -26,6 +27,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		QWidget *CreateTabOpts(QWidget * = NULL);
 		QComboBox *cb_chans;
 		void ReadSettings();
+		void DrawPlots();
 		
 	public:
 		Layout80211b(MainWindow *, int);
@@ -33,6 +35,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		void Run();
 		void Stop();
+		QwtPlot *pl_osc;
 		
 	public slots:
 		void RadioPressed(bool);

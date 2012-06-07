@@ -3,6 +3,8 @@
 #include "BBN_PLCP.h"
 #include "BBN_DPSKDemod.h"
 #include "BBN_Slicer.h"
+#include "QtBlock.h"
+#include "Layout80211b.h"
 #include <gr_io_signature.h>
 #include <gr_firdes.h>
 #include <gr_pfb_arb_resampler_ccf.h>
@@ -10,6 +12,7 @@
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
+#include <gr_complex_to_xxx.h>
 
 Rx80211bThread::Rx80211bThread(gr_msg_queue_sptr _queue) :
 	queue(_queue)
@@ -89,8 +92,9 @@ void Rx80211bThread::run()
 	}
 }
 
-Rx80211b::Rx80211b() :
-	gr_hier_block2("Rx80211b", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0))
+Rx80211b::Rx80211b(Layout80211b *_ly) :
+	gr_hier_block2("Rx80211b", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)), 
+	ly(_ly)
 {
 	msgq = gr_make_msg_queue();
 	rxth = new Rx80211bThread(msgq);
@@ -105,16 +109,20 @@ Rx80211b::Rx80211b() :
 	BBN_Slicer::sptr slicer = BBN_Slicer::Create(11, 16);
 	BBN_DPSKDemod::sptr dpsk = BBN_DPSKDemod::Create();
 	BBN_PLCP::sptr plcp = BBN_PLCP::Create(msgq);
+	Qt1D::sptr qt1d = Qt1D::Create(ly->pl_osc);
+	gr_complex_to_real_sptr re = gr_make_complex_to_real();
 	connect(self(), 0, resampler, 0);
 	connect(resampler, 0, filter, 0);
 	connect(filter, 0, slicer, 0);
 	connect(slicer, 0, dpsk, 0);
+	connect(slicer, 0, re, 0);
+	connect(re, 0, qt1d, 0);
 	connect(dpsk, 0, plcp, 0);
 	connect(dpsk, 1, plcp, 1);
 }
-Rx80211b::sptr Rx80211b::Create()
+Rx80211b::sptr Rx80211b::Create(Layout80211b *_ly)
 {
-	return sptr(new Rx80211b());
+	return sptr(new Rx80211b(_ly));
 }
 Rx80211b::~Rx80211b()
 {
