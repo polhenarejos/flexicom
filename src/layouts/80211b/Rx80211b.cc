@@ -14,6 +14,8 @@
 #include <iostream>
 #include <gr_complex_to_xxx.h>
 
+#include "bbMatlab.h"
+
 Rx80211bThread::Rx80211bThread(gr_msg_queue_sptr _queue) :
 	queue(_queue)
 {
@@ -115,6 +117,11 @@ Rx80211b::Rx80211b(Layout80211b *_ly) :
 	connect(resampler, 0, filter, 0);
 	connect(filter, 0, slicer, 0);
 	connect(slicer, 0, dpsk, 0);
+	if (0)
+	{
+		bbMatlab::sptr gm = bbMatlab::Create("m.txt", sizeof(gr_complex));
+		connect(slicer, 0, gm, 0);
+	}
 	connect(slicer, 0, re, 0);
 	connect(re, 0, qt1d, 0);
 	connect(dpsk, 0, plcp, 0);
