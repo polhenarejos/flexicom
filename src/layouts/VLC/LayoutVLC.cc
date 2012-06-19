@@ -1,5 +1,6 @@
 #include "LayoutVLC.h"
 #include <gr_uhd_usrp_source.h>
+#include <gr_uhd_usrp_sink.h>
 #include "RxVLC.h"
 #include "TxVLC.h"
 #include "MainWindow.h"
@@ -51,18 +52,49 @@ void LayoutVLC::Run()
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-		usrp->set_samp_rate(10e6);
-		usrp->set_center_freq(2462e6);
-		usrp->set_gain(mw->panel->sp_gain->value());
+		usrp_rx = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		usrp_rx->set_samp_rate(10e6);
+		usrp_rx->set_center_freq(2462e6);
+		usrp_rx->set_gain(mw->panel->sp_gain->value());
 		rx = RxVLC::Create();
-		grTop->connect(usrp, 0, rx, 0);
+		grTop->connect(usrp_rx, 0, rx, 0);
 		grTop->start();
+	}
+	else
+	{
+		int checked1,checked2;
+		usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		tx = TxVLC::Create(this);
+		if (tx->phy_type)
+		{
+			printf("PHY II mode is not still available\n");
+			exit(-1);
+		}
+		else
+		{
+			switch (tx->mod_type)
+			{
+				case 0:
+				usrp_tx->set_samp_rate(200e3);	
+				//other settings of USRP
+				break;
+				case 1:
+				usrp_tx->set_samp_rate(800e3);
+				//other settings of USRP
+				break;
+			}
+		}			
+		grTop->connect(tx, 0, usrp_tx, 0);
+		grTop->start();
+			
 	}
 }
 void LayoutVLC::Stop()
 {
-	rx->stop();
+	if (mw->panel->rb_chain[RB_RX]->isChecked())
+		rx->stop();
+	else
+		tx->stop();
 	grTop->stop();
 	grTop->wait();
 	grTop.reset();
@@ -110,6 +142,8 @@ QWidget *LayoutVLC::CreateTabOpts(QWidget *w)
 	vBox->addWidget(varVLC->l_phy_type);
 	vBox->addWidget(varVLC->rb_phy_type[0]);
 	vBox->addWidget(varVLC->rb_phy_type[1]);
+	vBox->addWidget(varVLC->l_flp_length);
+	vBox->addWidget(varVLC->sp_flp_length);
 	gBox->setLayout(vBox);
 	vBox_data->addWidget(varVLC->l_phy_modulation);
 	vBox_data->addWidget(varVLC->rb_phy_modulation[0]);
@@ -176,6 +210,13 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	varVLC->rb_phy_type[1] = new QRadioButton;
 	varVLC->rb_phy_type[1]->setText(tr("PHY II"));
 	
+	//FLP_length
+	varVLC->l_flp_length= new QLabel("FLP length:");
+	varVLC->sp_flp_length= new QSpinBox(p);
+	varVLC->sp_flp_length->setRange(64,16384);
+	varVLC->sp_flp_length->setSingleStep(100);
+	varVLC->sp_flp_length->setHidden(false);
+		
 	//Modulation
 	varVLC->l_phy_modulation = new QLabel("Modulation:");
 	varVLC->rb_phy_modulation[0] = new QRadioButton;
@@ -240,6 +281,7 @@ void LayoutVLC::SaveSettings(QSettings &s)
 		if (varVLC->rb_phy_modulation[i]->isChecked())
 			s.setValue("VLC/modulation", i);
 	}
+	s.setValue("VLC/flp_length", varVLC->sp_flp_length->value());
 	
 	//s.setValue("VLC/phy_op_mode_0", varVLC->cb_phy_op_mode->currentIndex());
 	//s.setValue("VLC/frame_size_0", varVLC->sp_frame_size->value());
@@ -259,6 +301,8 @@ void LayoutVLC::ReadSettings()
 	
 	varVLC->rb_phy_type[mw->s.value("VLC/phy_type", 0).toInt()]->setChecked(true);
 	varVLC->rb_phy_modulation[mw->s.value("VLC/modulation", 0).toInt()]->setChecked(true);
+	
+	varVLC->sp_flp_length->setValue(mw->s.value("VLC/flp_length",1).toInt());
 	
 	//varVLC->cb_phy_op_mode->setCurrentIndex(mw->s.value("VLC/tx_phy_op_mode_0").toInt());
 	varVLC->cb_phy_op_mode[0]->setCurrentIndex(mw->s.value("VLC/phy_op_mode_0").toInt());

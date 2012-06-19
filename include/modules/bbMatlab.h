@@ -20,4 +20,4 @@ class bbMatlab : public gr_sync_block
 
 };
 
-#endif /* _INC_BBMATLAB_H_ */
+#endif //_INC_BBMATLAB_H_

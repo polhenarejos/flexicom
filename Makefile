@@ -106,11 +106,13 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
-MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj
+MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj 
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
-        $(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj
+		$(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj \
+        $(OBJ_DIR)/bbManchesterEnc.obj $(OBJ_DIR)/bbManchesterDec.obj $(OBJ_DIR)/bb4b6bEnc.obj $(OBJ_DIR)/bb4b6bEnc.obj \
+        $(OBJ_DIR)/vlc_reed_solomon.obj $(OBJ_DIR)/bbRSEnc.obj
 
 all: exe install_deps
 	$(RM) Makefile.auto
