@@ -80,7 +80,7 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int *iptr= (int *)input_items[0];
 	unsigned char *optr= (unsigned char *)output_items[0];
 	
-	int blocks_to_process, samples_to_process,i, index=0, GF_words, RS_words;
+	int blocks_to_process, i, index=0, GF_words, RS_words;
 	int remaining_bits, remaining_GF_words,add_bits;
 	unsigned char *tmp;
 	tmp = new unsigned char[K];
@@ -150,7 +150,7 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		RS_words = GF_words/K;
 		}
 	}
-	consume_each(noutput_items/out_rs*length);
+	consume_each((noutput_items/out_rs)*length);
 	return noutput_items;
 	
 }

@@ -23,7 +23,7 @@ class bbRSEnc : public gr_block
 		int length;
 		int out_rs;
 		vlc_reed_solomon *vlc_rs;
-		unsigned char bi2dec ( int *, int GF);
+		unsigned char bi2dec ( int *, int);
 		int rs_out_elements();
 };
 
