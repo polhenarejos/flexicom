@@ -19,8 +19,10 @@ vlc_reed_solomon::vlc_reed_solomon (unsigned int _symsize, unsigned int _gfpoly,
 vlc_reed_solomon::~vlc_reed_solomon ()
 {
   if (d_rs)
+  {
     free_rs_char (d_rs);
-  d_rs = 0;
+    d_rs = 0;
+  }
 }
 
 void vlc_reed_solomon::encode(unsigned char *rs_enc_out, unsigned char *in)
