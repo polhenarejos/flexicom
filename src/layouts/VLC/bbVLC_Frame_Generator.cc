@@ -154,6 +154,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 		memcpy(optr,TDP_pattern, sizeof(int)*60);
 		optr = optr + 60;
 		memcpy(optr,iptr1, sizeof(int)*length_PHR);
+		iptr1 = iptr1+ length_PHR;
 		optr = optr + length_PHR;
 		
 		//3.Data payload
@@ -163,6 +164,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 			memcpy(optr,iptr2, sizeof(int)*length_data_payload);
 			optr = optr + length_data_payload;
 		}
+		iptr2= iptr2 + length_data_payload;
 		memcpy(optr,idle_pattern, sizeof(int)*IFS);
 		optr = optr + IFS;
 		
@@ -173,7 +175,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 		consume(1, length_data_payload);
 		frames_to_process --;
 	}
-	//consume(0,noutput_items/length_frame_tmp*length_PHR); //llámalos dentro y así no mueves puntero
-	//consume(1,noutput_items/length_frame_tmp*length_data_payload); //llámalos dentro bucle while
+	//consume(0,noutput_items/length_frame_tmp*length_PHR); //llámalos dentro para no perder la cuenta en cada momento
+	//consume(1,noutput_items/length_frame_tmp*length_data_payload); 
 	return noutput_items;
 }

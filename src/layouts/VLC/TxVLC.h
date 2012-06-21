@@ -32,6 +32,24 @@ struct cc_code
 	int cc_out;
 };
 
+//For simplicity, a struct which contains all the variables is created
+
+struct vlc_var
+{
+	int phy_type;
+	int mod_type;
+	int clock_rate;
+	int tx_mode;
+	int psdu_units;
+	rs_code rs_code;
+	cc_code cc_code;
+	int GF;
+	int frame_size;
+	int PHR_raw_length; //raw length prior to modulation
+	int PSDU_raw_length; //raw length prior to modulation
+};
+
+
 class LayoutVLC;
 class TxVLC : public gr_hier_block2
 {
@@ -40,21 +58,11 @@ class TxVLC : public gr_hier_block2
 		static sptr Create(LayoutVLC *);
 		~TxVLC();
 		void stop();
-		int phy_type;
-		int mod_type;
-		int clock_rate;
+		vlc_var vlc_var;
+		
 		
 	private:
 		TxVLC(LayoutVLC *);
-		//for simplicity I read the variables from the GUI
-		int tx_mode;
-		int psdu_units;
-		rs_code rs_code;
-		cc_code cc_code;
-		int GF;
-		int frame_size;
-		int PHR_raw_length; //raw length prior to modulation
-		int PSDU_raw_length; //raw length prior to modulation
 		LayoutVLC *ly;
 		void init_var();
 };

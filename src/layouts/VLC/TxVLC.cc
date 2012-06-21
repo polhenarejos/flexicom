@@ -27,167 +27,164 @@ void TxVLC::init_var()
 	for (int i=0; i<2; i++)
 	{
 		if (ly->varVLC->rb_phy_type[i]->isChecked())
-			phy_type = i; //phy_type=0 PHY I, otherwise PHY II
+			vlc_var.phy_type = i; //phy_type=0 PHY I, otherwise PHY II
 		if (ly->varVLC->rb_phy_modulation[i]->isChecked())
-			mod_type = i; //mod_type=0 OOK, otherwise PHY II
+			vlc_var.mod_type = i; //mod_type=0 OOK, otherwise PHY II
 	}
-	if ((phy_type == 0) && mod_type==0)
-		PHR_raw_length = 32 + 16 + 6 + 0 * 32; 
+	if ((vlc_var.phy_type == 0) && (vlc_var.mod_type==0))
+		vlc_var.PHR_raw_length = 32 + 16 + 6 + 0 * 32; 
 		//32 bits (Table 81) + 16 bits CRC + 6 Tail bits. The 0 is because for the moment
 		//we do not use dimming
 	else
-		PHR_raw_length = 32 + 16 + 0 * 32; //
+		vlc_var.PHR_raw_length = 32 + 16 + 0 * 32; //
 
 	
-	tx_mode = ly->varVLC->cb_tx_mode->currentIndex();
-	switch (tx_mode)
+	vlc_var.tx_mode = ly->varVLC->cb_tx_mode->currentIndex();
+	switch (vlc_var.tx_mode)
 	{
 		case 0:
-			psdu_units = ly->varVLC->sp_psdu_units[0]->value();
+			vlc_var.psdu_units = ly->varVLC->sp_psdu_units[0]->value();
 		break;
 		default:
-			psdu_units = ly->varVLC->sp_psdu_units[1]->value();
+			vlc_var.psdu_units = ly->varVLC->sp_psdu_units[1]->value();
 		break;
 	}
-	switch (phy_type)
+	switch (vlc_var.phy_type)
 	{
 		case 0: //PHY I
-			GF=4;
-			PSDU_raw_length = ly->varVLC->sp_frame_size[0]->value()*8;
-			switch (mod_type) // OOK
+			vlc_var.GF=4;
+			vlc_var.PSDU_raw_length = ly->varVLC->sp_frame_size[0]->value()*8;
+			switch (vlc_var.mod_type) // OOK
 			{
-				rs_code.pre_rs_in = 7;
-				rs_code.pre_rs_out = 15;
-				cc_code.pre_cc_in = 1;
-				cc_code.pre_cc_out = 4;
+				vlc_var.rs_code.pre_rs_in = 7;
+				vlc_var.rs_code.pre_rs_out = 15;
+				vlc_var.cc_code.pre_cc_in = 1;
+				vlc_var.cc_code.pre_cc_out = 4;
 				case 0:
-					clock_rate = 200e3;
+					vlc_var.clock_rate = 200e3;
 					switch (ly->varVLC->cb_phy_op_mode[0]->currentIndex())
 					{
 					    case 0:
-							rs_code.rs_in = 7;
-							rs_code.rs_out = 15;
-							cc_code.cc_in = 1;
-							cc_code.cc_out = 4;
-							PSDU_raw_length = PSDU_raw_length + 6; //tail bits
+							vlc_var.rs_code.rs_in = 7;
+							vlc_var.rs_code.rs_out = 15;
+							vlc_var.cc_code.cc_in = 1;
+							vlc_var.cc_code.cc_out = 4;
 							break;
 						case 1:
-							rs_code.rs_in = 11;
-							rs_code.rs_out = 15;
-							cc_code.cc_in = 1;
-							cc_code.cc_out = 3;
-							PSDU_raw_length = PSDU_raw_length + 6; //tail bits
+							vlc_var.rs_code.rs_in = 11;
+							vlc_var.rs_code.rs_out = 15;
+							vlc_var.cc_code.cc_in = 1;
+							vlc_var.cc_code.cc_out = 3;
 							break;
 						case 2:
-							rs_code.rs_in = 11;
-							rs_code.rs_out = 15;
-							cc_code.cc_in = 2;
-							cc_code.cc_out = 3;
-							PSDU_raw_length = PSDU_raw_length + 6; //tail bits
+							vlc_var.rs_code.rs_in = 11;
+							vlc_var.rs_code.rs_out = 15;
+							vlc_var.cc_code.cc_in = 2;
+							vlc_var.cc_code.cc_out = 3;
 							break;
 						case 3:
-							rs_code.rs_in = 11;
-							rs_code.rs_out = 15;
-							cc_code.cc_in = 0;
-							cc_code.cc_out = 0;
+							vlc_var.rs_code.rs_in = 11;
+							vlc_var.rs_code.rs_out = 15;
+							vlc_var.cc_code.cc_in = 0;
+							vlc_var.cc_code.cc_out = 0;
 							break;
 						case 4:
-							rs_code.rs_in = 0;
-							rs_code.rs_out = 0;
-							cc_code.cc_in = 0;
-							cc_code.cc_out = 0;
+							vlc_var.rs_code.rs_in = 0;
+							vlc_var.rs_code.rs_out = 0;
+							vlc_var.cc_code.cc_in = 0;
+							vlc_var.cc_code.cc_out = 0;
 							break;
 					}
 					break;
 				case 1:
 					
-					rs_code.pre_rs_in = 2;
-					rs_code.pre_rs_out = 15;
-					cc_code.pre_cc_in = 0;
-					cc_code.pre_cc_out = 0;
-					cc_code.cc_in=0;
-					cc_code.cc_out=0;
-					clock_rate = 800e3; //trick to use the manchester encoder
+					vlc_var.rs_code.pre_rs_in = 2;
+					vlc_var.rs_code.pre_rs_out = 15;
+					vlc_var.cc_code.pre_cc_in = 0;
+					vlc_var.cc_code.pre_cc_out = 0;
+					vlc_var.cc_code.cc_in=0;
+					vlc_var.cc_code.cc_out=0;
+					vlc_var.clock_rate = 800e3; //trick to use the manchester encoder
 					switch (ly->varVLC->cb_phy_op_mode[1]->currentIndex())
 					{
 						case 0:
-							rs_code.rs_in = 2;
-							rs_code.rs_out = 15;
+							vlc_var.rs_code.rs_in = 2;
+							vlc_var.rs_code.rs_out = 15;
 							break;
 						case 1:
-							rs_code.rs_in = 4;
-							rs_code.rs_out = 15;
+							vlc_var.rs_code.rs_in = 4;
+							vlc_var.rs_code.rs_out = 15;
 							break;
 						case 2:
-							rs_code.rs_in = 7;
-							rs_code.rs_out = 15;
+							vlc_var.rs_code.rs_in = 7;
+							vlc_var.rs_code.rs_out = 15;
 							break;
 						case 3:
-							rs_code.rs_in = 0;
-							rs_code.rs_out = 0;
+							vlc_var.rs_code.rs_in = 0;
+							vlc_var.rs_code.rs_out = 0;
 							break;
 					}
 					break;
 			}
 			break;
 		case 1: //PHY II
-			GF=8;
-			cc_code.pre_cc_in = 0;
-			cc_code.pre_cc_out = 0;
-			cc_code.cc_in = 0;
-			cc_code.cc_out = 0;
-			rs_code.pre_rs_in = 32;
-			rs_code.pre_rs_out = 64;
-			PSDU_raw_length = ly->varVLC->sp_frame_size[1]->value()*8;
-			switch (mod_type)
+			vlc_var.GF=8;
+			vlc_var.cc_code.pre_cc_in = 0;
+			vlc_var.cc_code.pre_cc_out = 0;
+			vlc_var.cc_code.cc_in = 0;
+			vlc_var.cc_code.cc_out = 0;
+			vlc_var.rs_code.pre_rs_in = 32;
+			vlc_var.rs_code.pre_rs_out = 64;
+			vlc_var.PSDU_raw_length = ly->varVLC->sp_frame_size[1]->value()*8;
+			switch (vlc_var.mod_type)
 			{
 				case 0: //OOK
 					switch (ly->varVLC->cb_phy_op_mode[2]->currentIndex())
 					{
 						case 0:
-							rs_code.pre_rs_in = 32;
-							rs_code.pre_rs_out = 64;
-							clock_rate=15e6;
+							vlc_var.rs_code.pre_rs_in = 32;
+							vlc_var.rs_code.pre_rs_out = 64;
+							vlc_var.clock_rate=15e6;
 							break;
 						case 1:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 160;
-							clock_rate=15e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 160;
+							vlc_var.clock_rate=15e6;
 							break;
 						case 2:
-							rs_code.pre_rs_in = 64;
-							rs_code.pre_rs_out = 128;
-							clock_rate=30e6;
+							vlc_var.rs_code.pre_rs_in = 64;
+							vlc_var.rs_code.pre_rs_out = 128;
+							vlc_var.clock_rate=30e6;
 							break;
 						case 3:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 160;
-							clock_rate=30e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 160;
+							vlc_var.clock_rate=30e6;
 							break;
 						case 4:
-							rs_code.pre_rs_in = 32;
-							rs_code.pre_rs_out =64;
-							clock_rate=60e6;
+							vlc_var.rs_code.pre_rs_in = 32;
+							vlc_var.rs_code.pre_rs_out =64;
+							vlc_var.clock_rate=60e6;
 							break;
 						case 5:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 160;
-							clock_rate=60e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 160;
+							vlc_var.clock_rate=60e6;
 							break;
 						case 6:
-							rs_code.pre_rs_in = 32;
-							rs_code.pre_rs_out = 64;
-							clock_rate=120e6;
+							vlc_var.rs_code.pre_rs_in = 32;
+							vlc_var.rs_code.pre_rs_out = 64;
+							vlc_var.clock_rate=120e6;
 							break;
 						case 7:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 164;
-							clock_rate=120e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 164;
+							vlc_var.clock_rate=120e6;
 							break;
 						case 8:
-							rs_code.pre_rs_in = 0;
-							rs_code.pre_rs_out = 0;
-							clock_rate=120e6;
+							vlc_var.rs_code.pre_rs_in = 0;
+							vlc_var.rs_code.pre_rs_out = 0;
+							vlc_var.clock_rate=120e6;
 							break;
 					}
 					break;
@@ -195,29 +192,29 @@ void TxVLC::init_var()
 					switch (ly->varVLC->cb_phy_op_mode[3]->currentIndex())
 					{
 						case 0:
-							rs_code.pre_rs_in = 32;
-							rs_code.pre_rs_out = 64;
-							clock_rate=3.75e6;
+							vlc_var.rs_code.pre_rs_in = 32;
+							vlc_var.rs_code.pre_rs_out = 64;
+							vlc_var.clock_rate=3.75e6;
 							break;
 						case 1:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 164;
-							clock_rate=3.75e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 164;
+							vlc_var.clock_rate=3.75e6;
 							break;
 						case 2:
-							rs_code.pre_rs_in = 32;
-							rs_code.pre_rs_out = 64;
-							clock_rate=7.5e6;
+							vlc_var.rs_code.pre_rs_in = 32;
+							vlc_var.rs_code.pre_rs_out = 64;
+							vlc_var.clock_rate=7.5e6;
 							break;
 						case 3:
-							rs_code.pre_rs_in = 128;
-							rs_code.pre_rs_out = 164;
-							clock_rate=7.5e6;
+							vlc_var.rs_code.pre_rs_in = 128;
+							vlc_var.rs_code.pre_rs_out = 164;
+							vlc_var.clock_rate=7.5e6;
 							break;
 						case 4:
-							rs_code.pre_rs_in = 0;
-							rs_code.pre_rs_out = 0;
-							clock_rate=7.5e6;
+							vlc_var.rs_code.pre_rs_in = 0;
+							vlc_var.rs_code.pre_rs_out = 0;
+							vlc_var.clock_rate=7.5e6;
 							break;
 
 					}

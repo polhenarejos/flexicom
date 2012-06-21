@@ -65,14 +65,14 @@ void LayoutVLC::Run()
 		int checked1,checked2;
 		usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 		tx = TxVLC::Create(this);
-		if (tx->phy_type)
+		if (tx->vlc_var.phy_type)
 		{
 			printf("PHY II mode is not still available\n");
 			exit(-1);
 		}
 		else
 		{
-			switch (tx->mod_type)
+			switch (tx->vlc_var.mod_type)
 			{
 				case 0:
 				usrp_tx->set_samp_rate(200e3);	
@@ -80,7 +80,7 @@ void LayoutVLC::Run()
 				break;
 				case 1:
 				usrp_tx->set_samp_rate(800e3);
-				//other settings of USRP
+				//other settings of USRP, VPPM is OOK with twice the speed
 				break;
 			}
 		}			
