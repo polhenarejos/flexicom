@@ -41,6 +41,7 @@ struct vlc_var
 	int clock_rate;
 	int tx_mode;
 	int psdu_units;
+	int operating_mode;
 	rs_code rs_code;
 	cc_code cc_code;
 	int GF;

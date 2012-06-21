@@ -71,8 +71,23 @@ int bbCCEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		memset(tmp, 0, sizeof(int)*(length+6));
 		memcpy(tmp, iptr, sizeof(int)*length);
 		iptr = iptr + length;
-		vlc_cc->encode_punct(tmp,optr, vlc_cc->xor_table, vlc_cc->poly,0,N,K,(length+6),2,vlc_cc->punct_matrix);
-		optr= optr + out_cc;
+		if (data_rate==0)
+		{
+			tmp2=new int[out_cc];
+			memset(tmp,0,sizeof(int)*out_cc);
+			vlc_cc->encode_punct(tmp,tmp2, vlc_cc->xor_table, vlc_cc->poly,0,N,K,(length+6),2,vlc_cc->punct_matrix);
+			for (i=0;i<out_cc/2;i++)
+			{
+				optr[0]=tmp[i];
+				optr[1]=tmp[i];
+				optr = optr +2;
+			}
+		}
+		else
+		{
+			vlc_cc->encode_punct(tmp,optr, vlc_cc->xor_table, vlc_cc->poly,0,N,K,(length+6),2,vlc_cc->punct_matrix);
+			optr= optr + out_cc;
+		}
 		blocks_to_process--;
 	}
 	consume_each((noutput_items/out_cc)*length);

@@ -62,6 +62,7 @@ void TxVLC::init_var()
 				vlc_var.cc_code.pre_cc_out = 4;
 				case 0:
 					vlc_var.clock_rate = 200e3;
+					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[0]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[0]->currentIndex())
 					{
 					    case 0:
@@ -105,6 +106,7 @@ void TxVLC::init_var()
 					vlc_var.cc_code.cc_in=0;
 					vlc_var.cc_code.cc_out=0;
 					vlc_var.clock_rate = 800e3; //trick to use the manchester encoder
+					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[1]->currentIndex())
 					{
 						case 0:
@@ -139,6 +141,7 @@ void TxVLC::init_var()
 			switch (vlc_var.mod_type)
 			{
 				case 0: //OOK
+					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[2]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[2]->currentIndex())
 					{
 						case 0:
@@ -189,6 +192,7 @@ void TxVLC::init_var()
 					}
 					break;
 				case 1: //VPPM
+					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[3]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[3]->currentIndex())
 					{
 						case 0:

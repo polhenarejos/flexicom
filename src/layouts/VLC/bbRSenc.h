@@ -12,6 +12,7 @@ class bbRSEnc : public gr_block
 		static sptr Create(unsigned int, unsigned int, unsigned int, int, int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
+		int out_rs;
 		~bbRSEnc();
 	
 	private:
@@ -21,7 +22,6 @@ class bbRSEnc : public gr_block
 		unsigned int K;
 		int phy_type;
 		int length;
-		int out_rs;
 		vlc_reed_solomon *vlc_rs;
 		unsigned char bi2dec ( int *, int);
 		int rs_out_elements();
