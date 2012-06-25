@@ -126,25 +126,15 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				tmp2= tmp2+4;
 			}
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
-			switch (phy_type)
+			memcpy(optr, tmp3,sizeof(unsigned char)*remaining_GF_words);
+			optr =optr + remaining_GF_words;
+			memcpy(optr, &tmp3[K], sizeof(unsigned char)*(N-K));
+			optr = optr + N-K;
+			if (phy_type==1)
 			{
-				case 1:
-					//move the zeros to the end, which are the punctured positions
-					memcpy(optr, tmp3,sizeof(unsigned char)*remaining_GF_words);
-					optr =optr + remaining_GF_words;
-					memcpy(optr, &tmp3[N-K], sizeof(unsigned char)*(N-K));
-					optr = optr + N-K;
-					memset(optr, 0, sizeof(unsigned char)*(N-K-remaining_GF_words));
-					optr = optr + (N-K-remaining_GF_words);
-					break;
-				case 2:
-					//it is not needed to add zeros at the end because in PHY II there is no puncturing
-					memcpy(optr, tmp3,sizeof(unsigned char)*remaining_GF_words);
-					optr =optr + remaining_GF_words;
-					memcpy(optr, &tmp3[N-K+1],sizeof(unsigned char)*(N-K+1));
-					optr = optr + (N-K);
-					break;
-			
+				//move the zeros to the end, which are the punctured positions
+				memset(optr, 0, sizeof(unsigned char)*(K-remaining_GF_words));
+				optr = optr + (K-remaining_GF_words);				
 			}
 		blocks_to_process--;
 		RS_words = GF_words/K;
