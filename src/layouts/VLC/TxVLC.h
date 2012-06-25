@@ -48,6 +48,7 @@ struct vlc_var
 	int frame_size;
 	int PHR_raw_length; //raw length prior to modulation
 	int PSDU_raw_length; //raw length prior to modulation
+	int *MCSID; //field for the PHR preamble
 };
 
 
