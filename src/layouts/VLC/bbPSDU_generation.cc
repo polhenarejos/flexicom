@@ -13,7 +13,9 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	int crc_length=16;
 	crc = new vlc_crc(PSDU_length);
 	generate_MHR_preamble(MHR);
-	int i,length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
+	int i;
+	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
+	length_payload= PSDU_length*8-40-crc_length;
 	data_payload = new int[length_payload];
 	sequence_number = 0;
 	//FILE READING
@@ -107,8 +109,8 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 		//memset(tmp,0, sizeof(int)*PSDU_length);
 		dec2bi(sequence_number,8,&MHR[16]);
 		memcpy(tmp, MHR, sizeof(int)*40);
-		memcpy(&tmp[40],data_payload, sizeof(data_payload)/sizeof(int));
-		crc->generate_crc(tmp, tmp);
+		memcpy(&tmp[40],data_payload, sizeof(int)*length_payload);
+		crc->generate_crc(tmp, tmp, PSDU_length);
 		memcpy(optr,tmp,sizeof(int)*PSDU_length);		
 		cycles--;
 		sequence_number = (sequence_number +1)%256;

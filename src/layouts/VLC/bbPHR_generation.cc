@@ -6,7 +6,7 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	gr_sync_block("bbPHR_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
 	tx_mode(_tx_mode), PSDU_length(_PSDU_length), PHR_length(_PHR_length),MCSID(_MCSID)
 {
-	int *tmp=new int[32];
+	int *tmp=new int[32]; //the CRC is computed always over a length of 32 in the PHR
 	int crc_length = 16;
 	crc = new vlc_crc(32+crc_length);
 	phr_crc=new int[32+crc_length];
@@ -14,11 +14,11 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	memset(tmp, 0, sizeof(int)*32);
 	if (tx_mode==2)
 		tmp[0]=1;
-	memcpy(&tmp[4],MCSID,sizeof(MCSID)/sizeof(int));
+	memcpy(&tmp[4],MCSID,sizeof(int)*6); //the field MCSID has 6 elements
 	dec2bi(PSDU_length, 16,tmp3);
 	memcpy(&tmp[10],tmp3,sizeof(int)*16);
 	//this would be to be modified in the future with the addition of dimming capabilities
-	crc->generate_crc(tmp,phr_crc);
+	crc->generate_crc(tmp,phr_crc, 32+crc_length);
 	set_output_multiple(PHR_length);
 
 }

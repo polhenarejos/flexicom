@@ -27,7 +27,7 @@ vlc_reed_solomon::~vlc_reed_solomon ()
 
 void vlc_reed_solomon::encode(unsigned char *rs_enc_out, unsigned char *in)
 {
-   assert ((sizeof(in)) == K);
+   //assert ((sizeof(in)) == K); ->if it is a pointer this is going to fail
 
   // copy message portion to output packet
    memcpy (rs_enc_out, in, K);
@@ -41,7 +41,7 @@ int vlc_reed_solomon::decode(unsigned char *rs_dec_out, unsigned char *in)
   int ncorrections;
 
   tmp =new unsigned char[N];
-  assert ((sizeof(in)) == N);
+  //assert ((sizeof(in)) == N); ->if it is a pointer this is going to fail
   memcpy (tmp, in, N);
   // correct message...
   ncorrections = decode_rs_char (d_rs, tmp, 0, 0);

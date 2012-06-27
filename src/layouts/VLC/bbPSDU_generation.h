@@ -20,6 +20,7 @@ class bbPSDU_generation : public gr_sync_block
 		int PSDU_length;
 		int *MHR;
 		int *data_payload;
+		int length_payload;
 		int sequence_number;
 		FILE *fp;
 		vlc_crc *crc;
