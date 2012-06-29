@@ -15,6 +15,7 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	if (tx_mode==2)
 		tmp[0]=1;
 	memcpy(&tmp[4],MCSID,sizeof(int)*6); //the field MCSID has 6 elements
+	//printf("El valor de PSDU_length;%d\n",PSDU_length);
 	dec2bi(PSDU_length, 16,tmp3);
 	memcpy(&tmp[10],tmp3,sizeof(int)*16);
 	//this would be to be modified in the future with the addition of dimming capabilities
@@ -42,7 +43,7 @@ void bbPHR_generation::dec2bi(int number, int GF, int *bin_number)
 	
 	for (int i=0; i<GF; i++)
     {
-        bin_number[GF-i]= number%2;
+        bin_number[GF-(i+1)]= number%2;
         number = number/2;
     }
     return;       

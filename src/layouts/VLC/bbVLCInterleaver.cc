@@ -68,7 +68,7 @@ void bbVLCInterleaver::dec2bi(unsigned char *number, int GF, int *bin_number)
 	tmp = (int *) number;
 	for (int i=0; i<GF; i++)
     {
-        bin_number[GF-i]= *tmp%2;
+        bin_number[GF-(i+1)]= *tmp%2;
         *tmp = *tmp /2;
     }
     return;       

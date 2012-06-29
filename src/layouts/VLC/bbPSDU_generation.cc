@@ -1,25 +1,26 @@
 #include "bbPSDU_generation.h"
 #include <gr_io_signature.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <io.h>
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
 	gr_sync_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
-	PSDU_length(_PSDU_length)
+	PSDU_length(_PSDU_length*8)
 {
-	crc=new vlc_crc(PSDU_length*8);
+	crc=new vlc_crc(PSDU_length);
 	//we assume we are transmitting in broadcast mode
 	MHR = new int[40];
 	int crc_length=16;
-	crc = new vlc_crc(PSDU_length);
 	generate_MHR_preamble(MHR);
 	int i;
 	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
-	length_payload= PSDU_length*8-40-crc_length;
+	length_payload= PSDU_length-40-crc_length;
 	data_payload = new int[length_payload];
-	sequence_number = 0;
+	sequence_number = 1;
 	//FILE READING
 	fp = fopen(_f.c_str(), "r");
+	int tmp;
 	if (fp ==NULL)
   	{
   		printf("The file is not available\n");
@@ -31,7 +32,11 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
   		//a)I do not check the length of the file , there is enough elements
   		//b)In the first approximation, the data_payload will be the same for all the frames
   		for (i=0; i<length_payload; i++)
-  			fscanf(fp, "%d\n", &data_payload[i]);  	
+  		{
+  			data_payload[i]=fgetc(fp)-48;  //it returns the ascii code
+  			tmp = fgetc(fp); //to read the \n element
+  			//the file could be prepared to do a fread call
+  		}
   	}
   	fclose(fp);
 	//this would be to be modified in the future with the addition of dimming capabilities
@@ -66,9 +71,11 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	memset(MHR, 0, sizeof(int) * 40);
 	// the first 6 bits are 0: frame_version and reserved.
 	// the 8th version is equal to 1, according to Table 7 (Page 76), data frame.
-	memset(&MHR[8],1,sizeof(int)*1);
+	//memset(&MHR[8],1,sizeof(int)*1);
+	MHR[8] =1;
 	//the 9th bit is equal to zero because security is not enabled.
-	memset(&MHR[10],1,sizeof(int)*1); //means that there is a frame_pending
+	//memset(&MHR[10],1,sizeof(int)*1); //means that there is a frame_pending
+	MHR[10]=1;
 	//the 11th bit is equal to zero because we do not request ACK
 	int dest_mode[] = {1,0}; // equal for source_mode
 	memcpy(&MHR[12],dest_mode, sizeof(dest_mode)/sizeof(int));
@@ -79,7 +86,9 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	
 	//The last 16bits are the destination address. As we are working in 
 	//broadcast mode, these bits are set to one.
-	memset(&MHR[24],1,sizeof(int)*16);
+	//memset(&MHR[24],1,sizeof(int)*16);
+	for (int i=0; i<16; i++)
+		MHR[24+i]= 1;
 	
 }
 
@@ -89,7 +98,7 @@ void bbPSDU_generation::dec2bi(int number, int GF, int *bin_number)
 	
 	for (int i=0; i<GF; i++)
     {
-        bin_number[GF-i]= number%2;
+        bin_number[GF-(i+1)]= number%2;
         number = number/2;
     }
     return;       
@@ -100,9 +109,11 @@ void bbPSDU_generation::dec2bi(int number, int GF, int *bin_number)
 int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
+	
 	int *tmp= new int[PSDU_length];
 	int *tmp2= new int[8];
-	int cycles = noutput_items / PSDU_length;
+	int cycles = noutput_items / (PSDU_length);
+	//printf("The number of cycles:%d\n", cycles);
 	while (cycles>0)
 	{
 		//1-Set the correct MHR, we have to change the sequence_number
