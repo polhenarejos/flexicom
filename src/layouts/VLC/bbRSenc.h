@@ -17,11 +17,11 @@ class bbRSEnc : public gr_block
 	
 	private:
 		bbRSEnc(unsigned int, unsigned int, unsigned int, int, int);
-		unsigned int GF;
-		unsigned int N;
-		unsigned int K;
+		unsigned int GF; //dimension of the galois Field in bits PHY I=4 bits, PHYII=8 bits
+		unsigned int N; //length of the output block
+		unsigned int K; //length of the input block
 		int phy_type;
-		int length;
+		int length; //length in bits of the input data
 		vlc_reed_solomon *vlc_rs;
 		unsigned char bi2dec ( int *, int);
 		int rs_out_elements();
