@@ -66,6 +66,6 @@ int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, 
 	//qp->replot();
 	emit Replot();
 	consume_each(no);
-	Sleep(50);
+	Sleep(10);
 	return 0;
 }

@@ -55,29 +55,25 @@ void Layout80211b::RadioPressed(bool check)
 {
 	if (check)
 	{
-		tabs.push_back(mw->panel->addTab(CreateTabOpts(mw->panel), "Options"));
+		mw->AddCustomTab(CreateTabOpts(), QString("Options"));
 		mw->panel->rb_chain[RB_TX]->setEnabled(false);
 		mw->panel->rb_chain[RB_RX]->setEnabled(true);
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
-		ReadSettings();
+		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
 		DrawPlots();
 	}
 	else
 	{
 		SaveSettings(mw->s);
-		for (int i = 0; i < tabs.size(); i++)
-		{
-			mw->panel->widget(tabs[i])->deleteLater();
-			mw->panel->removeTab(tabs[i]);
-		}
-		tabs.clear();
+		mw->RemoveCustomTabs();
 		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
+		RemovePlots();
 	}
 }
-QWidget *Layout80211b::CreateTabOpts(QWidget *w)
+QWidget *Layout80211b::CreateTabOpts()
 {
-	QWidget *p = new QWidget(w);
+	QWidget *p = new QWidget;
 	QGroupBox *gBox = new QGroupBox(tr("Channels"));
 	QGridLayout *vBox = new QGridLayout;
 	cb_chans = new QComboBox(p);
@@ -93,12 +89,16 @@ void Layout80211b::SaveSettings(QSettings &s)
 {
 	s.setValue("80211b/chan", cb_chans->currentIndex());
 }
-void Layout80211b::ReadSettings()
+void Layout80211b::ReadSettings(QSettings &s)
 {
-	cb_chans->setCurrentIndex(mw->s.value("80211b/chan").toInt());
+	cb_chans->setCurrentIndex(s.value("80211b/chan").toInt());
 }
 void Layout80211b::DrawPlots()
 {
 	pl_osc = new QwtPlot;
-	mw->plotGrid->addWidget(pl_osc, 0, 0);
+	mw->AddCustomPlot(pl_osc, 0, 0);
+}
+void Layout80211b::RemovePlots()
+{
+	mw->RemoveCustomPlots();
 }

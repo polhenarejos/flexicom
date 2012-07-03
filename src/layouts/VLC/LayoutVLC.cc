@@ -105,29 +105,24 @@ void LayoutVLC::RadioPressed(bool checked)
 {
 	if (checked)
 	{
-		tabs.push_back(mw->panel->addTab(CreateTabOpts(mw->panel), "OptionsVLC"));
+		mw->AddCustomTab(CreateTabOpts(), QString("OptionsVLC"));
 		mw->panel->rb_chain[RB_TX]->setEnabled(true);
 		mw->panel->rb_chain[RB_RX]->setEnabled(true);
 		mw->panel->rb_chain[RB_TX]->setChecked(true);
-		ReadSettings();
+		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
 	}
 	else
 	{
 		SaveSettings(mw->s);
-		for (int i = 0; i < tabs.size(); i++)
-		{
-			mw->panel->widget(tabs[i])->deleteLater();
-			mw->panel->removeTab(tabs[i]);
-		}
-		tabs.clear();
+		mw->RemoveCustomTabs();
 		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
 	}
 }
 
-QWidget *LayoutVLC::CreateTabOpts(QWidget *w)
+QWidget *LayoutVLC::CreateTabOpts()
 {
-	QWidget *p = new QWidget(w);
+	QWidget *p = new QWidget;
 	varVLC = new VarVLC;
 	init_v_VLC(varVLC, p);
 	QGroupBox *gBox = new QGroupBox(tr("General Settings"));
@@ -294,27 +289,27 @@ void LayoutVLC::SaveSettings(QSettings &s)
 	s.setValue("VLC/frame_size_0", varVLC->sp_frame_size[0]->value());
 	s.setValue("VLC/frame_size_1", varVLC->sp_frame_size[1]->value());
 }
-void LayoutVLC::ReadSettings()
+void LayoutVLC::ReadSettings(QSettings &s)
 {
-	varVLC->cb_tx_mode->setCurrentIndex(mw->s.value("VLC/tx_mode").toInt());
-	//varVLC->sp_psdu_units->setValue(mw->s.value("VLC/psdu_units_0",1).toInt());
-	varVLC->sp_psdu_units[0]->setValue(mw->s.value("VLC/psdu_units_0",1).toInt());
-	varVLC->sp_psdu_units[1]->setValue(mw->s.value("VLC/psdu_units_1",1).toInt());
+	varVLC->cb_tx_mode->setCurrentIndex(s.value("VLC/tx_mode").toInt());
+	//varVLC->sp_psdu_units->setValue(s.value("VLC/psdu_units_0",1).toInt());
+	varVLC->sp_psdu_units[0]->setValue(s.value("VLC/psdu_units_0",1).toInt());
+	varVLC->sp_psdu_units[1]->setValue(s.value("VLC/psdu_units_1",1).toInt());
 	
-	varVLC->rb_phy_type[mw->s.value("VLC/phy_type", 0).toInt()]->setChecked(true);
-	varVLC->rb_phy_modulation[mw->s.value("VLC/modulation", 0).toInt()]->setChecked(true);
+	varVLC->rb_phy_type[s.value("VLC/phy_type", 0).toInt()]->setChecked(true);
+	varVLC->rb_phy_modulation[s.value("VLC/modulation", 0).toInt()]->setChecked(true);
 	
-	varVLC->sp_flp_length->setValue(mw->s.value("VLC/flp_length",1).toInt());
+	varVLC->sp_flp_length->setValue(s.value("VLC/flp_length",1).toInt());
 	
-	//varVLC->cb_phy_op_mode->setCurrentIndex(mw->s.value("VLC/tx_phy_op_mode_0").toInt());
-	varVLC->cb_phy_op_mode[0]->setCurrentIndex(mw->s.value("VLC/phy_op_mode_0").toInt());
-	varVLC->cb_phy_op_mode[1]->setCurrentIndex(mw->s.value("VLC/phy_op_mode_1").toInt());
-	varVLC->cb_phy_op_mode[2]->setCurrentIndex(mw->s.value("VLC/phy_op_mode_2").toInt());
-	varVLC->cb_phy_op_mode[3]->setCurrentIndex(mw->s.value("VLC/phy_op_mode_3").toInt());
+	//varVLC->cb_phy_op_mode->setCurrentIndex(s.value("VLC/tx_phy_op_mode_0").toInt());
+	varVLC->cb_phy_op_mode[0]->setCurrentIndex(s.value("VLC/phy_op_mode_0").toInt());
+	varVLC->cb_phy_op_mode[1]->setCurrentIndex(s.value("VLC/phy_op_mode_1").toInt());
+	varVLC->cb_phy_op_mode[2]->setCurrentIndex(s.value("VLC/phy_op_mode_2").toInt());
+	varVLC->cb_phy_op_mode[3]->setCurrentIndex(s.value("VLC/phy_op_mode_3").toInt());
 		
-	//varVLC->sp_frame_size->setValue(mw->s.value("VLC/frame_size_0",1).toInt());
-	varVLC->sp_frame_size[0]->setValue(mw->s.value("VLC/frame_size_0",1).toInt());
-	varVLC->sp_frame_size[1]->setValue(mw->s.value("VLC/frame_size_1",1).toInt());
+	//varVLC->sp_frame_size->setValue(s.value("VLC/frame_size_0",1).toInt());
+	varVLC->sp_frame_size[0]->setValue(s.value("VLC/frame_size_0",1).toInt());
+	varVLC->sp_frame_size[1]->setValue(s.value("VLC/frame_size_1",1).toInt());
 }
 
 void LayoutVLC::setPSDUunits(int index)

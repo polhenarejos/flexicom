@@ -27,10 +27,9 @@ class LayoutVLC : public QObject , public LayoutFactory
 		boost::shared_ptr<uhd_usrp_sink> usrp_tx;
 		MainWindow *mw;
 		int radioID;
-		std::vector<int> tabs;
-		QWidget *CreateTabOpts(QWidget * = NULL);
+		QWidget *CreateTabOpts();
 		void init_v_VLC (VarVLC *, QWidget *);
-		void ReadSettings();
+		void ReadSettings(QSettings &);
 			
 	public:
 		LayoutVLC(MainWindow *, int);

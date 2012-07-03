@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
 		void StopLayout();
 		void writeSettings(QSettings &);
 		void readSettings(QSettings &);
+		std::vector<int> tabs;
 		
 	public:
 		MainWindow(QWidget * = NULL);
@@ -36,12 +37,18 @@ class MainWindow : public QMainWindow
 		void closeEvent(QCloseEvent *);
 		QSettings s;
 		QGridLayout *plotGrid;
+		void AddCustomTab(QWidget *, QString &);
+		void RemoveCustomTabs();
+		void AddCustomPlot(QWidget *, int = 0, int = 0);
+		void RemoveCustomPlots();
+		enum StatesLayout { STARTING, STARTED, STOPPING, STOPPED };
 		
 	public slots:
 		void clickMainButtons(QAbstractButton *);
 		
 	signals:
 		void SaveSettings(QSettings &);
+		void StateLayoutChanged(MainWindow::StatesLayout);
 		
 };
 class Panel : public QTabWidget
@@ -73,6 +80,7 @@ class Panel : public QTabWidget
 	
 	public slots:
 		void SetDevs(int);
+		void StateLayout(MainWindow::StatesLayout);
 };
 
 #endif //_INC_MAINWINDOW_H_

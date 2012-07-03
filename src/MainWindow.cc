@@ -66,8 +66,10 @@ void MainWindow::RunLayout()
 	}
 	if (layoutFactory)
 	{
+		emit StateLayoutChanged(STARTING);
 		//printf("Running layout %s\n", layoutFactory->Name());
 		layoutFactory->Run();
+		emit StateLayoutChanged(STARTED);
 	}
 }
 void MainWindow::StopLayout()
@@ -75,7 +77,9 @@ void MainWindow::StopLayout()
 	if (layoutFactory)
 	{
 		//printf("Stopping layout %s\n", layoutFactory->Name());
+		emit StateLayoutChanged(STOPPING);
 		layoutFactory->Stop();
+		emit StateLayoutChanged(STOPPED);
 	}
 }
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -137,6 +141,33 @@ void MainWindow::writeSettings(QSettings &s)
 	s.setValue("uhd/gain", panel->sp_gain->value());
 	emit SaveSettings(s);
 }
+void MainWindow::AddCustomTab(QWidget *w, QString &name)
+{
+	w->setParent(panel);
+	tabs.push_back(panel->addTab(w, name));
+}
+void MainWindow::RemoveCustomTabs()
+{
+	for (int i = 0; i < tabs.size(); i++)
+	{
+		panel->widget(tabs[i])->deleteLater();
+		panel->removeTab(tabs[i]);
+	}
+	tabs.clear();
+}
+void MainWindow::AddCustomPlot(QWidget *w, int x, int y)
+{
+	plotGrid->addWidget(w, x, y);
+}
+void MainWindow::RemoveCustomPlots()
+{
+	QLayoutItem *item;
+	while ((item = plotGrid->takeAt(0)))
+	{
+		delete item->widget();
+		delete item;
+    }
+}
 
 //Panel
 Panel::Panel(MainWindow *w) :
@@ -146,6 +177,7 @@ Panel::Panel(MainWindow *w) :
 	setTabPosition(QTabWidget::North);
 	addTab(CreateLayoutTab(this), "Layouts");
 	addTab(CreateUHDTab(this), "UHD");
+	QObject::connect(w, SIGNAL(StateLayoutChanged(MainWindow::StatesLayout)), this, SLOT(StateLayout(MainWindow::StatesLayout)));
 }
 QWidget *Panel::CreateLayoutTab(QWidget *w)
 {
@@ -216,4 +248,27 @@ void Panel::SetDevs(int devs)
 		ipfield[i].ip->setHidden(true);
 		ipfield[i].label->setHidden(true);
 	}
+}
+void Panel::StateLayout(MainWindow::StatesLayout s)
+{
+	for (int i = 0; i < rb_layout.size(); i++)
+	{
+		if (s == MainWindow::STARTING)
+			rb_layout[i]->bt->setEnabled(false);
+		else if (s == MainWindow::STOPPED)
+			rb_layout[i]->bt->setEnabled(true);
+	}
+	//Depends on the layout
+	/*
+	if (s == MainWindow::STARTING)
+	{
+		rb_chain[RB_TX]->setEnabled(false);
+		rb_chain[RB_RX]->setEnabled(false);
+	}
+	else if (s == MainWindow::STOPPED)
+	{
+		rb_chain[RB_TX]->setEnabled(true);
+		rb_chain[RB_RX]->setEnabled(true);
+	}
+	*/
 }

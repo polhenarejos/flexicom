@@ -23,11 +23,11 @@ class Layout80211b : public QObject, public LayoutFactory
 		boost::shared_ptr<uhd_usrp_source> usrp;
 		MainWindow *mw;
 		int radioID;
-		std::vector<int> tabs;
-		QWidget *CreateTabOpts(QWidget * = NULL);
+		QWidget *CreateTabOpts();
 		QComboBox *cb_chans;
-		void ReadSettings();
+		void ReadSettings(QSettings &);
 		void DrawPlots();
+		void RemovePlots();
 		
 	public:
 		Layout80211b(MainWindow *, int);
