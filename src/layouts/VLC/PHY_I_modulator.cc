@@ -16,8 +16,8 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var) :
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	//the phr has to be coded according to the parameters corresponding 
 	//to the minimum data_rate of the current negotiated clock
-	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->rs_code.pre_rs_out, vlc_var_phy->rs_code.pre_rs_in, vlc_var_phy->phy_type, vlc_var_phy->PHR_raw_length);
-	bbVLCInterleaver::sptr intlv_phr = bbVLCInterleaver::Create(vlc_var_phy->GF, vlc_var_phy->rs_code.pre_rs_out, vlc_var_phy->rs_code.pre_rs_in, vlc_var_phy->PHR_raw_length, rs_enc_phr->out_rs);
+	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.pre_rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->phy_type, vlc_var_phy->PHR_raw_length);
+	bbVLCInterleaver::sptr intlv_phr = bbVLCInterleaver::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.pre_rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->PHR_raw_length, rs_enc_phr->out_rs);
 	bbCCEnc::sptr cc_enc_phr = bbCCEnc::Create(3,7, poly,rs_enc_phr->out_rs,0);
 		
 	connect(self(),0, rs_enc_phr, 0);
@@ -26,13 +26,13 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var) :
 	connect(cc_enc_phr, 0, self(), 0);
 	
 	//data
-	if (vlc_var_phy->rs_code.rs_in !=0)
+	if (vlc_var_phy->_rs_code.rs_in !=0)
 	{
-		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->rs_code.rs_out,vlc_var_phy->rs_code.pre_rs_in,vlc_var_phy->phy_type, vlc_var_phy->PSDU_raw_length);
-		bbVLCInterleaver::sptr intlv_data = bbVLCInterleaver::Create(vlc_var_phy->GF, vlc_var_phy->rs_code.rs_out, vlc_var_phy->rs_code.pre_rs_in, vlc_var_phy->PSDU_raw_length, rs_enc_data->out_rs);
+		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.rs_out,vlc_var_phy->_rs_code.pre_rs_in,vlc_var_phy->phy_type, vlc_var_phy->PSDU_raw_length);
+		bbVLCInterleaver::sptr intlv_data = bbVLCInterleaver::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->PSDU_raw_length, rs_enc_data->out_rs);
 		connect(self(), 1, rs_enc_data, 0);
 		connect(rs_enc_data,0,intlv_data,0);
-		if (vlc_var_phy->cc_code.cc_in !=0)
+		if (vlc_var_phy->_cc_code.cc_in !=0)
 		{
 			bbCCEnc::sptr cc_enc_data = bbCCEnc::Create(3,7, poly,rs_enc_data->out_rs,vlc_var_phy->operating_mode);
 			connect(intlv_data,0, cc_enc_data,0);
