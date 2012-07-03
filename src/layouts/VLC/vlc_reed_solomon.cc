@@ -1,6 +1,7 @@
 #include <vlc_reed_solomon.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 extern "C"{
 	#include "rs.h"
@@ -10,7 +11,8 @@ extern "C"{
 vlc_reed_solomon::vlc_reed_solomon (unsigned int _symsize, unsigned int _gfpoly, unsigned int _fcr, unsigned int _prim, unsigned int _nroots) :
 				 rs_init_symsize(_symsize), rs_init_gfpoly(_gfpoly), rs_init_fcr (_fcr), rs_init_prim(_prim), rs_init_nroots(_nroots)
 {
-  d_rs = init_rs_char (rs_init_symsize, rs_init_gfpoly, rs_init_fcr, rs_init_prim, rs_init_nroots);
+  //printf("rs_init_symsize:%d, rs_init_gfpoly:%d, rs_init_fcr:%d\n", rs_init_symsize, rs_init_gfpoly, rs_init_fcr);
+  d_rs = (struct rs *)init_rs_char(rs_init_symsize, rs_init_gfpoly, rs_init_fcr, rs_init_prim, rs_init_nroots);
   N = (1 << rs_init_symsize) - 1;
   K = N - rs_init_nroots;
   assert (d_rs != 0);

@@ -13,19 +13,20 @@ class bbVLCInterleaver : public gr_block
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbVLCInterleaver();
+		int out_int; //remaining elements to be punctured
 	
 	private:
 		bbVLCInterleaver(unsigned int,unsigned int, unsigned int, int, int);
-		unsigned int N;
-		unsigned int K;
-		unsigned int GF;
-		int raw_length;
-		int rs_length;
-		int out_int; //remaining elements to be punctured
+		unsigned int N; //the length of the output reed-solomon codeword
+		unsigned int K; //the length of the input reed-solomon codeword
+		unsigned int GF; //number of bits of each word
+		int raw_length; //length at the input of the rs_encoder
+		int rs_length; //length at the output of the rs_encoder, must be a multiple of N
+		
 		int *interleaving_vector;
 		int *puncturing_vector;
 		int *bin_number;
-		void dec2bi(unsigned char *, int, int *);
+		void dec2bi(unsigned char , int, int *);
 		bool puncture;
 };
 

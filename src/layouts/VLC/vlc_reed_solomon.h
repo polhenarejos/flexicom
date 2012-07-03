@@ -1,6 +1,7 @@
 #ifndef _VLC_REED_SOLOMON_H_
 #define _VLC_REED_SOLOMON_H_
 
+
 class vlc_reed_solomon {
 	
 	public:	

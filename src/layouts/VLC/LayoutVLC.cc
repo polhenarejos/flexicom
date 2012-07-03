@@ -11,6 +11,8 @@
 #include <QRadioButton>
 #include <iostream>
 
+#include <gr_null_sink.h>
+
 const char *LayoutVLC::name = "VLC";
 
 double rate_phy1_o [] = { 
@@ -60,17 +62,16 @@ void LayoutVLC::Run()
 		grTop->connect(usrp_rx, 0, rx, 0);
 		grTop->start();
 	}
-	else
+	else //transmitter
 	{
-		int checked1,checked2;
-		usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		//usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 		tx = TxVLC::Create(this);
 		if (tx->vlc_var.phy_type)
 		{
 			printf("PHY II mode is not still available\n");
 			exit(-1);
 		}
-		else
+		/*else
 		{
 			switch (tx->vlc_var.mod_type)
 			{
@@ -83,8 +84,9 @@ void LayoutVLC::Run()
 				//other settings of USRP, VPPM is OOK with twice the speed
 				break;
 			}
-		}			
-		grTop->connect(tx, 0, usrp_tx, 0);
+		}*/	
+		gr_null_sink_sptr sink = gr_make_null_sink(sizeof(float));		
+		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 			
 	}

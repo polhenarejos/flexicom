@@ -2,6 +2,7 @@
 #include <gr_io_signature.h>
 #include "vlc_reed_solomon.h"
 #include <math.h>
+#include <stdio.h>
 
 
 bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
@@ -10,6 +11,7 @@ bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 {
 	unsigned int poly;
 	int output;
+	//printf("GF:%d, N:%d, K:%d, phy_type:%d, length:%d\n", GF,N,K, phy_type, length);
 	switch (phy_type)
 	{
 		case 0: //PHY I
@@ -19,9 +21,11 @@ bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 			poly = 0x11D; 
 			break;
 	}
-	vlc_rs=new vlc_reed_solomon(GF, poly, 1, 1, (N-K));
+	vlc_rs=new vlc_reed_solomon(GF, poly, 1, 1,(N-K));
 	out_rs=rs_out_elements();
+	//printf("El valor de out_rs es:%d\n", out_rs);
 	set_output_multiple(out_rs);
+	//printf("Reed Solomon\n");
 }
 
 bbRSEnc::~bbRSEnc()
@@ -43,14 +47,15 @@ int bbRSEnc::rs_out_elements()
 {
 	//if there is not RS encoding, this block will not be instantiated
 	int GF_words,tmp, rs_output_bits;
-	GF_words = (int) ceil((double)(length/GF));
+	GF_words = ceil(((double)length/GF));
+	//printf("GF_words:%d\n", GF_words);
 	tmp = GF_words%K;
 	if (tmp==0)
 		rs_output_bits = (GF_words/K)*N*GF;
 	else
 		//if is not integer, the padded zeros are not transmitted
-		rs_output_bits = ((int)floor((double)(GF_words/K))*N+ tmp + (N-K))*GF;
-
+		rs_output_bits = ((int)floor(((double)GF_words/K))*N+ tmp + (N-K))*GF;
+	
 	return rs_output_bits;
 	//if all divisions were exact, there will not need to do that
 }
@@ -80,65 +85,93 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int *iptr= (int *)input_items[0];
 	unsigned char *optr= (unsigned char *)output_items[0];
 	
-	int blocks_to_process, i, index=0, GF_words, RS_words;
-	int remaining_bits, remaining_GF_words,add_bits;
+	int blocks_to_process, i, GF_words, RS_words;
+	int remaining_bits;
 	unsigned char *tmp;
+	int times=0;
+	int *samples_block = new int[length + length%GF];
+	//printf("El valor del modulo length con GF:%d\n" ,length%GF);
 	tmp = new unsigned char[K];
 	int *tmp2;
 	unsigned char *tmp3;
 	tmp3= new unsigned char[N];
 	blocks_to_process = (noutput_items/out_rs);
-	GF_words = (int) ceil((double)(length/GF));
+	GF_words = (int) ceil(((double)length/GF));
+	//printf("El valor de GF_words:%d\n", GF_words);
 	//be careful, these measures could be a source of error
 	RS_words = GF_words/K;
+	//printf("Las que sobran:%d\n", GF_words%K);
+	int index;
+	//printf("El valor de RS_words:%d\n", RS_words);
+	//printf("blocks_to_process:%d\n", blocks_to_process);
 	while (blocks_to_process>0)
 	{
-		while(RS_words>0)
+		//First, adapt the samples to process
+		memcpy(samples_block, iptr, sizeof(int)*length);
+		iptr = iptr + length-1;
+		for (i=length; i<length+length%GF; i++)
+		{
+			samples_block[i]=iptr[0]; //we replicate the last sample
+		}
+		iptr++;
+		index=0;
+		while(index<RS_words)
 		{
 			memset(tmp,0,sizeof(unsigned char)*K);
 			for (i=0; i<K; i++)
 			{
-				tmp[i]=bi2dec(iptr,GF);
-				iptr=iptr+4;
+				tmp[i]=bi2dec(&samples_block[(index*K*GF)+i*GF],GF);
+				//printf("El valor de tmp[%d]=%u\n",i, tmp[i]);
+				//iptr=iptr+GF;
 			}
 			vlc_rs->encode(optr,tmp);
+			/*for (i=0;i<N; i++)
+			{
+				printf("output[%d] es:%u\n", i,optr[i]);
+			}*/
 			optr=optr + N;		
-			RS_words--;
+			//RS_words--;
+			index++;
 		}
 		if ((GF_words%K) !=0)
 		{
 			//we need to process the last word of the block
-			remaining_bits= GF_words%K;
-			remaining_GF_words = (int) ceil((double)(remaining_bits/GF))*GF;
-			add_bits= (remaining_GF_words*GF)-remaining_bits;
-			tmp2= new int(remaining_bits+add_bits);
-			memset(tmp2,0,sizeof(int)*(remaining_bits+add_bits));
-			memcpy(tmp2,iptr, sizeof(int)*remaining_bits);
-			iptr=iptr+ remaining_bits -1;
-			for (i=0; i<add_bits; i++)
-				tmp2[remaining_bits+i]=iptr[0];
-			iptr ++; //ready for the next iteration
+			remaining_bits = (GF_words%K)*GF;
+			//printf("Remaining_bits:%d\n", remaining_bits);
+			tmp2 = new int[GF*K];
+			//RS_words = GF_words/K;
+			memset(tmp2, 0, sizeof(int)*GF*K);
+			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*remaining_bits);
+			//for (i=0; i<remaining_bits;i++)
+				//printf("Los remaining_bits[%d] son:%d\n",i, tmp2[i]);
 			memset(tmp,0, sizeof(unsigned char)*K);
 			memset(tmp3,0, sizeof(unsigned char)*N);
-			for (i=0; i<(remaining_GF_words); i++);
+			for (i=0; i<K; i++)
 			{
-				tmp[i]=bi2dec(tmp2,GF);
-				tmp2= tmp2+4;
+				tmp[i]=bi2dec(&tmp2[i*GF],GF);
+			//	printf("El clandemor tmp[%d]=%d\n",i,tmp[i]);
 			}
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
-			memcpy(optr, tmp3,sizeof(unsigned char)*remaining_GF_words);
-			optr =optr + remaining_GF_words;
+			/*for (i=0;i<N; i++)
+			{
+				printf("la que sobra[%d] es:%u\n", i,tmp3[i]);
+			}*/
+			memcpy(optr, tmp3,sizeof(unsigned char)*(GF_words%K));
+			optr =optr + (GF_words%K);
 			memcpy(optr, &tmp3[K], sizeof(unsigned char)*(N-K));
 			optr = optr + N-K;
-			if (phy_type==1)
+			if (phy_type==0)
 			{
 				//move the zeros to the end, which are the punctured positions
-				memset(optr, 0, sizeof(unsigned char)*(K-remaining_GF_words));
-				optr = optr + (K-remaining_GF_words);				
+				memset(optr, 0, sizeof(unsigned char)*(K-GF_words%K));
+				optr = optr + (K-GF_words%K);				
 			}
-		blocks_to_process--;
-		RS_words = GF_words/K;
 		}
+		blocks_to_process--;
+		//RS_words = GF_words/K; //reset because it achieves the zero value ->no needed due to the use of index variable
+		/*times ++;
+		if (times==2)
+			exit(-1);*/
 	}
 	consume_each((noutput_items/out_rs)*length);
 	return noutput_items;

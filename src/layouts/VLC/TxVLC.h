@@ -42,8 +42,8 @@ struct vlc_var
 	int tx_mode;
 	int psdu_units;
 	int operating_mode;
-	rs_code rs_code;
-	cc_code cc_code;
+	rs_code _rs_code;
+	cc_code _cc_code;
 	int GF;
 	int frame_size;
 	int PHR_raw_length; //raw length prior to modulation

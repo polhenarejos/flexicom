@@ -11,35 +11,45 @@ bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned 
 {
 	//equations in section 10.3 of IEEE 802.15.7
 	int S_frame, D,S, S_block,p;
+	int tmp;
 	int i;
-	
+	//printf ("El valor de GF:%d, el valor de N:%d, el valor de K:%d\n, el valor de raw_length=%d, el valor de rs_length:%d\n", GF, N, K, raw_length, rs_length);
 	//raw_length is a number of bits
 	//rs_length is a number of decimal values	
-	S_frame = (int)ceil((double)(raw_length/GF));
-	S = N * (int) ceil((double)(S_frame/K)) -  (K- (S_frame%K));
-	D = (int)ceil((double)(S/N));
+	S_frame = ceil((double)raw_length/GF);
+	S = N * ceil((double)S_frame/K) -  (K- (S_frame%K));
+	//tmp = N*ceil((double)(S_frame/K));
+	D = ceil(((double)S/N));
 	S_block = N * D;
 	p = N - (S%N);
+	//printf ("El valor de S_frame:%d, el valor de S:%d, el valor de D:%d, S_block:%d, p:%d\n", S_frame,S,D, S_block,p);
+	
 	interleaving_vector = new int[S_block]; //l vector
 	puncturing_vector = new int[p]; //z vector
 	bin_number = new int[GF];
 	memset(bin_number,0,sizeof(int)*GF);
 	for (i=0; i<S_block; i++)
-		interleaving_vector[i]= (i%D)*N + (int) floor((double)(i/D));
+	{
+		interleaving_vector[i]= (i%D)*N + (int) floor(((double)i/D));
+		//printf("Interleaving_vector[%d]= %d\n", i, interleaving_vector[i]);
+	}
 	for (i=0; i<p; i++)
+	{
 		puncturing_vector[i]= (N-p+1)*D + (i*D)-1;
+		//printf("puncturing_vector[%d]= %d\n", i, puncturing_vector[i]);
+	}
 	if (p< K)
 	{
-		puncture = 1;	
+		puncture = true;	
 		out_int= GF*(rs_length-p);
 	}
 	else
 	{
-		puncture = 0;
+		puncture = false;
 		out_int= GF *rs_length;
 	}
+	//printf("El valor de out_int:%d\n",out_int);
 	set_output_multiple(out_int);
-	
 }
 
 bbVLCInterleaver::~bbVLCInterleaver()
@@ -60,16 +70,16 @@ bbVLCInterleaver::sptr bbVLCInterleaver::Create(unsigned int _GF, unsigned int _
 	return sptr(new bbVLCInterleaver(_GF, _N, _K, _raw_length, _rs_length));
 }
 
-void bbVLCInterleaver::dec2bi(unsigned char *number, int GF, int *bin_number)
+void bbVLCInterleaver::dec2bi(unsigned char number, int GF, int *bin_number)
 {
 	//again the same criteria as in the rs-encoder 'left-msb'	
-	int *tmp;
+	int tmp;
 	//tmp = new int;
-	tmp = (int *) number;
+	tmp = (int) number;
 	for (int i=0; i<GF; i++)
     {
-        bin_number[GF-(i+1)]= *tmp%2;
-        *tmp = *tmp /2;
+        bin_number[GF-(i+1)]= tmp%2;
+        tmp = tmp /2;
     }
     return;       
 }
@@ -79,7 +89,7 @@ void bbVLCInterleaver::forecast(int noutput_items, gr_vector_int &ninput_items_r
 	int ninputs = ninput_items_required.size();
 	for (int i=0; i < ninputs; i++)
 		ninput_items_required[i]= (noutput_items/out_int)*rs_length;
-	
+		//printf("El valor de ninputs_items_required[%d]: %d\n",i, (noutput_items/out_int)*rs_length);	
 }
 
 int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
@@ -90,23 +100,32 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 	unsigned char *tmp, *tmp2, *tmp3;
 	
 	blocks_to_process=(noutput_items/out_int);
+	//printf("Blocks to process:%d\n", blocks_to_process);
 	p =rs_length- (out_int/GF);
-	tmp = new unsigned char[rs_length];
+	tmp  = new unsigned char[rs_length];
 	tmp2 = new unsigned char[rs_length];
 	tmp3 = new unsigned char[rs_length-p];
+	int times=0;
 	
 	while (blocks_to_process > 0)
 	{
 		//1.Interleaving
+		//printf("Blocks to process:%d\n", blocks_to_process);
 		memset(tmp,0,sizeof(unsigned char)*rs_length);
 		memset(tmp2,0,sizeof(unsigned char)*rs_length);
 		memcpy(tmp,iptr, sizeof(unsigned char)*rs_length);
+		//for (i=0; i<rs_length;i++)
+			//printf("El input al bloque es [%d]=%d\n", i, tmp[i]);
 		iptr = iptr + rs_length;
 		for (i=0; i<rs_length; i++)
+		{
 			tmp2[i]=tmp[interleaving_vector[i]];
+			//printf("El valor de interleaved_data[%d]=%u en times %d\n", i,tmp2[i],times);
+		}
 		//2.Puncturing
 		if (puncture)
 		{
+			//printf("Hola\n");
 			j=0,l=0;
 			for (i=0; i<rs_length; i++)
 			{
@@ -122,7 +141,10 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 			}
 			for (i=0; i<rs_length-p; i++)
 			{	
-				dec2bi(&tmp3[i],GF,bin_number);
+				dec2bi(tmp3[i],GF,bin_number);
+				//printf("El valor de tmp3[%d]:%d\n", i, tmp3[i]);
+				//for (j=0; j<GF;j++)
+					//printf("El valor de bin_number[%d,%d]=%d\n", i,j,bin_number[j]);
 				memcpy(optr,bin_number,sizeof(int)*GF);
 				optr = optr + GF;
 			}
@@ -132,14 +154,19 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 		{
 			for (i=0; i<rs_length; i++)
 			{	
-				dec2bi(&tmp2[i],GF,bin_number);
+				dec2bi(tmp2[i],GF,bin_number);
+				//for (j=0;j<GF;j++)
+					//printf("Bin_number[%d,%d]=%d\n",i,j,bin_number[j]);
 				memcpy(optr,bin_number,sizeof(int)*GF);
 				optr = optr + GF;
 			}
 		}
 		blocks_to_process--;
+		/*times++;
+		if (times==3)
+			exit(-1);*/
 	}
-	consume_each(noutput_items/out_int*rs_length);
+	consume_each((noutput_items/out_int)*rs_length);
 	return noutput_items;
 }
 	

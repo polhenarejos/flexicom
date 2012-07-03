@@ -21,6 +21,7 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	//this would be to be modified in the future with the addition of dimming capabilities
 	crc->generate_crc(tmp,phr_crc, 32+crc_length);
 	set_output_multiple(PHR_length);
+	//printf("PHR generation\n");
 
 }
 
