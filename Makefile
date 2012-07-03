@@ -48,6 +48,10 @@ UHD_DIR=deps\UHD
 UHD_INC_DIR=$(UHD_DIR)\include
 UHD_LIB_DIR=$(UHD_DIR)\lib\$(PREF)
 UHD_BIN_DIR=$(UHD_DIR)\bin\$(PREF)
+## CPPUNIT
+CPPUNIT_DIR=deps\cppunit
+CPPUNIT_INC_DIR=$(CPPUNIT_DIR)\include
+CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib\$(PREF)
 
 ###############################
 
@@ -59,6 +63,7 @@ MOD_DIR=modules
 LAYOUT_DIR=$(SRC_DIR)/layouts
 LAYOUT_INC=/I $(LAYOUT_DIR)/80211b /I $(LAYOUT_DIR)/VLC /I $(INC_DIR)/$(MOD_DIR)
 TARGET=flexicom
+TEST_DIR=test
 
 QT_CORE_DIR=$(QT_INC_DIR)\QtCore
 QT_GUI_DIR=$(QT_INC_DIR)\QtGui
@@ -81,6 +86,9 @@ GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk /D LV_HA
 GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
+CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
+CPPUNIT_LIB=/LIBPATH:$(CPPUNIT_LIB_DIR) cppunit.lib
+
 
 INC_FILES = /I $(INC_DIR) $(QT_INC) $(QWT_INC) $(BOOST_INC) $(LAYOUT_INC) $(GR_INC) $(UHD_INC)
 EXECFLAGS=$(DBGCFLAG) $(CFLAGS) $(INC_FILES) /Fo$(OBJ_DIR)/
@@ -115,6 +123,8 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/bbRSEnc.obj $(OBJ_DIR)/bbVLCInterleaver.obj $(OBJ_DIR)/bbVLC_Frame_Generator.obj \
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj $(OBJ_DIR)/vlc_crc.obj \
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj
+        
+TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 
 all: exe install_deps
 	$(RM) Makefile.auto
@@ -167,3 +177,14 @@ $(OBJ_DIR)/Layout80211b_moc.obj: $(LAYOUT_DIR)/80211b/Layout80211b.h
 $(OBJ_DIR)/LayoutVLC_moc.obj: $(LAYOUT_DIR)/VLC/LayoutVLC.h
 	$(MOC) $(LAYOUT_DIR)/VLC/LayoutVLC.h -o $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
 	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
+
+#Test Suite
+test: test_files
+	$(LINK) $(LFLAGS) $(TEST_FILES) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(CPPUNIT_LIB) /MAP /OUT:test_$(TARGET).exe
+	test_$(TARGET).exe
+	
+test_files: $(TEST_FILES) objs
+
+{$(TEST_DIR)}.cc{$(OBJ_DIR)}.obj:
+	$(CC) $(EXECFLAGS) $(CPPUNIT_INC) /Fd$(OBJ_DIR) $<
+	
