@@ -32,7 +32,7 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
 	}
 	bbVLCInterleaver::sptr intlv_phr = bbVLCInterleaver::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.pre_rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->PHR_raw_length, phr_words);
 	bbCCEnc::sptr cc_enc_phr = bbCCEnc::Create(3,7, poly,intlv_phr->out_int,0);
-	bbManchesterEnc::sptr manch_phr = bbManchesterEnc::Create(0); //always on/off keying
+	bbManchesterEnc::sptr manch_phr = bbManchesterEnc::Create(0,cc_enc_phr->out_cc); //always on/off keying
 	out_PHY_I_phr= cc_enc_phr->out_cc*2; //due to the manchester codification
 		
 	connect(self(),0, rs_enc_phr, 0);
@@ -66,7 +66,7 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
 			connect(intlv_data,0, cc_enc_data,0);
 			if (vlc_var_phy->mod_type == 0)
 			{
-				bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0,cc_enc_data->out_cc);
 				out_PHY_I_psdu= cc_enc_data->out_cc*2;
 				connect(cc_enc_data,0,RLL_psdu,0);
 				connect(RLL_psdu,0,self(),1);
@@ -83,7 +83,7 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
 		{
 			if (vlc_var_phy->mod_type == 0)
 			{
-				bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0,intlv_data->out_int);
 				out_PHY_I_psdu= intlv_data->out_int*2;
 				connect(intlv_data,0, RLL_psdu,0);
 				connect(RLL_psdu, 0, self(),1);
@@ -102,7 +102,7 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
 	{
 		if (vlc_var_phy->mod_type == 0)
 		{
-			bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0);
+			bbManchesterEnc::sptr RLL_psdu = bbManchesterEnc::Create(0,vlc_var_phy->PSDU_raw_length);
 			out_PHY_I_psdu= vlc_var_phy->PSDU_raw_length*2;
 			connect(self(),1, RLL_psdu,0);
 			connect(RLL_psdu,0,self(),1);

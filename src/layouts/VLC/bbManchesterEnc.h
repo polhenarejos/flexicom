@@ -7,14 +7,15 @@ class bbManchesterEnc : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<bbManchesterEnc> sptr;
-		static sptr Create(int);
+		static sptr Create(int, int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbManchesterEnc();
 	
 	private:
-		bbManchesterEnc(int);
+		bbManchesterEnc(int, int);
 		int d_mode;
+		int d_length;
 };
 
 #endif //_INC_BBMANCHESTERENC_H_
