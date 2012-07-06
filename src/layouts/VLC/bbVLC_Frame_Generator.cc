@@ -30,8 +30,8 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 	assert (FLP_length%2==0);
 	FLP_pattern = new int[FLP_length];
 	memset(FLP_pattern,0,sizeof(int)*FLP_length);
-	int i, IFS; //IFS stands for Interframe Spacing
-	for (i=0; i<FLP_length;i=i+2);
+	int i; //IFS stands for Interframe Spacing
+	for (i=0; i<FLP_length;i=i+2)
 		FLP_pattern[i]=1;
 	TDP_pattern=new int[4*15];	
 	switch (TDP)
@@ -60,10 +60,10 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 			memcpy(TDP_pattern, TDP_aux3, sizeof(int)*15);
 			memcpy(&TDP_pattern[15], TDP_aux_neg3, sizeof(int)*15);
 			memcpy(&TDP_pattern[30], TDP_aux3, sizeof(int)*15);
-			memcpy(&TDP_pattern[45], TDP_aux_neg2, sizeof(int)*15);
+			memcpy(&TDP_pattern[45], TDP_aux_neg3, sizeof(int)*15);
 		break;
 	}
-	
+	IFS=0;
 	switch(tx_mode)
 	{
 		case 0:
@@ -81,7 +81,7 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 			break;
 	}
 	idle_pattern = new int[IFS];
-	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account
+	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account --fallo
 	FLP_counter=0;
 	set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
 	/*printf("soy un clandemor\n");
@@ -136,7 +136,7 @@ void bbVLC_Frame_Generator::forecast(int noutput_items, gr_vector_int &ninput_it
 	int ninputs = ninput_items_required.size();
 		ninput_items_required[0]= (noutput_items/length_frame)*length_PHR;
 		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
-		printf("Hola\n");
+		//printf("Hola\n");
 	
 }
 
@@ -145,12 +145,12 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 	int *iptr1= (int *)input_items[0]; //PHR
 	int *iptr2= (int *)input_items[1]; //PSDU
 	int *optr=  (int *)output_items[0];
-	printf("Hola\n");
+	//printf("Hola\n");
 	int frames_to_process = noutput_items/length_frame;
 	int i;
 	while (frames_to_process > 0)
 	{
-		printf("Hola\n");
+		//printf("Hola\n");
 		//1.FLP
 		if (FLP_counter == 0)
 		{
@@ -173,7 +173,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 			optr = optr + length_data_payload;
 		}
 		iptr2= iptr2 + length_data_payload;
-		memcpy(optr,idle_pattern, sizeof(int)*IFS);
+		memcpy(optr,idle_pattern, sizeof(int)*IFS); 
 		optr = optr + IFS;
 		
 		if (tx_mode == 3)

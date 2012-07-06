@@ -16,7 +16,6 @@ bb4b6bEnc::~bb4b6bEnc()
 bb4b6bEnc::bb4b6bEnc():
 	gr_block("bb4b6bEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
 {
-	set_output_multiple(6); //the number of outputs has to be a multiple of 6
 	outputTable6b = new int[6*16];
 	int table[] = {  0,0,1,1,1,0, 0,0,1,1,0,1, 0,1,0,0,1,1, 0,1,0,1,1,0,
                      0,1,0,1,0,1, 1,0,0,0,1,1, 1,0,0,1,1,0, 1,0,0,1,0,1,
@@ -24,6 +23,8 @@ bb4b6bEnc::bb4b6bEnc():
 			         1,1,0,0,1,0, 1,0,1,0,0,1, 1,0,1,0,1,0, 1,0,1,1,0,0};
 	for (uint i=0; i<6*16; i++)
 		outputTable6b[i]=table[i];
+	
+	set_output_multiple(6); //the number of outputs has to be a multiple of 6
 }
 
 

@@ -45,6 +45,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	connect(null,0,phr_RLL,0);
 	connect(phr_RLL,0,i2f,0);
 	connect(i2f,0,self(),0);*/
+	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
 	
 	//GENERATION OF PHR, DATA
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
@@ -66,23 +67,20 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	bbVLCInterleaver::sptr phr_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in , vlc_var.PHR_raw_length, phr_words);
 	bbCCEnc::sptr phr_cc_encoder = bbCCEnc::Create(3, 7, poly, phr_interleaver->out_int, 0);
 	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0,phr_cc_encoder->out_cc); //always on/off keying
-	//bb4b6bEnc::sptr phr_RLL = bb4b6bEnc::Create();
 	out_PHY_I_phr= phr_cc_encoder->out_cc*2;
 	gr_null_sink_sptr sink_phr = gr_make_null_sink(sizeof(int));
-	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
-	gr_int_to_float_sptr i2f2 = gr_make_int_to_float(1, 1.0);
+	
+	
 	//PHR connections
 	connect(PHR_gen,0,phr_rs_encoder,0);
 	connect(phr_rs_encoder,0,phr_interleaver,0);
 	connect(phr_interleaver,0,phr_cc_encoder,0);
 	connect(phr_cc_encoder, 0, phr_RLL,0);
-	//connect(phr_cc_encoder,0, i2f2,0);
-	//connect(phr_RLL,0,sink_phr,0);
-	connect(phr_RLL, 0, i2f,0);
-	connect(i2f,0,self(),0);
+	//connect(phr_RLL, 0, i2f,0);
+	//connect(i2f,0,self(),0);
 	
 	//PSDU CHAIN
-	/*gr_null_sink_sptr sink_psdu = gr_make_null_sink(sizeof(int));
+	gr_null_sink_sptr sink_psdu = gr_make_null_sink(sizeof(int));
 	if (vlc_var._rs_code.rs_in!=0)
 	{
 		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in ,vlc_var.phy_type,vlc_var.PSDU_raw_length);
@@ -104,42 +102,50 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			connect(psdu_interleaver, 0, psdu_cc_encoder, 0);
 			if(vlc_var.mod_type ==0)
 			{
-				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_cc_encoder->out_cc);
 				out_PHY_I_psdu= psdu_cc_encoder->out_cc*2;
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(psdu_RLL,0,sink_psdu,0);
-				//connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+				connect(phr_RLL,0,FRAME_gen,0);
+				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(FRAME_gen,0,i2f,0);
+				connect(i2f,0,self(),0);
 			}
 			else
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 				out_PHY_I_psdu= psdu_cc_encoder->out_cc/4*6;
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(psdu_RLL,0,sink_psdu,0);
-				//connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+				connect(phr_RLL,0,FRAME_gen,0);
+				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(FRAME_gen,0,i2f,0);
+				connect(i2f,0,self(),0);
 			}
 		}
 		else
 		{
 			if(vlc_var.mod_type ==0)
 			{
-				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_interleaver->out_int);
 				out_PHY_I_psdu= psdu_interleaver->out_int*2;
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(psdu_RLL,0,sink_psdu,0);
-				//connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+				connect(phr_RLL,0,FRAME_gen,0);
+				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(FRAME_gen,0,i2f,0);
+				connect(i2f,0,self(),0);
 			}
 			else
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 				out_PHY_I_psdu=psdu_interleaver->out_int/4*6;
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(psdu_RLL,0,sink_psdu,0);
-				//connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+				connect(phr_RLL,0,FRAME_gen,0);
+				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(FRAME_gen,0,i2f,0);
+				connect(i2f,0,self(),0);
 			}	
 		}
 	}
@@ -147,21 +153,25 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	{
 		if(vlc_var.mod_type ==0)
 		{
-			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,vlc_var.PSDU_raw_length);
 			out_PHY_I_psdu= vlc_var.PSDU_raw_length*2;
+			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(psdu_RLL,0,sink_psdu,0);
-			//	connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+			connect(phr_RLL,0,FRAME_gen,0);
+			connect(psdu_RLL,0,FRAME_gen,1);
+			connect(FRAME_gen,0,i2f,0);
+			connect(i2f,0,self(),0);
 		}
 		else
 		{
 			bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 			out_PHY_I_psdu=vlc_var.PSDU_raw_length/4*6;
+			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
 			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(psdu_RLL,0,sink_psdu,0);
-				//connect(psdu_RLL,0,i2f,0);
-				//connect(i2f,0,self(),0);
+			connect(phr_RLL,0,FRAME_gen,0);
+			connect(psdu_RLL,0,FRAME_gen,1);
+			connect(FRAME_gen,0,i2f,0);
+			connect(i2f,0,self(),0);
 		}	
 	}
 	
