@@ -48,8 +48,8 @@ bbPSDU_generation::~bbPSDU_generation()
 {
 	if (MHR && data_payload && crc && fp)
 	{
-		delete MHR; MHR =0;
-		delete data_payload; data_payload = 0;
+		delete [] MHR; MHR =0;
+		delete [] data_payload; data_payload = 0;
 		delete crc; crc=0;
 		delete fp; fp=0;
 	}

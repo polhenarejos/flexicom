@@ -8,7 +8,7 @@ bb4b6bEnc::~bb4b6bEnc()
 {
 	if (outputTable6b)
 	{
-		delete outputTable6b;
+		delete [] outputTable6b;
 		outputTable6b=0;
 	}
 }
@@ -43,13 +43,15 @@ int bb4b6bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_v
 {
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
-	int samples_to_process,i, index=0;
+	int samples_to_process,i;
+	int index=0;
 	samples_to_process= noutput_items/6*4;
 	while (samples_to_process>0)
 	{
+		index = 0;
 		for (i=0; i<4; i++)
 		{
-			index=index + iptr[i]*(int)pow((double)2,i);
+			index=index + iptr[i]*powf(2,3-i);
 		}
 
 		for (i=0; i<6; i++)
@@ -58,7 +60,6 @@ int bb4b6bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_v
 		}
 		iptr= iptr+4;
 		optr = optr +6;
-		index=0;
 		samples_to_process=samples_to_process-4;
 	}
 	consume_each(noutput_items/6*4);

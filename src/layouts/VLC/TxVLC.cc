@@ -14,11 +14,17 @@
 #include <gr_vector_source_i.h>
 #include <gr_uchar_to_float.h>
 #include <gr_vector_source_b.h>
+#include <gr_null_sink.h>
 #include "bbPHR_generation.h"
 #include "bbPSDU_generation.h"
 #include "bbRSEnc.h"
 #include "bbVLCInterleaver.h"
 #include "bbCCEnc.h"
+#include "bbManchesterEnc.h"
+#include "bb4b6bEnc.h"
+#include "PHY_I_modulator.h"
+#include "bbVLC_Frame_Generator.h"
+
 #include "bbMatlab.h"
 
 
@@ -28,62 +34,25 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 {
 	//variable initialization, to make easier the pass of parameters. Prepared for PHY I 
 	init_var();
-		
-	/*gr_add_const_ff_sptr add = gr_make_add_const_ff (5.0);
-	//std::complex< float > a(20.0,-5.0);
-    //gr_add_const_cc_sptr add = 	gr_make_add_const_cc (a);
-    gr_null_source_sptr null = 	gr_make_null_source (sizeof(float));
-    connect(null,0,add,0);
-    connect(add,0,self(),0);*/
-    
-    /*int PHR_pre_mod[] = {0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	1,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	1,	0,	0,	1,	1,	0,	0,	0,	0,	0,	0,	0,	0,};
-    std::vector<int> PHR_pre_mod2(PHR_pre_mod, PHR_pre_mod + sizeof(PHR_pre_mod) / sizeof(int));
-    gr_vector_source_i_sptr integer = gr_make_vector_source_i (PHR_pre_mod2, false, 54);
-    bbRSEnc::sptr rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in ,vlc_var.phy_type , vlc_var.PHR_raw_length);
-	//gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
-	gr_uchar_to_float_sptr uc2f = 	gr_make_uchar_to_float ();
-	unsigned char PHR_pre_interleave[] ={0,	0,	0,	0,	1,	9,	0,	1,	7,	1,	5,	15,	7,	13,	5,	0,	11,	9,	14,	11,	0,	0,	11,	6,	2,	5,	1,	3,	0,	7};
-	std::vector<unsigned char> PHR_pre_interleave2(PHR_pre_interleave, PHR_pre_interleave + sizeof(PHR_pre_interleave)/sizeof(unsigned char));
-	gr_vector_source_b_sptr uchar = gr_make_vector_source_b(PHR_pre_interleave2, true, sizeof(PHR_pre_interleave)/sizeof(unsigned char));
-	printf("GF:%d; N:%d K:%d, PHR_length:%d\n", vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in , vlc_var.PHR_raw_length);
-	bbVLCInterleaver::sptr interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in , vlc_var.PHR_raw_length, 30);
-	gr_int_to_float_sptr i2f = gr_make_int_to_float(sizeof(int)*120,1.0);
-	
-	connect(uchar,0,interleaver,0);
-    connect(interleaver,0,i2f,0);
-    connect(i2f,0,self(),0);*/
-
-	int psdu_words;
 	int phr_words;
-		
+	int psdu_words;
+	int out_PHY_I_phr;
+	int out_PHY_I_psdu;
 	
-	
-
-	//PSDU
-	/*bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("C:/CTTC/FlexiCom/src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
-	bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in ,vlc_var.phy_type,vlc_var.PSDU_raw_length);
-	switch (vlc_var.phy_type)
-	{
-		case 0:
-			psdu_words = (int) ceil(((double)vlc_var.PSDU_raw_length/(vlc_var.GF*vlc_var._rs_code.rs_in)))*vlc_var._rs_code.rs_out;
-			//phr_words = (int)  ceil(((double)vlc_var.PHR_raw_length/(vlc_var.GF*vlc_var._rs_code.pre_rs_in)))*vlc_var._rs_code.pre_rs_out;
-		break;
-		case 1:
-			psdu_words = psdu_rs_encoder->out_rs / vlc_var.GF;
-			//phr_words = phr_rs_encoder->out_rs / vlc_var.GF;
-		break;
-	}
-	bbVLCInterleaver::sptr psdu_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in , vlc_var.PSDU_raw_length, psdu_words);
+	/*gr_null_source_sptr null = gr_make_null_source(sizeof(int));
+	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0);
 	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
-	connect(PSDU_gen,0,psdu_rs_encoder,0);
-	connect(psdu_rs_encoder,0,psdu_interleaver,0);
-	connect(psdu_interleaver,0,i2f,0);
+	connect(null,0,phr_RLL,0);
+	connect(phr_RLL,0,i2f,0);
 	connect(i2f,0,self(),0);*/
-
 	
+	//GENERATION OF PHR, DATA
+	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
+	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("C:/CTTC/FlexiCom/src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
+	poly = new int[3];
+	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	
-	//PHR
-	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);
+	//PHR CHAIN
 	bbRSEnc::sptr phr_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in ,vlc_var.phy_type , vlc_var.PHR_raw_length);
 	switch(vlc_var.phy_type)
 	{
@@ -94,26 +63,135 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			phr_words = phr_rs_encoder->out_rs / vlc_var.GF;
 		break;
 	}
-	//printf("El numero de phr_words:%d\n", phr_words);
 	bbVLCInterleaver::sptr phr_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in , vlc_var.PHR_raw_length, phr_words);
-	int poly[3];
-	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
-	//printf("El valor de phr_interleaver->out_int:%d\n", phr_interleaver->out_int);
-	bbCCEnc::sptr phr_cc_encoder = bbCCEnc::Create(vlc_var._cc_code.pre_cc_out, 7, poly, phr_interleaver->out_int,vlc_var.operating_mode);
+	bbCCEnc::sptr phr_cc_encoder = bbCCEnc::Create(3, 7, poly, phr_interleaver->out_int, 0);
+	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0); //always on/off keying
+	out_PHY_I_phr= phr_cc_encoder->out_cc*2;
+	gr_null_sink_sptr sink_phr = gr_make_null_sink(sizeof(int));
 	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+	//PHR connections
 	connect(PHR_gen,0,phr_rs_encoder,0);
 	connect(phr_rs_encoder,0,phr_interleaver,0);
 	connect(phr_interleaver,0,phr_cc_encoder,0);
-	connect(phr_cc_encoder,0, i2f,0);
-	connect(i2f,0,self(),0);
-
+	connect(phr_cc_encoder, 0, phr_RLL,0);
+	connect(phr_RLL,0,sink_phr,0);
+	//connect(phr_RLL, 0, i2f,0);
+	//connect(i2f,0,self(),0);
 	
-    
+	//PSDU CHAIN
+	gr_null_sink_sptr sink_psdu = gr_make_null_sink(sizeof(int));
+	if (vlc_var._rs_code.rs_in!=0)
+	{
+		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in ,vlc_var.phy_type,vlc_var.PSDU_raw_length);
+		connect(PSDU_gen, 0, psdu_rs_encoder, 0);
+		switch (vlc_var.phy_type)
+		{
+			case 0:
+				psdu_words = (int) ceil(((double)vlc_var.PSDU_raw_length/(vlc_var.GF*vlc_var._rs_code.rs_in)))*vlc_var._rs_code.rs_out;
+			break;
+			case 1:
+				psdu_words = psdu_rs_encoder->out_rs / vlc_var.GF;
+			break;
+		}
+		bbVLCInterleaver::sptr psdu_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in , vlc_var.PSDU_raw_length, psdu_words);		
+		connect(psdu_rs_encoder, 0, psdu_interleaver, 0);
+		if(vlc_var._cc_code.cc_in !=0) 
+		{
+			bbCCEnc::sptr psdu_cc_encoder = bbCCEnc::Create(3, 7, poly, psdu_interleaver->out_int, vlc_var.operating_mode);
+			connect(psdu_interleaver, 0, psdu_cc_encoder, 0);
+			if(vlc_var.mod_type ==0)
+			{
+				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+				out_PHY_I_psdu= psdu_cc_encoder->out_cc*2;
+				connect(psdu_cc_encoder,0,psdu_RLL,0);
+				//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+			}
+			else
+			{
+				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
+				out_PHY_I_psdu= psdu_cc_encoder->out_cc/4*6;
+				connect(psdu_cc_encoder,0,psdu_RLL,0);
+				//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+			}
+		}
+		else
+		{
+			if(vlc_var.mod_type ==0)
+			{
+				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+				out_PHY_I_psdu= psdu_interleaver->out_int*2;
+				connect(psdu_interleaver,0,psdu_RLL,0);
+				//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+			}
+			else
+			{
+				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
+				out_PHY_I_psdu=psdu_interleaver->out_int/4*6;
+				connect(psdu_interleaver,0,psdu_RLL,0);
+				//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+			}	
+		}
+	}
+	else
+	{
+		if(vlc_var.mod_type ==0)
+		{
+			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0);
+			out_PHY_I_psdu= vlc_var.PSDU_raw_length*2;
+			connect(PSDU_gen,0,psdu_RLL,0);
+			//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+		}
+		else
+		{
+			bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
+			out_PHY_I_psdu=vlc_var.PSDU_raw_length/4*6;
+			connect(PSDU_gen,0,psdu_RLL,0);
+			//connect(psdu_RLL,0,sink_psdu,0);
+				connect(psdu_RLL,0,i2f,0);
+				connect(i2f,0,self(),0);
+		}	
+	}
+	
+	
+	
+	
+	//only developed PHY_I_modulator
+	//PHY_I_modulator::sptr PHY_I_mod = PHY_I_modulator::Create(&vlc_var);
+		//3:broadcast topology
+	//bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,PHY_I_mod->out_PHY_I_phr,PHY_I_mod->out_PHY_I_psdu,10);
+	/*gr_null_sink_sptr sink = gr_make_null_sink(sizeof(int));
+	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+	
+	
+	
+	connect(PHR_gen,0,PHY_I_mod,0);
+	connect(PSDU_gen,0,PHY_I_mod,1);
+	connect(PHY_I_mod,1,sink,0);
+	connect(PHY_I_mod,0,i2f,0);
+	connect(i2f,0,self(),0);
+	
+	/*connect(PHY_I_mod,0,FRAME_gen,0);
+	connect(PHY_I_mod,1,FRAME_gen,1);
+	connect(FRAME_gen,0,i2f,0);
+	connect(i2f,0, self(),0);*/
+	
 	if (1)
 	{
 		bbMatlab::sptr gm = bbMatlab::Create("m.txt", sizeof(float));
 		connect(i2f, 0, gm, 0);
+		//connect(uc2f,0,gm,0);
 	}
+	
 }
 
 
@@ -125,6 +203,8 @@ TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
 void TxVLC::init_var()
 {
 	vlc_var.MCSID=new int[6];
+	
+	vlc_var.flp_length=ly->varVLC->sp_flp_length->value();
 	
 	for (int i=0; i<2; i++)
 	{
@@ -378,6 +458,12 @@ void TxVLC::init_var()
 
 TxVLC::~TxVLC()
 {
+	if(poly && vlc_var.MCSID)
+	{
+		delete [] poly;
+		delete [] vlc_var.MCSID;
+	}
+			
 	//stop();
 }
 

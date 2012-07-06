@@ -49,6 +49,7 @@ struct vlc_var
 	int PHR_raw_length; //raw length prior to modulation
 	int PSDU_raw_length; //raw length prior to modulation
 	int *MCSID; //field for the PHR preamble
+	int flp_length;
 };
 
 
@@ -64,6 +65,7 @@ class TxVLC : public gr_hier_block2
 		
 		
 	private:
+		int *poly;
 		TxVLC(LayoutVLC *);
 		LayoutVLC *ly;
 		void init_var();

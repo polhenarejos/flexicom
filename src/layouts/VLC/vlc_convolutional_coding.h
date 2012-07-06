@@ -18,16 +18,16 @@ class vlc_convolutional_coding {
 		int *xor_table;
 		int *punct_matrix;
 		int *poly;
+		int encoder_state;
 		/*! 
-         * Decode RS encoded packet.
-         * returns a count of corrected symbols, or -1 if the block was uncorrectible.
+         * Decode CC encoded packet.
         */
 		int decode (unsigned char *rs_dec_out, unsigned char *in); 
 	
 	private:
 		
 		int *output_reverse_int;
-		int encoder_state;
+		
 		int no_states;
 		int data_rate;
 		int ones; //count the number of ones in the puncturing_matrix

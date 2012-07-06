@@ -36,27 +36,27 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 	TDP_pattern=new int[4*15];	
 	switch (TDP)
 	{
-		case 0:	
+		case 0:	 //topology independent
 			memcpy(TDP_pattern, TDP_aux0, sizeof(int)*15);
 			memcpy(&TDP_pattern[15], TDP_aux_neg0, sizeof(int)*15);
 			memcpy(&TDP_pattern[30], TDP_aux0, sizeof(int)*15);
 			memcpy(&TDP_pattern[45], TDP_aux_neg0, sizeof(int)*15);
 			
 		break;
-		case 1:
+		case 1: //peer-to-peer
 			memcpy(TDP_pattern, TDP_aux1, sizeof(int)*15);
 			memcpy(&TDP_pattern[15], TDP_aux_neg1, sizeof(int)*15);
 			memcpy(&TDP_pattern[30], TDP_aux1, sizeof(int)*15);
 			memcpy(&TDP_pattern[45], TDP_aux_neg1, sizeof(int)*15);
 		break;
-		case 2:
+		case 2: //star
 			memcpy(TDP_pattern, TDP_aux2, sizeof(int)*15);
 			memcpy(&TDP_pattern[15], TDP_aux_neg2, sizeof(int)*15);
 			memcpy(&TDP_pattern[30], TDP_aux2, sizeof(int)*15);
 			memcpy(&TDP_pattern[45], TDP_aux_neg2, sizeof(int)*15);
 			
 		break;
-		case 3:
+		case 3: //broadcast
 			memcpy(TDP_pattern, TDP_aux3, sizeof(int)*15);
 			memcpy(&TDP_pattern[15], TDP_aux_neg3, sizeof(int)*15);
 			memcpy(&TDP_pattern[30], TDP_aux3, sizeof(int)*15);
@@ -84,16 +84,22 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account
 	FLP_counter=0;
 	set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
+	/*printf("soy un clandemor\n");
+	printf("La longitud de phr:%d\n", length_PHR);
+	printf("La longitud de payload:%d\n", length_data_payload);
+	printf("Length frame:%d\n", length_frame);*/
 }
 
 bbVLC_Frame_Generator::~bbVLC_Frame_Generator()
 {
 	if (FLP_pattern && TDP_pattern)
 	{
-		delete FLP_pattern;
-		delete TDP_pattern;
+		delete [] FLP_pattern;
+		delete [] TDP_pattern;
+		delete [] idle_pattern;
 		FLP_pattern = 0;
 		TDP_pattern = 0;
+		idle_pattern = 0;
 	}
 		
 }
@@ -130,6 +136,7 @@ void bbVLC_Frame_Generator::forecast(int noutput_items, gr_vector_int &ninput_it
 	int ninputs = ninput_items_required.size();
 		ninput_items_required[0]= (noutput_items/length_frame)*length_PHR;
 		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
+		printf("Hola\n");
 	
 }
 
@@ -138,11 +145,12 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 	int *iptr1= (int *)input_items[0]; //PHR
 	int *iptr2= (int *)input_items[1]; //PSDU
 	int *optr=  (int *)output_items[0];
-	
+	printf("Hola\n");
 	int frames_to_process = noutput_items/length_frame;
 	int i;
 	while (frames_to_process > 0)
 	{
+		printf("Hola\n");
 		//1.FLP
 		if (FLP_counter == 0)
 		{

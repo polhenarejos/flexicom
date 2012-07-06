@@ -56,9 +56,9 @@ bbVLCInterleaver::~bbVLCInterleaver()
 {
 	if (interleaving_vector || puncturing_vector || bin_number)
 	{
-		delete interleaving_vector;
-		delete puncturing_vector;
-		delete bin_number;
+		delete [] interleaving_vector;
+		delete [] puncturing_vector;
+		delete [] bin_number;
 		interleaving_vector =0;
 		puncturing_vector =0;
 		bin_number = 0;
@@ -155,6 +155,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 			for (i=0; i<rs_length; i++)
 			{	
 				dec2bi(tmp2[i],GF,bin_number);
+				//printf("El valor de tmp2[%d]=%d\n", i,tmp2[i]);
 				//for (j=0;j<GF;j++)
 					//printf("Bin_number[%d,%d]=%d\n",i,j,bin_number[j]);
 				memcpy(optr,bin_number,sizeof(int)*GF);
@@ -163,7 +164,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 		}
 		blocks_to_process--;
 		/*times++;
-		if (times==3)
+		if (times==2)
 			exit(-1);*/
 	}
 	consume_each((noutput_items/out_int)*rs_length);

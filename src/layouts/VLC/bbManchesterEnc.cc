@@ -23,7 +23,7 @@ void bbManchesterEnc::forecast(int noutput_items, gr_vector_int &ninput_items_re
 {
 	uint ninputs = ninput_items_required.size();
 	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i]= noutput_items/2; //for each input bit, we generate 2 output bits
+		ninput_items_required[i]= (noutput_items/2)*500; //for each input bit, we generate 2 output bits
 }
 
 int bbManchesterEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
@@ -32,48 +32,30 @@ int bbManchesterEnc::general_work(int noutput_items, gr_vector_int &ninput_items
 	int *optr= (int *)output_items[0];
 	int samples_to_process;
 	samples_to_process= noutput_items/2;
-	switch (d_mode)
+	//printf("El valor del modulation:%d\n", d_mode);
+
+	while(samples_to_process>0)
 	{
-		case 0: //OOK
-			while (samples_to_process >0)
-			{
-				switch (iptr[0])
-				{
-					case 0:
-						optr[0]=0;
-						optr[1]=1;
-					break;
-					case 1:
-						optr[0]=1;
-						optr[1]=0;
-					break;
-				}
-				optr=optr+2;
-				iptr++;
-				samples_to_process--;
-			}
-		break;
-		case 1: //VPPM
-			while (samples_to_process > 0)
-			{
-				switch (iptr[0])
-				{
-					case 0:
-						optr[0]=1;
-						optr[1]=0;
-					break;
-					case 1:
-						optr[0]=0;
-						optr[1]=1;
-					break;
-				}
-				optr=optr+2;
-				iptr++;
-				samples_to_process--;
-			}
-		break;
+		if (iptr[0]==0)
+		{
+			optr[0]=0;
+			printf("%d\n", optr[0]);
+			optr[1]=1;
+			printf("%d\n", optr[1]);
+		}
+		else if (iptr[0]==1)
+		{
+			optr[0]=1;
+			printf("%d\n", optr[0]);
+			optr[1]=0;
+			printf("%d\n", optr[1]);
+		}
+		else 
+			printf("algo falla\n");
+		optr=optr+2;
+		iptr++;
+		samples_to_process--;
 	}
 	consume_each(noutput_items/2);
 	return noutput_items;
-	
 }

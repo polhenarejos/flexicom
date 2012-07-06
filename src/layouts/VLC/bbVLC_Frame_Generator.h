@@ -25,8 +25,8 @@ class bbVLC_Frame_Generator : public gr_block
 		int *TDP_pattern;
 		int *idle_pattern;
 		int IFS;
-		int length_PHR;
-		int length_data_payload;
+		int length_PHR; //length of modulated PHR
+		int length_data_payload; // length of modulated data
 		int length_frame;
 		int FLP_counter; //to control the inclusion of the FLP preamble in the burst mode
 		int length_burst;

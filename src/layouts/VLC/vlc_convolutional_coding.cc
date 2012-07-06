@@ -8,17 +8,30 @@
 vlc_convolutional_coding::vlc_convolutional_coding(int _N, int _K, int *_poly,int _length, int _data_rate):
 	N(_N),K(_K),poly(_poly), length(_length), data_rate(_data_rate)
 {
-	no_states= (int)pow((double)2, (double)(K-1));
-	xor_table = new int[(int) pow((double)2,(double)K)];
-	output_reverse_int = new int[(int) pow((double)2,(double)K)];
+	no_states= powf(2, (K-1));
+	//printf("K:%d\n", K);
+	int a = powf(2,K);
+	xor_table = new int[a];
+	if (N!=3)
+	{
+		printf("The N value must be 3, because is the code generator value\n");
+		exit(-1);
+	}
+	output_reverse_int = new int[2*no_states];
+	memset(output_reverse_int,0,sizeof(int)*2*no_states);
+	memset(xor_table,0, sizeof(int)*a);
+	//printf("El valor de powf(2,K):%d\n", a);
+	//mother convolutional code n=3! important
 	set_generator_polynomials(xor_table,poly,K,N,no_states, output_reverse_int);
+	
 	//m=K-1;
+	//printf("El valor de N:%d, el valor de K:%d, el valor de poly[0]:%d, poly[1]:%d, poly[2]:%d, el valor de length:%d, el valor de data_rate:%d\n", N,K, poly[0], poly[1], poly[2], length, data_rate);
 	encoder_state = 0;
 	punct_matrix= new int[N*2];
 	ones=0;
 	switch (data_rate)
 	{
-		case 0: //1/4
+		case 0: //1/2, then we have to transform to 1/4
 			punct_matrix[0]=1; punct_matrix[1]=1;
 			punct_matrix[2]=1; punct_matrix[3]=1;
 			punct_matrix[4]=0; punct_matrix[5]=0;
@@ -67,13 +80,14 @@ void vlc_convolutional_coding::set_generator_polynomials(int *xor, int *poly, in
    int limit;
    int zero_one_output[2];
    limit=(int) pow((double)2,(double)K);
+   //printf("El valor de no_states:%d, limit:%d\n", no_states, limit);
    //limit=128;
    //no_states= 64; //2^(K-1)
     
    for (i = 0; i < limit; i++) 
-    {
+   {
       xor[i] = (weight_int(K, i) & 1);
-    }
+   }
     
     
     for (i=0; i<no_states;i++)
@@ -119,6 +133,7 @@ void vlc_convolutional_coding::encode( int *data,  int *output,int *xor_table, i
   int i,j;
   int temp;
   int M = K-1;
+  
   for (i = 0; i < NN; i++) 
   {
     encoder_state |=  data[i] << M;
@@ -129,7 +144,7 @@ void vlc_convolutional_coding::encode( int *data,  int *output,int *xor_table, i
     }
     encoder_state >>= 1;
   }
-
+  
   // add tail of m = K-1 zeros
   for ( i = NN; i < NN + M; i++) 
   {
@@ -144,9 +159,11 @@ void vlc_convolutional_coding::encode( int *data,  int *output,int *xor_table, i
 
 int vlc_convolutional_coding::encode_punct(int *data, int *output, int *xor_table, int *poly, int encoder_state, int N, int K,int NN, int Period, int *punct_matrix)
 {
+	//N has to be always 3!! (according to the standard)
   int i,j,k=0,p=0;
   int length= (NN+(K-1))*N;
-  encode (data,output,xor_table, poly, encoder_state, N, (K-1), NN);
+  //printf("El valor de Period:%d\n", Period);
+  encode(data,output,xor_table, poly, encoder_state, N, K, NN);
   
   for (i =0; i<(length/N); i++)
   {

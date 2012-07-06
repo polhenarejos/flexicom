@@ -13,6 +13,7 @@ class bbCCEnc : public gr_block
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbCCEnc();
+		int out_cc;
 	
 	private:
 		bbCCEnc(int, int, int *, int, int);
@@ -21,7 +22,7 @@ class bbCCEnc : public gr_block
 		int *poly;
 		int length;
 		int data_rate;
-		int out_cc;
+		
 		vlc_convolutional_coding *vlc_cc;
 };
 

@@ -15,8 +15,11 @@ class PHY_I_modulator : public gr_hier_block2
 		~PHY_I_modulator();
 		void stop();
 		vlc_var *vlc_var_phy;
+		int out_PHY_I_phr;
+		int out_PHY_I_psdu;
 		
 	private:
+		int *poly;
 		PHY_I_modulator(vlc_var *vlc_var_phy);
 };
 

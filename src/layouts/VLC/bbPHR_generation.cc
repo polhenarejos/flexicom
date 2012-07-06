@@ -29,8 +29,8 @@ bbPHR_generation::~bbPHR_generation()
 {
 	if (MCSID && phr_crc && crc)
 	{
-		delete MCSID;
-		delete phr_crc;
+		delete [] MCSID;
+		delete [] phr_crc;
 		delete crc;
 		MCSID =0;
 		phr_crc=0;
