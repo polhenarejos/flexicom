@@ -1,4 +1,4 @@
-DEBUG=0
+DEBUG=1
 CMDLINE=1
 
 ###############################
@@ -52,6 +52,11 @@ UHD_BIN_DIR=$(UHD_DIR)\bin\$(PREF)
 CPPUNIT_DIR=deps\cppunit
 CPPUNIT_INC_DIR=$(CPPUNIT_DIR)\include
 CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib\$(PREF)
+## NaturalDocs
+DOC_DIR=deps\NaturalDocs
+DOC_BIN=$(DOC_DIR)\NaturalDocs.bat
+DOC_PROJ=doc
+DOC_OUT=$(DOC_PROJ)\html
 
 ###############################
 
@@ -105,7 +110,7 @@ CFLAGS = $(CFLAGS) /D _WIN32 /arch:SSE2 /D _USE_32BIT_TIME_T
 !endif
 
 !if $(DEBUG) == 1
-DBGCFLAG=/MDd /Zi /Od
+DBGCFLAG=/MD /Zi /Od
 DBGLFLAG=/debug
 !else
 DBGCFLAG=/MD /Zi /Ox /W1
@@ -188,3 +193,10 @@ test_files: $(TEST_FILES) objs
 {$(TEST_DIR)}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) $(CPPUNIT_INC) /Fd$(OBJ_DIR) $<
 	
+#Doc suite
+doc: docdep
+	@if not exist $(DOC_PROJ) mkdir $(DOC_PROJ)
+	@if not exist $(DOC_OUT) mkdir $(DOC_OUT)
+	$(DOC_BIN) -i $(INC_DIR) -i $(SRC_DIR) -o HTML $(DOC_OUT) -p $(DOC_PROJ) 
+	
+docdep:
