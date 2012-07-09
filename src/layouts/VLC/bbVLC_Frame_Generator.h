@@ -11,7 +11,6 @@ class bbVLC_Frame_Generator : public gr_block
 		typedef boost::shared_ptr<bbVLC_Frame_Generator> sptr;
 		static sptr Create(int,int,int,int,int,int,int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
-		void forecast(int, gr_vector_int &);
 		~bbVLC_Frame_Generator();
 	
 	private:

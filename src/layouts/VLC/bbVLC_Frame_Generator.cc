@@ -24,7 +24,7 @@ int visibility_patterns[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 
                             
 bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
-	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(2,2,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), FLP_length(_FLP), TDP(_topology), 
+	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), FLP_length(_FLP), TDP(_topology), 
 	tx_mode(_tx_mode), PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload), length_burst(_length_burst)
 {
 	assert (FLP_length%2==0);
@@ -76,14 +76,15 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 			break;
 		case 2:
 			IFS = 90;
-			length_frame = FLP_length + 60 + length_PHR + PSDU_units * length_data_payload+ IFS;
+			length_frame = FLP_length + (60 + length_PHR + PSDU_units * length_data_payload+ IFS)*length_burst;
 			//this is true only the first time, we will have to modify the length_frame variable in the general_work method
 			break;
 	}
 	idle_pattern = new int[IFS];
 	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account --fallo
 	FLP_counter=0;
-	set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
+	if (tx_mode != 2) //no burst
+		set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
 	/*printf("soy un clandemor\n");
 	printf("La longitud de phr:%d\n", length_PHR);
 	printf("La longitud de payload:%d\n", length_data_payload);
@@ -130,16 +131,17 @@ void bbVLC_Frame_Generator::idle_pattern_generation( int *iddle_pattern, int IFS
 		
 	}
 }
-
+/*
 void bbVLC_Frame_Generator::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
-	int ninputs = ninput_items_required.size();
+	if (tx_mode != 2)
+	{
 		ninput_items_required[0]= (noutput_items/length_frame)*length_PHR;
 		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
-		//printf("Hola\n");
-	
+	}
 }
-
+*7
+/*
 int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr1= (int *)input_items[0]; //PHR
@@ -185,5 +187,28 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 	}
 	//consume(0,noutput_items/length_frame_tmp*length_PHR); //llámalos dentro para no perder la cuenta en cada momento
 	//consume(1,noutput_items/length_frame_tmp*length_data_payload); 
+	return noutput_items;
+}
+*/
+int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
+{
+	int *iptr1= (int *)input_items[0]; //PHR+PSDU
+	int *optr = (int *)output_items[0];
+	int ci = 0;
+	static int packet_len = 60 + length_PHR + PSDU_units * length_data_payload;
+	for (int n = 0; n < noutput_items; n++)
+	{
+		if (FLP_counter < FLP_length)
+			*optr++ = FLP_pattern[FLP_counter];
+		else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
+			*optr++ = idle_pattern[FLP_counter];
+		else
+		{
+			*optr++ = *iptr1++;
+			ci++;
+		}
+		FLP_counter = (FLP_counter+1)%length_frame;
+	}
+	consume_each(ci);
 	return noutput_items;
 }
