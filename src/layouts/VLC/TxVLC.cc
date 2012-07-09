@@ -6,15 +6,7 @@
 #include <QtGlobal>
 #include <iostream>
 
-#include <gr_file_source.h>
-#include <gr_add_const_ii.h>
-#include <gr_add_const_ff.h>
 #include <gr_int_to_float.h>
-#include <gr_null_source.h>
-#include <gr_vector_source_i.h>
-#include <gr_uchar_to_float.h>
-#include <gr_vector_source_b.h>
-#include <gr_null_sink.h>
 #include "bbPHR_generation.h"
 #include "bbPSDU_generation.h"
 #include "bbRSEnc.h"
@@ -23,6 +15,7 @@
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"
 #include "PHY_I_modulator.h"
+#include "bbVLC_info_assembler.h"
 #include "bbVLC_Frame_Generator.h"
 
 #include "bbMatlab.h"
@@ -68,9 +61,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	bbCCEnc::sptr phr_cc_encoder = bbCCEnc::Create(3, 7, poly, phr_interleaver->out_int, 0);
 	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0,phr_cc_encoder->out_cc); //always on/off keying
 	out_PHY_I_phr= phr_cc_encoder->out_cc*2;
-	gr_null_sink_sptr sink_phr = gr_make_null_sink(sizeof(int));
-	
-	
+		
 	//PHR connections
 	connect(PHR_gen,0,phr_rs_encoder,0);
 	connect(phr_rs_encoder,0,phr_interleaver,0);
@@ -80,7 +71,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	//connect(i2f,0,self(),0);
 	
 	//PSDU CHAIN
-	gr_null_sink_sptr sink_psdu = gr_make_null_sink(sizeof(int));
 	if (vlc_var._rs_code.rs_in!=0)
 	{
 		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in ,vlc_var.phy_type,vlc_var.PSDU_raw_length);
@@ -104,10 +94,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			{
 				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_cc_encoder->out_cc);
 				out_PHY_I_psdu= psdu_cc_encoder->out_cc*2;
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(phr_RLL,0,FRAME_gen,0);
-				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(phr_RLL,0,INFO_ass,0);
+				connect(psdu_RLL,0,INFO_ass,1);
+				connect(INFO_ass,0, FRAME_gen,0);
 				connect(FRAME_gen,0,i2f,0);
 				connect(i2f,0,self(),0);
 			}
@@ -115,10 +107,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 				out_PHY_I_psdu= psdu_cc_encoder->out_cc/4*6;
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(phr_RLL,0,FRAME_gen,0);
-				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(phr_RLL,0,INFO_ass,0);
+				connect(psdu_RLL,0,INFO_ass,1);
+				connect(INFO_ass,0, FRAME_gen,0);
 				connect(FRAME_gen,0,i2f,0);
 				connect(i2f,0,self(),0);
 			}
@@ -129,10 +123,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			{
 				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_interleaver->out_int);
 				out_PHY_I_psdu= psdu_interleaver->out_int*2;
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(phr_RLL,0,FRAME_gen,0);
-				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(phr_RLL,0,INFO_ass,0);
+				connect(psdu_RLL,0,INFO_ass,1);
+				connect(INFO_ass,0, FRAME_gen,0);
 				connect(FRAME_gen,0,i2f,0);
 				connect(i2f,0,self(),0);
 			}
@@ -140,10 +136,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 				out_PHY_I_psdu=psdu_interleaver->out_int/4*6;
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(phr_RLL,0,FRAME_gen,0);
-				connect(psdu_RLL,0,FRAME_gen,1);
+				connect(phr_RLL,0,INFO_ass,0);
+				connect(psdu_RLL,0,INFO_ass,1);
+				connect(INFO_ass,0, FRAME_gen,0);
 				connect(FRAME_gen,0,i2f,0);
 				connect(i2f,0,self(),0);
 			}	
@@ -155,10 +153,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		{
 			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,vlc_var.PSDU_raw_length);
 			out_PHY_I_psdu= vlc_var.PSDU_raw_length*2;
-			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(phr_RLL,0,FRAME_gen,0);
-			connect(psdu_RLL,0,FRAME_gen,1);
+			connect(phr_RLL,0,INFO_ass,0);
+			connect(psdu_RLL,0,INFO_ass,1);
+			connect(INFO_ass,0, FRAME_gen,0);
 			connect(FRAME_gen,0,i2f,0);
 			connect(i2f,0,self(),0);
 		}
@@ -166,37 +166,17 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		{
 			bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
 			out_PHY_I_psdu=vlc_var.PSDU_raw_length/4*6;
-			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,5);
+			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
+			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
 			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(phr_RLL,0,FRAME_gen,0);
-			connect(psdu_RLL,0,FRAME_gen,1);
+			connect(phr_RLL,0,INFO_ass,0);
+			connect(psdu_RLL,0,INFO_ass,1);
+			connect(INFO_ass,0, FRAME_gen,0);
 			connect(FRAME_gen,0,i2f,0);
 			connect(i2f,0,self(),0);
 		}	
 	}
 	
-	
-	
-	
-	//only developed PHY_I_modulator
-	//PHY_I_modulator::sptr PHY_I_mod = PHY_I_modulator::Create(&vlc_var);
-		//3:broadcast topology
-	//bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,3,vlc_var.tx_mode, vlc_var.psdu_units,PHY_I_mod->out_PHY_I_phr,PHY_I_mod->out_PHY_I_psdu,10);
-	/*gr_null_sink_sptr sink = gr_make_null_sink(sizeof(int));
-	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
-	
-	
-	
-	connect(PHR_gen,0,PHY_I_mod,0);
-	connect(PSDU_gen,0,PHY_I_mod,1);
-	connect(PHY_I_mod,1,sink,0);
-	connect(PHY_I_mod,0,i2f,0);
-	connect(i2f,0,self(),0);
-	
-	/*connect(PHY_I_mod,0,FRAME_gen,0);
-	connect(PHY_I_mod,1,FRAME_gen,1);
-	connect(FRAME_gen,0,i2f,0);
-	connect(i2f,0, self(),0);*/
 	
 	if (1)
 	{

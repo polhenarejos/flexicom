@@ -3,14 +3,6 @@
 #include <math.h>
 
 
-int TDP_aux0[]=     {1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0};
-int TDP_aux_neg0[]= {0 ,0 ,0 ,0 ,1 ,0 ,1 ,0 ,0 ,1 ,1 ,0 ,1 ,1 ,1};
-int TDP_aux1[]=     {0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0};
-int TDP_aux_neg1[]= {1 ,1 ,0 ,1 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1};
-int TDP_aux2[]=     {1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1};
-int TDP_aux_neg2[]= {0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1 ,1 ,0 ,0};
-int TDP_aux3[]=     {0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1};
-int TDP_aux_neg3[]= {1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0};
 int visibility_patterns[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
                             0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 
@@ -23,47 +15,18 @@ int visibility_patterns[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             1, 1, 1, 1, 0, 1, 1, 1, 1, 1,   
                             1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 
                             
-bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
-	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), FLP_length(_FLP), TDP(_topology), 
-	tx_mode(_tx_mode), PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload), length_burst(_length_burst)
+bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
+	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), FLP_length(_FLP), tx_mode(_tx_mode), 
+	PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload), length_burst(_length_burst)
 {
 	assert (FLP_length%2==0);
 	FLP_pattern = new int[FLP_length];
 	memset(FLP_pattern,0,sizeof(int)*FLP_length);
-	int i; //IFS stands for Interframe Spacing
+	int i; 
 	for (i=0; i<FLP_length;i=i+2)
 		FLP_pattern[i]=1;
-	TDP_pattern=new int[4*15];	
-	switch (TDP)
-	{
-		case 0:	 //topology independent
-			memcpy(TDP_pattern, TDP_aux0, sizeof(int)*15);
-			memcpy(&TDP_pattern[15], TDP_aux_neg0, sizeof(int)*15);
-			memcpy(&TDP_pattern[30], TDP_aux0, sizeof(int)*15);
-			memcpy(&TDP_pattern[45], TDP_aux_neg0, sizeof(int)*15);
-			
-		break;
-		case 1: //peer-to-peer
-			memcpy(TDP_pattern, TDP_aux1, sizeof(int)*15);
-			memcpy(&TDP_pattern[15], TDP_aux_neg1, sizeof(int)*15);
-			memcpy(&TDP_pattern[30], TDP_aux1, sizeof(int)*15);
-			memcpy(&TDP_pattern[45], TDP_aux_neg1, sizeof(int)*15);
-		break;
-		case 2: //star
-			memcpy(TDP_pattern, TDP_aux2, sizeof(int)*15);
-			memcpy(&TDP_pattern[15], TDP_aux_neg2, sizeof(int)*15);
-			memcpy(&TDP_pattern[30], TDP_aux2, sizeof(int)*15);
-			memcpy(&TDP_pattern[45], TDP_aux_neg2, sizeof(int)*15);
-			
-		break;
-		case 3: //broadcast
-			memcpy(TDP_pattern, TDP_aux3, sizeof(int)*15);
-			memcpy(&TDP_pattern[15], TDP_aux_neg3, sizeof(int)*15);
-			memcpy(&TDP_pattern[30], TDP_aux3, sizeof(int)*15);
-			memcpy(&TDP_pattern[45], TDP_aux_neg3, sizeof(int)*15);
-		break;
-	}
-	IFS=0;
+	
+	IFS=0; //IFS stands for Interframe Spacing
 	switch(tx_mode)
 	{
 		case 0:
@@ -85,29 +48,23 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _topology, int _tx_mo
 	FLP_counter=0;
 	if (tx_mode != 2) //no burst
 		set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
-	/*printf("soy un clandemor\n");
-	printf("La longitud de phr:%d\n", length_PHR);
-	printf("La longitud de payload:%d\n", length_data_payload);
-	printf("Length frame:%d\n", length_frame);*/
 }
 
 bbVLC_Frame_Generator::~bbVLC_Frame_Generator()
 {
-	if (FLP_pattern && TDP_pattern)
+	if (FLP_pattern && idle_pattern)
 	{
 		delete [] FLP_pattern;
-		delete [] TDP_pattern;
 		delete [] idle_pattern;
 		FLP_pattern = 0;
-		TDP_pattern = 0;
 		idle_pattern = 0;
 	}
 		
 }
 
-bbVLC_Frame_Generator::sptr bbVLC_Frame_Generator::Create(int _FLP_length, int _topology, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst)
+bbVLC_Frame_Generator::sptr bbVLC_Frame_Generator::Create(int _FLP_length, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst)
 {
-	return sptr(new bbVLC_Frame_Generator(_FLP_length, _topology, _tx_mode, _PSDU_units, _length_PHR, _length_data_payload, _length_burst));
+	return sptr(new bbVLC_Frame_Generator(_FLP_length, _tx_mode, _PSDU_units, _length_PHR, _length_data_payload, _length_burst));
 }
 
 void bbVLC_Frame_Generator::idle_pattern_generation( int *iddle_pattern, int IFS, int dimming)
@@ -192,7 +149,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 */
 int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr1= (int *)input_items[0]; //PHR+PSDU
+	int *iptr1= (int *)input_items[0]; //TDP+PHR+PSDU
 	int *optr = (int *)output_items[0];
 	int ci = 0;
 	static int packet_len = 60 + length_PHR + PSDU_units * length_data_payload;
@@ -201,7 +158,8 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 		if (FLP_counter < FLP_length)
 			*optr++ = FLP_pattern[FLP_counter];
 		else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
-			*optr++ = idle_pattern[FLP_counter];
+			*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
+			//*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)];       
 		else
 		{
 			*optr++ = *iptr1++;
