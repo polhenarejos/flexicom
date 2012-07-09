@@ -1,0 +1,46 @@
+SOURCES=LayoutFactory.cc main.cc MainWindow.cc MainWindow_moc.cc
+LAYOUTS=BBN_PLCP.cc BBN_Slicer.cc BBN_DPSKDemod.cc Layout80211b.cc Rx80211b.cc
+VPATH=layouts/80211b:layouts/VLC
+OBJS=$(SOURCES:%.cc=$(OUTDIR)/%.o)
+LAYOBJS=$(LAYOUTS:%.cc=$(OUTDIR)/%.o)
+
+INCLUDES=$(INCLUDEDIR)/LayoutFactory.h $(INCLUDEDIR)/MainWindow.h
+MAKEARGS='CFLAGS=${CFLAGS}' \
+		'CC=${CC}' \
+		'LDFLAGS=${LDFLAGS}' \
+		'INCLUDES=${INCLUDES}' \
+		'INCLUDEDIR=${INCLUDEDIR}' \
+		'RM=${RM}' \
+		'AR=${AR}' \
+		'CP=${CP}' \
+		'MLDFLAGS=${MLDFLAGS}' \
+		'LN=${LN}' \
+		'TARGET=${TARGET}' \
+		'MKDIR=${MKDIR}' \
+		'OUTDIR=${OUTDIR}' \
+		'TESTDIR=${TESTDIR}'
+
+
+
+MAKE=make $(MAKEARGS)
+all: build
+
+build: $(OBJS) $(LAYOBJS)
+	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(LDFLAGS) $(LIBS)
+	@$(CP) $(OUTDIR)/$(TARGET) ../$(TARGET)
+
+$(OUTDIR)/MainWindow.o: MainWindow.cc $(INCLUDES)
+	$(MOC) $(INCLUDEDIR)/MainWindow.h -o MainWindow_moc.cc
+	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c MainWindow.cc -o $(OUTDIR)/MainWindow.o 
+$(OUTDIR)/main.o: main.cc $(INCLUDES)
+	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c main.cc -o $(OUTDIR)/main.o 
+
+$(OUTDIR)/%.o: %.cc $(INCLUDES)
+	$(CC) $(CFLAGS) -c $< -o $@
+	
+$(OUTDIR)/%.o: %.cc $(INCLUDES)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	$(RM) -f $(OUTDIR)/* $(OBJS)
+	cd layout; $(MAKE) clean

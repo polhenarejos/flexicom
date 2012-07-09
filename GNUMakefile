@@ -1,0 +1,49 @@
+# $Id$
+
+DEBUG=1
+
+##########
+
+RM=rm
+AR=ar
+CP=cp
+LN=ln
+CC=g++
+TARGET=flexicom
+UNAME:=$(shell uname)
+MKDIR=mkdir
+OUTDIR=out
+TESTDIR=test
+
+INCLUDEDIR=../include
+MOC=moc
+CFLAGS=-I$(INCLUDEDIR) $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` -I/usr/include/qwt-qt4 `pkg-config --cflags uhd`
+LDFLAGS=-lboost_program_options-mt -lm `pkg-config --libs gnuradio-core` -lqwt-qt4 `pkg-config --libs QtGui` `pkg-config --libs uhd`
+
+XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg 
+
+MAKEARGS='CFLAGS=${CFLAGS}' \
+		'CC=${CC}' \
+		'LDFLAGS=${LDFLAGS}' \
+		'INCLUDEDIR=${INCLUDEDIR}' \
+		'RM=${RM}' \
+		'AR=${AR}' \
+		'CP=${CP}' \
+		'DYNCOMP=${DYNCOMP}' \
+		'MLDFLAGS=${MLDFLAGS}' \
+		'LN=${LN}' \
+		'MKDIR=${MKDIR}' \
+		'OUTDIR=${OUTDIR}' \
+		'TESTDIR=${TESTDIR}' \
+		'MOC=${MOC}' 
+
+all: build
+build: 
+	@if [ ! -r src/$(OUTDIR) ] ; then \
+		$(MKDIR) src/$(OUTDIR); \
+	fi
+	cd src; ${MAKE} ${MAKEARGS} 'TARGET=${TARGET}' build; 
+	
+clean:
+	$(RM) -f *~ *.so
+	cd src; ${MAKE} ${MAKEARGS} clean;
