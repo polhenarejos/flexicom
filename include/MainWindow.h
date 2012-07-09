@@ -17,6 +17,9 @@
 class Panel;
 #define RB_TX 0
 #define RB_RX 1
+
+/*! \brief MainWindow class is used for handling GUI Window
+*/
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -31,6 +34,7 @@ class MainWindow : public QMainWindow
 		std::vector<int> tabs;
 		
 	public:
+		//! Constructor
 		MainWindow(QWidget * = NULL);
 		bool initd;
 		Panel *panel;

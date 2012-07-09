@@ -53,10 +53,8 @@ CPPUNIT_DIR=deps\cppunit
 CPPUNIT_INC_DIR=$(CPPUNIT_DIR)\include
 CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib\$(PREF)
 ## NaturalDocs
-DOC_DIR=deps\NaturalDocs
-DOC_BIN=$(DOC_DIR)\NaturalDocs.bat
-DOC_PROJ=doc
-DOC_OUT=$(DOC_PROJ)\html
+DOC_DIR=deps\doxygen\bin\$(PREF)
+DOC_BIN=$(DOC_DIR)\doxygen
 
 ###############################
 
@@ -195,8 +193,6 @@ test_files: $(TEST_FILES) objs
 	
 #Doc suite
 doc: docdep
-	@if not exist $(DOC_PROJ) mkdir $(DOC_PROJ)
-	@if not exist $(DOC_OUT) mkdir $(DOC_OUT)
-	$(DOC_BIN) -i $(INC_DIR) -i $(SRC_DIR) -o HTML $(DOC_OUT) -p $(DOC_PROJ) 
+	$(DOC_BIN) doc\doxy.conf
 	
 docdep:
