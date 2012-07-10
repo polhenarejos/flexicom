@@ -72,7 +72,7 @@ class TxVLC : public gr_hier_block2
 		static sptr Create(LayoutVLC *);
 		~TxVLC();
 		void stop();
-		vlc_var vlc_var;
+		vlc_var vlc_var; /**< [in] struct which contains the configuration of the VLC system set at the GUI interface.*/
 		
 		
 	private:
