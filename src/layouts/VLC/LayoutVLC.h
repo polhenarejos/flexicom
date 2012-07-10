@@ -14,6 +14,13 @@ class uhd_usrp_source;
 class uhd_usrp_sink;
 class MainWindow;
 
+/*! \brief The class where the layout of the VLC communication system is defined
+
+* In this class, the TXVLC or the RXVLC is connected to the usrp class object to stablish the stream of samples
+* Another functionality of this class is to manage the tab which configures the VLC system.
+
+*/
+
 class LayoutVLC : public QObject , public LayoutFactory
 {
 	Q_OBJECT

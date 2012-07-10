@@ -3,6 +3,13 @@
 
 #include <gr_block.h>
 
+/*! \brief bb8b10bEnc class defines the RLL encoding process defined in IEEE 802.15.7.
+
+* This scheme is used in PHY II when using OOK modulation. The 8B10B expands 8-bits to 10-bit encoded symbols with
+  DC balance. This encoding process is not explicitily specified in the standard, but the following web resource has been
+  selected as reference: http://www.latticesemi.com/lit/docs/refdesigns/rd1012.pdf?jsessionid=f030dc40700e304b612a7c7d361735751137
+*/
+
 class bb8b10bEnc : public gr_block
 {
 	public:

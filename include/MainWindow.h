@@ -41,8 +41,10 @@ class MainWindow : public QMainWindow
 		void closeEvent(QCloseEvent *);
 		QSettings s;
 		QGridLayout *plotGrid;
+		//! Method which allow the creation of particular tab for the selected communication system
 		void AddCustomTab(QWidget *, QString &);
 		void RemoveCustomTabs();
+		//! Method which allow the creation of particular plots for the selected communication system
 		void AddCustomPlot(QWidget *, int = 0, int = 0);
 		void RemoveCustomPlots();
 		enum StatesLayout { STARTING, STARTED, STOPPING, STOPPED };

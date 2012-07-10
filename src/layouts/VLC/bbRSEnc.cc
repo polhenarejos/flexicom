@@ -10,7 +10,6 @@ bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 	GF(_GF),N(_N),K(_K), phy_type(_phy_type), length(_length)
 {
 	unsigned int poly;
-	int output;
 	//printf("GF:%d, N:%d, K:%d, phy_type:%d, length:%d\n", GF,N,K, phy_type, length);
 	switch (phy_type)
 	{
@@ -38,9 +37,9 @@ bbRSEnc::~bbRSEnc()
 }
 
 
-bbRSEnc::sptr bbRSEnc::Create(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int length )
+bbRSEnc::sptr bbRSEnc::Create(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length )
 {
-	return sptr(new bbRSEnc(_GF, _N, _K, _phy_type, length));
+	return sptr(new bbRSEnc(_GF, _N, _K, _phy_type, _length));
 }
 
 int bbRSEnc::rs_out_elements()

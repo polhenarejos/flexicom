@@ -3,6 +3,12 @@
 
 #include <gr_block.h>
 
+/*! \brief bb4b6bEnc class defines the RLL encoding process defined in section 10.5.1 of IEEE 802.15.7.
+
+* All VPPM PHY I modes shall use 4B6B encoding. The 4B6B expands 4-bit to 6-bit encoded symbols with
+  DC balance.
+*/
+
 class bb4b6bEnc : public gr_block
 {
 	public:

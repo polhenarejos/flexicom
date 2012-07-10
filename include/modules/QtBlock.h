@@ -9,6 +9,9 @@
 #include <QObject>
 #include <QMutex>
 
+/*! \brief Qtblock class is the base definition of a plot object to be inserted in the GUI
+*/
+
 class QtBlock : public QObject, public gr_block
 {
 	Q_OBJECT
@@ -28,6 +31,11 @@ class QtBlock : public QObject, public gr_block
 	signals:
 		void Replot();
 };
+
+/*! \brief Qt1D class inherites from QtBlock and is the GNURadio block which handles the plot drawing process inside the GNURadio process 
+*/
+
+
 class Qt1D : public QtBlock
 {
 	public:
