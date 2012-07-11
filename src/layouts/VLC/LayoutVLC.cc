@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include <gr_null_sink.h>
+#include <gr_sig_source_f.h>
 
 const char *LayoutVLC::name = "VLC";
 
@@ -64,14 +65,19 @@ void LayoutVLC::Run()
 	}
 	else //transmitter
 	{
-		//usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-		tx = TxVLC::Create(this);
+		usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		usrp_tx->set_samp_rate(10e6);
+		usrp_tx->set_center_freq(0);
+		usrp_tx->set_gain(mw->panel->sp_gain->value());
+		gr_sig_source_f_sptr sig = gr_make_sig_source_f(10e6, GR_SQR_WAVE, 200e3, 5, 0);
+		grTop->connect(sig, 0, usrp_tx, 0);
+		/*tx = TxVLC::Create(this);
 		if (tx->vlc_var.phy_type)
 		{
 			printf("PHY II mode is not still available\n");
 			exit(-1);
 		}
-		/*else
+		else
 		{
 			switch (tx->vlc_var.mod_type)
 			{
@@ -84,11 +90,11 @@ void LayoutVLC::Run()
 				//other settings of USRP, VPPM is OOK with twice the speed
 				break;
 			}
-		}*/	
+		}
 		gr_null_sink_sptr sink = gr_make_null_sink(sizeof(float));		
 		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
-			
+		*/
 	}
 }
 void LayoutVLC::Stop()
