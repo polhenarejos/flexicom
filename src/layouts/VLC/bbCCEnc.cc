@@ -72,7 +72,6 @@ int bbCCEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	tmp= new int[length];
 	tmp2=new int[(length+K-1)*N];
 	blocks_to_process = (noutput_items/out_cc);
-	int times=0;
 	//printf("Noutput_items:%d\n", noutput_items);
 	while (blocks_to_process>0)
 	{

@@ -9,7 +9,7 @@
 #include "bb4b6bEnc.h"
 #include <gr_io_signature.h>
 
-PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
+PHY_I_modulator::PHY_I_modulator(VLCvar *_vlc_var_phy) :
 	gr_hier_block2("PHY_I_modulator", gr_make_io_signature(2,2,sizeof(int)), gr_make_io_signature(2,2,sizeof(int))),
 	vlc_var_phy(_vlc_var_phy)
 {
@@ -117,7 +117,7 @@ PHY_I_modulator::PHY_I_modulator(vlc_var *_vlc_var_phy) :
 	}
 }
 
-PHY_I_modulator::sptr PHY_I_modulator::Create(vlc_var *_vlc_var_phy)
+PHY_I_modulator::sptr PHY_I_modulator::Create(VLCvar *_vlc_var_phy)
 { 
 	return sptr(new PHY_I_modulator(_vlc_var_phy));
 }

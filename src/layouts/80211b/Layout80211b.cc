@@ -55,7 +55,7 @@ void Layout80211b::RadioPressed(bool check)
 {
 	if (check)
 	{
-		mw->AddCustomTab(CreateTabOpts(), QString("Options"));
+		mw->AddCustomTab(CreateTabOpts(), tr("Options"));
 		mw->panel->rb_chain[RB_TX]->setEnabled(false);
 		mw->panel->rb_chain[RB_RX]->setEnabled(true);
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
@@ -77,7 +77,7 @@ QWidget *Layout80211b::CreateTabOpts()
 	QGroupBox *gBox = new QGroupBox(tr("Channels"));
 	QGridLayout *vBox = new QGridLayout;
 	cb_chans = new QComboBox(p);
-	for (int i = 0; i < sizeof(channels)/sizeof(int); i++)
+	for (uint i = 0; i < sizeof(channels)/sizeof(int); i++)
 		cb_chans->addItem(QString("Channel %1: %2 MHz").arg(i+1).arg(channels[i]));
 	vBox->addWidget(cb_chans);
 	gBox->setLayout(vBox);

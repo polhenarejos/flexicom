@@ -34,7 +34,7 @@ struct cc_code
 
 //For simplicity, a struct which contains all the variables is created
 
-struct vlc_var
+struct VLCvar
 {
 	int phy_type;
 	int mod_type;
@@ -72,7 +72,7 @@ class TxVLC : public gr_hier_block2
 		static sptr Create(LayoutVLC *);
 		~TxVLC();
 		void stop();
-		vlc_var vlc_var; /**< [in] struct which contains the configuration of the VLC system set at the GUI interface.*/
+		VLCvar vlc_var; /**< [in] struct which contains the configuration of the VLC system set at the GUI interface.*/
 		
 		
 	private:

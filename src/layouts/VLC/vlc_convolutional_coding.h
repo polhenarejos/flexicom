@@ -49,9 +49,9 @@ class vlc_convolutional_coding {
 		int *output_reverse_int;
 		
 		int no_states;
+		int length;
 		int data_rate;
 		int ones; //count the number of ones in the puncturing_matrix
-		int length;
 		//encoding auxiliary functions
 		void set_generator_polynomials(int *, int *, int , int ,int, int *);
 		int weight_int(int, int);

@@ -84,10 +84,10 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int *iptr= (int *)input_items[0];
 	unsigned char *optr= (unsigned char *)output_items[0];
 	
-	int blocks_to_process, i, GF_words, RS_words;
+	uint blocks_to_process, i, GF_words, RS_words;
 	int remaining_bits;
 	unsigned char *tmp;
-	int times=0;
+	//int times=0;
 	int *samples_block = new int[length + length%GF];
 	//printf("El valor del modulo length con GF:%d\n" ,length%GF);
 	tmp = new unsigned char[K];
@@ -100,7 +100,7 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	//be careful, these measures could be a source of error
 	RS_words = GF_words/K;
 	//printf("Las que sobran:%d\n", GF_words%K);
-	int index;
+	uint index;
 	//printf("El valor de RS_words:%d\n", RS_words);
 	//printf("blocks_to_process:%d\n", blocks_to_process);
 	while (blocks_to_process>0)

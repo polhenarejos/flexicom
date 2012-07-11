@@ -17,12 +17,12 @@ TESTDIR=test
 
 INCLUDEDIR=../include
 MOC=moc
-CFLAGS=-I$(INCLUDEDIR) $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` -I/usr/include/qwt-qt4 `pkg-config --cflags uhd`
-LDFLAGS=-lboost_program_options-mt -lm `pkg-config --libs gnuradio-core` -lqwt-qt4 `pkg-config --libs QtGui` `pkg-config --libs uhd`
+CFLAGS=-I$(INCLUDEDIR) -I$(INCLUDEDIR)/modules $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags gnuradio-uhd` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` -I/usr/include/qwt `pkg-config --cflags uhd`
+LDFLAGS=-lboost_program_options-mt -lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` -lqwt `pkg-config --libs QtGui` `pkg-config --libs uhd`
 
-XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg 
+XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -DLV_HAVE_GENERIC
 
-MAKEARGS='CFLAGS=${CFLAGS}' \
+MAKEARGS=-f GNUMakefile 'CFLAGS=${CFLAGS}' \
 		'CC=${CC}' \
 		'LDFLAGS=${LDFLAGS}' \
 		'INCLUDEDIR=${INCLUDEDIR}' \

@@ -18,7 +18,7 @@ typedef struct oob_hdr_struct
 	ushort length;
 	signed char rssi; /* dB Scale */
 	char rate; /* Receive rate in units of 100 kBps */
-} oob_hdr_t;);
+} oob_hdr_t);
 
 #define REVERSE_BITS(c) ( bit_reverse_table[(c) & 0xff])
 
@@ -62,6 +62,7 @@ class BBN_PLCP : public gr_block
 		long long d_packet_rate;
 		gr_msg_queue_sptr d_target_queue;
 		plcp_state_enum d_state;
+		bool crc_table_initialized;
 		uint d_data;
 		int d_byte_offset;
 		int d_shift;
@@ -85,7 +86,6 @@ class BBN_PLCP : public gr_block
 		uint UpdateCRC(uint crc, const uchar *data, int len, uint);
 		ushort crc16_table[256];
 		uint crc32_table[256];
-		bool crc_table_initialized;
 };
 
 #endif //_INC_BBN_PLCP_H_

@@ -1,4 +1,4 @@
-#include <vlc_convolutional_coding.h>
+#include "vlc_convolutional_coding.h"
 #include <assert.h>
 #include <string.h>
 #include <math.h>
@@ -73,7 +73,7 @@ vlc_convolutional_coding::~vlc_convolutional_coding()
 
 //ENCODING ROUTINES
 
-void vlc_convolutional_coding::set_generator_polynomials(int *xor, int *poly, int K, int N, int no_states, int *output_reverse_int)
+void vlc_convolutional_coding::set_generator_polynomials(int *xxor, int *poly, int K, int N, int no_states, int *output_reverse_int)
 {
    // Generate table look-up of weight of integers of size K bits
    int i;
@@ -86,13 +86,13 @@ void vlc_convolutional_coding::set_generator_polynomials(int *xor, int *poly, in
     
    for (i = 0; i < limit; i++) 
    {
-      xor[i] = (weight_int(K, i) & 1);
+      xxor[i] = (weight_int(K, i) & 1);
    }
     
     
     for (i=0; i<no_states;i++)
     {
-      output_reverse(N, i, poly, xor, zero_one_output);
+      output_reverse(N, i, poly, xxor, zero_one_output);
       output_reverse_int[i]= zero_one_output[0];
       output_reverse_int[no_states+i]= zero_one_output[1];      
     }
@@ -204,7 +204,8 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
   //Inizialitations
   //clear visited states
   temp_rec=new int[N];
-  delta_metrics= new int[pow((double)2,N)]; //size determined by 2^no_outputs=2^n
+  int dm = pow((double)2,N);
+  delta_metrics= new int[dm]; //size determined by 2^no_outputs=2^n
   temp_sum_metric = new int[no_states];
   temp_visited_state = new int[no_states];
   path_memory = new int[no_states*block_length];

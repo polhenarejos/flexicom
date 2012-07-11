@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include "LayoutFactory.h"
-#include "LayoutVLC.h"
-#include "Layout80211b.h"
+#include "layouts/VLC/LayoutVLC.h"
+#include "layouts/80211b/Layout80211b.h"
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -114,7 +114,7 @@ void MainWindow::writeSettings(QSettings &s)
 	s.setValue("mw/size", size());
 	s.setValue("mw/pos", pos());
 	s.setValue("mw/fullScreen", isFullScreen());
-	for (int i = 0; i < panel->rb_layout.size(); i++)
+	for (uint i = 0; i < panel->rb_layout.size(); i++)
 	{
 		if (panel->rb_layout[i]->bt->isChecked())
 		{
@@ -122,7 +122,7 @@ void MainWindow::writeSettings(QSettings &s)
 			break;
 		}
 	}
-	for (int i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
+	for (uint i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
 	{
 		if (panel->rb_chain[i]->isChecked())
 		{
@@ -132,7 +132,7 @@ void MainWindow::writeSettings(QSettings &s)
 	}
 	s.setValue("uhd/devs", panel->sp_devs->value());
 	s.beginWriteArray("uhd/ip");
-	for (int i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
+	for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
 	{
 		s.setArrayIndex(i);
 		s.setValue("ip", panel->ipfield[i].ip->text().remove(' '));
@@ -141,14 +141,14 @@ void MainWindow::writeSettings(QSettings &s)
 	s.setValue("uhd/gain", panel->sp_gain->value());
 	emit SaveSettings(s);
 }
-void MainWindow::AddCustomTab(QWidget *w, QString &name)
+void MainWindow::AddCustomTab(QWidget *w, QString name)
 {
 	w->setParent(panel);
 	tabs.push_back(panel->addTab(w, name));
 }
 void MainWindow::RemoveCustomTabs()
 {
-	for (int i = 0; i < tabs.size(); i++)
+	for (uint i = 0; i < tabs.size(); i++)
 	{
 		panel->widget(tabs[i])->deleteLater();
 		panel->removeTab(tabs[i]);
@@ -214,7 +214,7 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	sp_devs->setRange(1, 4);
 	QGridLayout *grid = new QGridLayout(p);
 	QRegExpValidator *v = new QRegExpValidator(QRegExp("^[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]$"), this);
-	int i = 0;
+	uint i = 0;
 	for (; i < sizeof(ipfield)/sizeof(IPField); i++)
 	{
 		ipfield[i].ip = new QLineEdit("0.0.0.0", p);
@@ -243,7 +243,7 @@ void Panel::SetDevs(int devs)
 		ipfield[i].ip->setHidden(false);
 		ipfield[i].label->setHidden(false);
 	}
-	for (int i = devs; i < sizeof(ipfield)/sizeof(IPField); i++)
+	for (uint i = devs; i < sizeof(ipfield)/sizeof(IPField); i++)
 	{
 		ipfield[i].ip->setHidden(true);
 		ipfield[i].label->setHidden(true);
@@ -251,7 +251,7 @@ void Panel::SetDevs(int devs)
 }
 void Panel::StateLayout(MainWindow::StatesLayout s)
 {
-	for (int i = 0; i < rb_layout.size(); i++)
+	for (uint i = 0; i < rb_layout.size(); i++)
 	{
 		if (s == MainWindow::STARTING)
 			rb_layout[i]->bt->setEnabled(false);

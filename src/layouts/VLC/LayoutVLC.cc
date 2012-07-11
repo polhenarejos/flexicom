@@ -175,7 +175,7 @@ QWidget *LayoutVLC::CreateTabOpts()
 
 void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 {
-	int i;
+	uint i;
 	//Tx.Mode
 	varVLC->l_tx_mode= new QLabel("Tx. Mode:");
 	varVLC->cb_tx_mode = new QComboBox(p);

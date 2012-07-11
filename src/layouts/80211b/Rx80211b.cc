@@ -29,7 +29,7 @@ typedef struct mac_header
 	unsigned char add2[6];
 	unsigned char add3[6];
 	unsigned short sc;
-} mac_header;);
+} mac_header);
 PACK(
 typedef struct frame_control
 {
@@ -44,14 +44,14 @@ typedef struct frame_control
 	unsigned more_data:1;
 	unsigned wep:1;
 	unsigned order:1;
-} frame_control;);
+} frame_control);
 PACK(
 typedef struct beacon_header
 {
 	unsigned char timestamp[8];
 	unsigned char beacon_interval[2];
 	unsigned char cap_info[2];
-} beacon_header;);
+} beacon_header);
 void Rx80211bThread::run()
 {
 	while (1)
@@ -59,7 +59,7 @@ void Rx80211bThread::run()
 		gr_message_sptr mesg = queue->delete_head();
 		if (mesg)
 		{
-			uint size = sizeof(oob_hdr_t), size_d = mesg->length()-size;
+			uint size = sizeof(oob_hdr_t);
 			const char *packet = (const char *)mesg->msg(), *packet_data = packet+size;
 			oob_hdr_t *oob = (oob_hdr_t *)packet;
 			char addr1[18], addr2[18], addr3[18];
@@ -103,7 +103,7 @@ Rx80211b::Rx80211b(Layout80211b *_ly) :
 	rxth->start();
 	uint chip_rate = 10e6, interpolate_rate = 11, decimation_rate = 10;
 	double sample_rate = chip_rate * 11;
-	uint spb = 8, ntaps = 2*spb-1;
+	uint spb = 8;
 	std::vector<float> rate_taps = gr_firdes::low_pass_2(15, sample_rate, sample_rate / (2 * 11), .25 * sample_rate / 11, 9.f);
 	gr_pfb_arb_resampler_ccf_sptr resampler = gr_make_pfb_arb_resampler_ccf((double)interpolate_rate/decimation_rate, rate_taps);
 	std::vector<float> filter_taps = BarkerTaps(spb);
@@ -153,13 +153,8 @@ std::vector<float> Rx80211b::BarkerTaps(int sample_rate)
 	float Barker[] = {1, -1, 1, 1, -1, 1, 1, 1, -1, -1, -1};
 	std::vector<float> result(sample_rate);
 	int i, j;
-	int filter_period;
 	float maxVal;
 	float *ff = new float[total_taps];
-	if(sample_rate > 11)
-		filter_period = sample_rate;
-	else
-		filter_period = 11;
 	sinc(total_taps, sample_rate, ff);
 	for(i=0; i<sample_rate; ++i)
 		result[i] = 0;

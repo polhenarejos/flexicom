@@ -1,4 +1,4 @@
-#include <vlc_reed_solomon.h>
+#include "vlc_reed_solomon.h"
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>

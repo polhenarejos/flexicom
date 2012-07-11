@@ -17,7 +17,7 @@ void RxVLCThread::run()
 		gr_message_sptr mesg = queue->delete_head();
 		if (mesg)
 		{
-			printf("Hola caracola\n");
+			//printf("Hola caracola\n");
 			
 			
 		}

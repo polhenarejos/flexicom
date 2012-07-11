@@ -1,8 +1,13 @@
 #include "QtBlock.h"
-#include <volk_32f_convert_64f_a.h>
-#include <volk_32f_convert_64f_u.h>
+#include <volk/volk_32f_convert_64f_a.h>
+#include <volk/volk_32f_convert_64f_u.h>
+#ifdef _WIN
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
-QtBlock::QtBlock(QwtPlot *_qp, std::string &_s, gr_io_signature_sptr _io) :
+QtBlock::QtBlock(QwtPlot *_qp, std::string _s, gr_io_signature_sptr _io) :
 	gr_block(_s, _io, gr_make_io_signature(0, 0, 0)), qp(_qp)
 {
 	QObject::connect(this, SIGNAL(Replot()), this, SLOT(DrawPlot()), Qt::BlockingQueuedConnection);
@@ -11,17 +16,19 @@ void QtBlock::DrawPlot()
 {
 	//printf("in");
 	mutex.lock();
+	/*
 	QwtPlotItemList list = qp->itemList(QwtPlotItem::Rtti_PlotCurve);
 	for (int i = 0; i < list.size(); i++)
 	{
 		QwtPlotCurve *qc = (QwtPlotCurve *)list[i];
 		if (qc->dataSize())
 		{
-			double *yval = (double *)((QwtCPointerData *)(qc->data()))->yData();
+			//double *yval = (double *)((QwtCPointerData *)(qc->data()))->yData();
 			//printf("fsamp out %lf (ds = %d)\n", yval[0], qc->dataSize());
 			//delete ((QwtCPointerData *)qc->data())->yData();
 		}
 	}
+	*/
 	qp->replot();
 	//qp->detachItems(QwtPlotItem::Rtti_PlotCurve);
 	mutex.unlock();
@@ -48,12 +55,11 @@ Qt1D::Qt1D(QwtPlot *_qp, int _acc) :
 		qc[i]->attach(qp);
 	}
 }
-#include <windows.h>
 int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, gr_vector_void_star &o)
 {
 	const float **in = (const float **)&i[0];
 	mutex.lock();
-	for (int n = 0; n < i.size(); n++)
+	for (uint n = 0; n < i.size(); n++)
 	{
 		if (is_unaligned())
 			volk_32f_convert_64f_u_generic(yval[n], in[n], no);
@@ -66,6 +72,10 @@ int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, 
 	//qp->replot();
 	emit Replot();
 	consume_each(no);
+#ifdef _WIN
 	Sleep(10);
+#else
+	usleep(10);
+#endif
 	return 0;
 }

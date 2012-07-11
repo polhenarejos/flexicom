@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
 		QSettings s;
 		QGridLayout *plotGrid;
 		//! Method which allow the creation of particular tab for the selected communication system
-		void AddCustomTab(QWidget *, QString &);
+		void AddCustomTab(QWidget *, QString);
 		void RemoveCustomTabs();
 		//! Method which allow the creation of particular plots for the selected communication system
 		void AddCustomPlot(QWidget *, int = 0, int = 0);

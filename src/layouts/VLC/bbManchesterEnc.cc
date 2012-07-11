@@ -31,9 +31,7 @@ int bbManchesterEnc::general_work(int noutput_items, gr_vector_int &ninput_items
 {
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
-	int samples_to_process;
-	samples_to_process= noutput_items/2;
-	int hola= samples_to_process;
+	int samples_to_process = noutput_items/2;
 	//printf("El valor del modulation:%d\n", d_mode);
 
 	while(samples_to_process>0)
@@ -52,8 +50,6 @@ int bbManchesterEnc::general_work(int noutput_items, gr_vector_int &ninput_items
 			optr[1]=0;
 			//printf("output[%d]:%d\n", hola-samples_to_process, optr[1]);
 		}
-		else 
-			printf("algo falla\n");
 		optr=optr+2;
 		iptr++;
 		samples_to_process--;

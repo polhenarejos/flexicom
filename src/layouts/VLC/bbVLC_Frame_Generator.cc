@@ -97,8 +97,7 @@ void bbVLC_Frame_Generator::forecast(int noutput_items, gr_vector_int &ninput_it
 		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
 	}
 }
-*7
-/*
+
 int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr1= (int *)input_items[0]; //PHR

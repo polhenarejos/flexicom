@@ -8,7 +8,9 @@
 #include <gr_io_signature.h>
 #include <complex>
 #include "bbMatlab.h"
+#ifdef _WIN
 #include <io.h>
+#endif
 
 bbMatlab::~bbMatlab()
 {

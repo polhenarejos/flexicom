@@ -18,10 +18,10 @@ class BBN_DPSKDemod : public gr_block
 		BBN_DPSKDemod();
 		void UpdateRSSI();
 		void InitLogTable();
-		gr_complex d_prev;
 		float d_e_squared;
 		int d_sample_count;
 		short d_rssi;
+		gr_complex d_prev;
 		char d_log_table[64];
 };
 

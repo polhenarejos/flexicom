@@ -42,7 +42,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	
 	//GENERATION OF PHR, DATA
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
-	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("C:/CTTC/FlexiCom/src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
+	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
 	poly = new int[3];
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	

@@ -2,7 +2,9 @@
 #include <gr_io_signature.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef _WIN
 #include <io.h>
+#endif
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
 	gr_sync_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
@@ -34,7 +36,7 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
   		for (i=0; i<length_payload; i++)
   		{
   			data_payload[i]=fgetc(fp)-48;  //it returns the ascii code
-  			tmp = fgetc(fp); //to read the \n element
+  			fgetc(fp); //to read the \n element
   			//the file could be prepared to do a fread call
   		}
   	}
@@ -111,7 +113,6 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 	int *optr = (int *) output_items[0];
 	
 	int *tmp= new int[PSDU_length];
-	int *tmp2= new int[8];
 	int cycles = noutput_items / (PSDU_length);
 	//printf("The number of cycles:%d\n", cycles);
 	while (cycles>0)

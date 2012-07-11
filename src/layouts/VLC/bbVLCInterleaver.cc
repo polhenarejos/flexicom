@@ -10,9 +10,8 @@ bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned 
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), rs_length(_rs_length)
 {
 	//equations in section 10.3 of IEEE 802.15.7
-	int S_frame, D,S, S_block,p;
-	int tmp;
-	int i;
+	uint S_frame, D,S, S_block,p;
+	uint i;
 	//printf ("El valor de GF:%d, el valor de N:%d, el valor de K:%d\n, el valor de raw_length=%d, el valor de rs_length:%d\n", GF, N, K, raw_length, rs_length);
 	//raw_length is a number of bits
 	//rs_length is a number of decimal values	
@@ -105,7 +104,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 	tmp  = new unsigned char[rs_length];
 	tmp2 = new unsigned char[rs_length];
 	tmp3 = new unsigned char[rs_length-p];
-	int times=0;
+	//int times=0;
 	
 	while (blocks_to_process > 0)
 	{

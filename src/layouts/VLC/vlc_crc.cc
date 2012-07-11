@@ -19,7 +19,7 @@ vlc_crc::~vlc_crc ()
 void vlc_crc::generate_crc(int *data, int *out, int size)
 {
 	int *tmp = new int [4];
-	int i;
+	uint i;
 		//tab_len = length_data + crc_length;
 	int *tab_ops = new int[size];
 	int *shift_reg = new int[size];

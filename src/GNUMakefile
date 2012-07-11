@@ -1,8 +1,16 @@
-SOURCES=LayoutFactory.cc main.cc MainWindow.cc MainWindow_moc.cc
-LAYOUTS=BBN_PLCP.cc BBN_Slicer.cc BBN_DPSKDemod.cc Layout80211b.cc Rx80211b.cc
-VPATH=layouts/80211b:layouts/VLC
+SOURCES=main.cc MainWindow.cc MainWindow_moc.cc
+LAYOUTS=BBN_PLCP.cc BBN_Slicer.cc BBN_DPSKDemod.cc Layout80211b.cc Rx80211b.cc \
+				Layout80211b_moc.cc
+LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEnc.cc \
+					bbPHR_generation.cc bbPSDU_generation.cc bbRSEnc.cc bbVLC_Frame_Generator.cc \
+					bbVLC_info_assembler.cc bbVLCInterleaver.cc LayoutVLC.cc PHY_I_modulator.cc \
+					PHY_II_modulator.cc RxVLC.cc TxVLC.cc vlc_convolutional_coding.cc vlc_crc.cc \
+					vlc_reed_solomon.cc LayoutVLC_moc.cc
+MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc
+VPATH=layouts/80211b:layouts/VLC:modules
 OBJS=$(SOURCES:%.cc=$(OUTDIR)/%.o)
 LAYOBJS=$(LAYOUTS:%.cc=$(OUTDIR)/%.o)
+MODOBJS=$(MODULES:%.cc=$(OUTDIR)/%.o)
 
 INCLUDES=$(INCLUDEDIR)/LayoutFactory.h $(INCLUDEDIR)/MainWindow.h
 MAKEARGS='CFLAGS=${CFLAGS}' \
@@ -25,8 +33,8 @@ MAKEARGS='CFLAGS=${CFLAGS}' \
 MAKE=make $(MAKEARGS)
 all: build
 
-build: $(OBJS) $(LAYOBJS)
-	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(LDFLAGS) $(LIBS)
+build: $(OBJS) $(LAYOBJS) $(MODOBJS)
+	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(LDFLAGS) $(LIBS)
 	@$(CP) $(OUTDIR)/$(TARGET) ../$(TARGET)
 
 $(OUTDIR)/MainWindow.o: MainWindow.cc $(INCLUDES)
@@ -35,12 +43,18 @@ $(OUTDIR)/MainWindow.o: MainWindow.cc $(INCLUDES)
 $(OUTDIR)/main.o: main.cc $(INCLUDES)
 	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c main.cc -o $(OUTDIR)/main.o 
 
-$(OUTDIR)/%.o: %.cc $(INCLUDES)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OUTDIR)/Layout80211b.o: layouts/80211b/Layout80211b.cc $(INCLUDES)
+	$(MOC) layouts/80211b/Layout80211b.h -o layouts/80211b/Layout80211b_moc.cc
+	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c layouts/80211b/Layout80211b.cc -o $(OUTDIR)/Layout80211b.o 
+$(OUTDIR)/LayoutVLC.o: layouts/VLC/LayoutVLC.cc $(INCLUDES)
+	$(MOC) layouts/VLC/LayoutVLC.h -o layouts/VLC/LayoutVLC_moc.cc
+	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c layouts/VLC/LayoutVLC.cc -o $(OUTDIR)/LayoutVLC.o 
+$(OUTDIR)/QtBlock.o: modules/QtBlock.cc $(INCLUDES)
+	$(MOC) $(INCLUDEDIR)/modules/QtBlock.h -o modules/QtBlock_moc.cc
+	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c modules/QtBlock.cc -o $(OUTDIR)/QtBlock.o 
 	
 $(OUTDIR)/%.o: %.cc $(INCLUDES)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	$(RM) -f $(OUTDIR)/* $(OBJS)
-	cd layout; $(MAKE) clean

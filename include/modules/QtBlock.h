@@ -17,7 +17,7 @@ class QtBlock : public QObject, public gr_block
 	Q_OBJECT
 	
 	protected:
-		QtBlock(QwtPlot *, std::string &, gr_io_signature_sptr);
+		QtBlock(QwtPlot *, std::string , gr_io_signature_sptr);
 		QwtPlot *qp;
 		QwtPlotCurve **qc;
 		QMutex mutex;

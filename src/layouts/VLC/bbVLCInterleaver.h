@@ -31,9 +31,9 @@ class bbVLCInterleaver : public gr_block
 	
 	private:
 		bbVLCInterleaver(unsigned int,unsigned int, unsigned int, int, int);
+		unsigned int GF; //number of bits of each word
 		unsigned int N; //the length of the output reed-solomon codeword
 		unsigned int K; //the length of the input reed-solomon codeword
-		unsigned int GF; //number of bits of each word
 		int raw_length; //length at the input of the rs_encoder
 		int rs_length; //length at the output of the rs_encoder
 		

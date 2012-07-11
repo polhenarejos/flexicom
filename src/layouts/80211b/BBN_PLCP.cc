@@ -3,8 +3,6 @@
 
 #define PLCP_DEBUG 0
 
-static inline uchar ReverseBits(uchar);
-
 BBN_PLCP::BBN_PLCP(gr_msg_queue_sptr target_queue, bool check_crc) :
 	gr_block ("BBN_PLCP", gr_make_io_signature (1, 2, sizeof (ushort)), gr_make_io_signature(0,0,0)),
 	d_symbol_count(0), d_packet_rx_time(0), d_packet_rate(0), d_target_queue(target_queue), d_state(PLCP_STATE_SEARCH_PREAMBLE), crc_table_initialized(false),

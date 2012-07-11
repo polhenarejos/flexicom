@@ -68,7 +68,6 @@ bbVLC_info_assembler::sptr bbVLC_info_assembler::Create(int _topology, int _PSDU
 
  void bbVLC_info_assembler::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
-	int ninputs = ninput_items_required.size();
 		ninput_items_required[0]= (noutput_items/length_frame)*length_PHR;
 		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
 		//printf("Hola\n");

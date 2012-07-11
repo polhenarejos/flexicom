@@ -20,15 +20,15 @@ class PHY_II_modulator : public gr_hier_block2
        * The creation of PHY_II_modulator requires 1 parameter: 
        * @param vlc_var_phy: pointer which contains the configuration of the VLC system set at the GUI interface. 
        */
-		static sptr Create(vlc_var *vlc_var_phy);
+		static sptr Create(VLCvar *vlc_var_phy);
 		~PHY_II_modulator();
 		void stop();
-		vlc_var *vlc_var_phy; /**< [in] struct which contains the configuration of the VLC system*/
+		VLCvar *vlc_var_phy; /**< [in] struct which contains the configuration of the VLC system*/
 		int out_PHY_II_phr; /**< [out] indicates the length in bits of the encoded PHR block of data*/
 		int out_PHY_II_psdu; /**< [out] indicates the length in bits of the encoded PSDU block of data*/
 		
 	private:
-		PHY_II_modulator(vlc_var *vlc_var_phy);
+		PHY_II_modulator(VLCvar *vlc_var_phy);
 };
 
 #endif //_INC_PHY_I_MODULATOR_H_
