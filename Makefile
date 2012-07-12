@@ -153,6 +153,9 @@ objs: $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS)
 clean:
 	$(RM) "$(OBJ_DIR)\*.obj" 
 	
+frame_conversor: tools/frame_conversor.cc
+	$(CC) /EHsc /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) tools/frame_conversor.cc
+	
 {$(SRC_DIR)}.cc{$(OBJ_DIR)}.obj:
 	@if not exist $(OUT_DIR) mkdir $(OUT_DIR)
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
