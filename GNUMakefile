@@ -47,3 +47,6 @@ build:
 clean:
 	$(RM) -f *~ *.so
 	cd src; ${MAKE} ${MAKEARGS} clean;
+
+frame_conversor: tools/frame_conversor.cc
+	g++ tools/frame_conversor.cc -o frame_conversor $(CFLAGS)
