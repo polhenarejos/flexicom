@@ -19,10 +19,10 @@ vlc_crc::~vlc_crc ()
 void vlc_crc::generate_crc(int *data, int *out, int size)
 {
 	int *tmp = new int [4];
-	uint i;
+	unsigned int i;
 		//tab_len = length_data + crc_length;
-	int *tab_ops = new int[size];
-	int *shift_reg = new int[size];
+	int *tab_ops = (int *)malloc(sizeof(int)*size);
+	int *shift_reg = (int *)malloc(sizeof(int)*size);
 	int tb;
 	
 	memset(shift_reg, 0, sizeof(int)*size);
@@ -47,8 +47,9 @@ void vlc_crc::generate_crc(int *data, int *out, int size)
 	}
 	memcpy(out,data,sizeof(int)*(size-crc_length));
 	memcpy(&out[size-crc_length],shift_reg, sizeof(int)*crc_length);
-	delete[] tab_ops;
-	delete[] shift_reg;
+	free(tab_ops);
+	free(shift_reg);
+	delete [] tmp;
 	return;
 }
 
@@ -68,5 +69,5 @@ void vlc_crc::check_crc( int *data, int *out, bool *ok, int size)
 	}
 	memcpy(out,&data[size-2*crc_length],sizeof(int)*crc_length);
 	//we copy in out the crc
-	
+	delete [] error;
 }

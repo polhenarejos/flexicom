@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 extern "C"{
 	#include "rs.h"
@@ -39,15 +40,15 @@ void vlc_reed_solomon::encode(unsigned char *rs_enc_out, unsigned char *in)
 
 int vlc_reed_solomon::decode(unsigned char *rs_dec_out, unsigned char *in)
 {
-  unsigned char *tmp;
+  unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*N);;
   int ncorrections;
 
-  tmp =new unsigned char[N];
   //assert ((sizeof(in)) == N); ->if it is a pointer this is going to fail
   memcpy (tmp, in, N);
   // correct message...
   ncorrections = decode_rs_char (d_rs, tmp, 0, 0);
   // copy corrected message to output, skipping prefix zero padding
   memcpy (rs_dec_out, tmp, K);
+  free(tmp);
   return ncorrections;
 }

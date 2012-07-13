@@ -191,26 +191,16 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
   int block_length= (NN+m);
   int S0[2]; //S0 and S1
   int i,l,s; //loop variables
-  int *temp_sum_metric;
-  int *temp_rec;
-  int *delta_metrics;
-  int *temp_visited_state;
-  //int path_memory[no_states][block_length]; //this variable will suffer, when working with a big block_length
-  int *path_memory;
   double temp_metric_zero, temp_metric_one;
-  int *visited_state; //1 means visited state, 0 means not visited state
-  int *sum_metric;
   
   //Inizialitations
   //clear visited states
-  temp_rec=new int[N];
   int dm = pow((double)2,N);
-  delta_metrics= new int[dm]; //size determined by 2^no_outputs=2^n
-  temp_sum_metric = new int[no_states];
-  temp_visited_state = new int[no_states];
-  path_memory = new int[no_states*block_length];
-  visited_state = new int[no_states];
-  sum_metric = new int[no_states];
+  int *delta_metrics= (int *)malloc(sizeof(int)*dm); //size determined by 2^no_outputs=2^n
+  int *temp_visited_state = (int *)malloc(sizeof(int)*no_states);
+  int *path_memory = (int *)malloc(sizeof(int)*no_states*block_length);
+  int *visited_state = (int *)malloc(sizeof(int)*no_states); //1 means visited state, 0 means not visited state
+  int *sum_metric = (int *)malloc(sizeof(int)*no_states);
   memset(visited_state,0,sizeof(int)*no_states);
   memset(temp_visited_state,0,sizeof(int)*no_states);
   memset(path_memory,0,sizeof(int)*(no_states*block_length));
@@ -227,6 +217,8 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
   }
   
   // evolve up to m where not all states visited
+  int *temp_rec=new int[N];
+  int *temp_sum_metric = new int[no_states];
   for (l = 0; l < m; l++) // all transitions including the tail
   { 
     for (i=0; i<N; i++)
@@ -279,7 +271,6 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
       visited_state[i] = temp_visited_state[i];
     }
   } // all transitions, l
-
   // evolve from m and to the end of the block
   for (l = m; l < block_length; l++) // all transitions except the tail
   { 
@@ -327,12 +318,18 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
     // previous state calculation
     min_metric_state = previous_state_1(min_metric_state,path_memory[min_metric_state*block_length+l],m);
   }
+  delete [] temp_rec;
+  free(delta_metrics);
+  delete [] temp_sum_metric;
+  free(temp_visited_state);
+  free(path_memory);
+  free(visited_state);
+  free(sum_metric);
 }
 
 void vlc_convolutional_coding::decode_punct(int *encoded, int *decoded, int NN, int K, int N, int no_states, int *output_reverse_int, int k_size, int total, int Period, int *punct_matrix)
 {
   int k = 0, i = 0, p = k_size / total, j;
-  int *temp;
   int temp_size = p * Period * N;
   int m=K-1;
   // number of punctured bits in a fraction of the puncture matrix
@@ -356,7 +353,7 @@ void vlc_convolutional_coding::decode_punct(int *encoded, int *decoded, int NN, 
     exit(-1);
   }
 
-  temp=new int[temp_size];
+  int *temp=new int[temp_size];
 
   k = 0;
   j = 0;
@@ -385,6 +382,7 @@ void vlc_convolutional_coding::decode_punct(int *encoded, int *decoded, int NN, 
   } // while
 
   decode(temp, decoded, NN, m, N, no_states, output_reverse_int);
+  delete [] temp;
 }
 
 void vlc_convolutional_coding::calc_metric(int *rx_codeword, int *delta_metrics,int N)

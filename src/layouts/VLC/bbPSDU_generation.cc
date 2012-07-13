@@ -112,7 +112,7 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 {
 	int *optr = (int *) output_items[0];
 	
-	int *tmp= new int[PSDU_length];
+	int *tmp= (int *)malloc(sizeof(int)*PSDU_length);
 	int cycles = noutput_items / (PSDU_length);
 	//printf("The number of cycles:%d\n", cycles);
 	while (cycles>0)
@@ -128,6 +128,6 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 		sequence_number = (sequence_number +1)%256;
 		optr = optr + PSDU_length;
 	}
-    
-  return noutput_items;
+    free(tmp);
+	return noutput_items;
 }

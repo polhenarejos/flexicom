@@ -10,8 +10,8 @@ bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned 
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), rs_length(_rs_length)
 {
 	//equations in section 10.3 of IEEE 802.15.7
-	uint S_frame, D,S, S_block,p;
-	uint i;
+	unsigned int S_frame, D,S, S_block,p;
+	unsigned int i;
 	//printf ("El valor de GF:%d, el valor de N:%d, el valor de K:%d\n, el valor de raw_length=%d, el valor de rs_length:%d\n", GF, N, K, raw_length, rs_length);
 	//raw_length is a number of bits
 	//rs_length is a number of decimal values	
@@ -96,14 +96,12 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 	unsigned char *iptr= (unsigned char *)input_items[0];
 	int *optr= (int *)output_items[0];
 	int blocks_to_process,i,j,l,p;
-	unsigned char *tmp, *tmp2, *tmp3;
-	
 	blocks_to_process=(noutput_items/out_int);
 	//printf("Blocks to process:%d\n", blocks_to_process);
 	p =rs_length- (out_int/GF);
-	tmp  = new unsigned char[rs_length];
-	tmp2 = new unsigned char[rs_length];
-	tmp3 = new unsigned char[rs_length-p];
+	unsigned char *tmp  = (unsigned char *)malloc(sizeof(char)*rs_length);
+	unsigned char *tmp2 = (unsigned char *)malloc(sizeof(char)*rs_length);
+	unsigned char *tmp3 = (unsigned char *)malloc(sizeof(char)*(rs_length-p));
 	//int times=0;
 	
 	while (blocks_to_process > 0)
@@ -166,6 +164,9 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 		if (times==2)
 			exit(-1);*/
 	}
+	free(tmp);
+	free(tmp2);
+	free(tmp3);
 	consume_each((noutput_items/out_int)*rs_length);
 	return noutput_items;
 }

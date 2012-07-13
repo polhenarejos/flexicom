@@ -59,7 +59,7 @@ bbPHR_generation::sptr bbPHR_generation::Create(int _tx_mode, int _PSDU_length, 
 int bbPHR_generation::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
-	int *tmp= new int[PHR_length];
+	int *tmp= (int *)malloc(sizeof(int)*PHR_length);
 	memset(tmp,0,sizeof(int)*PHR_length);
 	memcpy(tmp,phr_crc, sizeof(int)*48); //48 = 32 + 16
 	int cycles = noutput_items / PHR_length;
@@ -69,6 +69,6 @@ int bbPHR_generation::work(int noutput_items, gr_vector_const_void_star &input_i
 		cycles--;
 		optr = optr + PHR_length;
 	}
-    
-  return noutput_items;
+	free(tmp);
+	return noutput_items;
 }

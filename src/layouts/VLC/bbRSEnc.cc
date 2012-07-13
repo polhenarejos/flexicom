@@ -83,24 +83,21 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 {
 	int *iptr= (int *)input_items[0];
 	unsigned char *optr= (unsigned char *)output_items[0];
-	
-	uint blocks_to_process, i, GF_words, RS_words;
+	unsigned int blocks_to_process, i, GF_words, RS_words;
 	int remaining_bits;
-	unsigned char *tmp;
+	unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*K);
 	//int times=0;
-	int *samples_block = new int[length + length%GF];
+	int *samples_block = (int *)malloc(sizeof(int)*(length + length%GF));;
 	//printf("El valor del modulo length con GF:%d\n" ,length%GF);
-	tmp = new unsigned char[K];
-	int *tmp2;
-	unsigned char *tmp3;
-	tmp3= new unsigned char[N];
+	int *tmp2 = (int *)malloc(sizeof(int)*GF*K);
+	unsigned char *tmp3 = (unsigned char *)malloc(sizeof(char)*N);
 	blocks_to_process = (noutput_items/out_rs);
 	GF_words = (int) ceil(((double)length/GF));
 	//printf("El valor de GF_words:%d\n", GF_words);
 	//be careful, these measures could be a source of error
 	RS_words = GF_words/K;
 	//printf("Las que sobran:%d\n", GF_words%K);
-	uint index;
+	unsigned int index;
 	//printf("El valor de RS_words:%d\n", RS_words);
 	//printf("blocks_to_process:%d\n", blocks_to_process);
 	while (blocks_to_process>0)
@@ -137,7 +134,6 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			//we need to process the last word of the block
 			remaining_bits = (GF_words%K)*GF;
 			//printf("Remaining_bits:%d\n", remaining_bits);
-			tmp2 = new int[GF*K];
 			//RS_words = GF_words/K;
 			memset(tmp2, 0, sizeof(int)*GF*K);
 			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*remaining_bits);
@@ -172,6 +168,10 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		if (times==2)
 			exit(-1);*/
 	}
+	free(tmp);
+	free(tmp2);
+	free(tmp3);
+	free(samples_block);
 	consume_each((noutput_items/out_rs)*length);
 	return noutput_items;
 	
