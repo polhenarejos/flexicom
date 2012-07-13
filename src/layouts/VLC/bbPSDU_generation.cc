@@ -111,8 +111,7 @@ void bbPSDU_generation::dec2bi(int number, int GF, int *bin_number)
 int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
-	
-	int *tmp= (int *)malloc(sizeof(int)*PSDU_length);
+	int *tmp= new int[PSDU_length];
 	int cycles = noutput_items / (PSDU_length);
 	//printf("The number of cycles:%d\n", cycles);
 	while (cycles>0)
@@ -128,6 +127,6 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 		sequence_number = (sequence_number +1)%256;
 		optr = optr + PSDU_length;
 	}
-    free(tmp);
+    delete [] tmp;
 	return noutput_items;
 }

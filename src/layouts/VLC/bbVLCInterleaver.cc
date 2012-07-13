@@ -99,9 +99,9 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 	blocks_to_process=(noutput_items/out_int);
 	//printf("Blocks to process:%d\n", blocks_to_process);
 	p =rs_length- (out_int/GF);
-	unsigned char *tmp  = (unsigned char *)malloc(sizeof(char)*rs_length);
-	unsigned char *tmp2 = (unsigned char *)malloc(sizeof(char)*rs_length);
-	unsigned char *tmp3 = (unsigned char *)malloc(sizeof(char)*(rs_length-p));
+	unsigned char *tmp = new unsigned char[rs_length];
+	unsigned char *tmp2 = new unsigned char[rs_length];
+	unsigned char *tmp3 = new unsigned char[rs_length-p];
 	//int times=0;
 	
 	while (blocks_to_process > 0)
@@ -164,9 +164,9 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 		if (times==2)
 			exit(-1);*/
 	}
-	free(tmp);
-	free(tmp2);
-	free(tmp3);
+	delete [] tmp;
+	delete [] tmp2;
+	delete [] tmp3;
 	consume_each((noutput_items/out_int)*rs_length);
 	return noutput_items;
 }

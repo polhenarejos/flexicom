@@ -81,8 +81,8 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int RS_words= length/N;
 	int blocks_to_process = (noutput_items/out_rs_dec);
 	int corrections,i,j;
-	unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*N);
-	unsigned char *tmp2 = (unsigned char *)malloc(sizeof(char)*K);
+	unsigned char *tmp = new unsigned char[N];
+	unsigned char *tmp2 = new unsigned char[K];
 	while (blocks_to_process>0)
 	{
 		for (i=0; i<RS_words; i++)
@@ -115,8 +115,8 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		}
 		blocks_to_process--;
 	}
-	free(tmp);
-	free(tmp2);
+	delete [] tmp;
+	delete [] tmp2;
 	consume_each((noutput_items/out_rs_dec)*length);
 	return noutput_items;
 }

@@ -85,12 +85,12 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	unsigned char *optr= (unsigned char *)output_items[0];
 	unsigned int blocks_to_process, i, GF_words, RS_words;
 	int remaining_bits;
-	unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*K);
+	unsigned char *tmp = new unsigned char[K];
 	//int times=0;
-	int *samples_block = (int *)malloc(sizeof(int)*(length + length%GF));;
+	int *samples_block = new int[length+length%GF];
 	//printf("El valor del modulo length con GF:%d\n" ,length%GF);
-	int *tmp2 = (int *)malloc(sizeof(int)*GF*K);
-	unsigned char *tmp3 = (unsigned char *)malloc(sizeof(char)*N);
+	int *tmp2 = new int[GF*K];
+	unsigned char *tmp3 = new unsigned char[N];
 	blocks_to_process = (noutput_items/out_rs);
 	GF_words = (int) ceil(((double)length/GF));
 	//printf("El valor de GF_words:%d\n", GF_words);
@@ -168,10 +168,10 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		if (times==2)
 			exit(-1);*/
 	}
-	free(tmp);
-	free(tmp2);
-	free(tmp3);
-	free(samples_block);
+	delete [] tmp;
+	delete [] tmp2;
+	delete [] tmp3;
+	delete [] samples_block;
 	consume_each((noutput_items/out_rs)*length);
 	return noutput_items;
 	

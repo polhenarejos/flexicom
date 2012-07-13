@@ -91,9 +91,9 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 	unsigned char *optr= (unsigned char *)output_items[0];
 	int blocks_to_process,i,j,l;
 	int GF_words = pre_length/GF; //this division will be always an integer number
-	unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*GF_words);
-	unsigned char *tmp2 = (unsigned char *)malloc(sizeof(char)*GF_words);
-	unsigned char *tmp3 = (unsigned char *)malloc(sizeof(char)*(GF_words+len_punct_vector));
+	unsigned char *tmp = new unsigned char[GF_words];
+	unsigned char *tmp2 = new unsigned char[GF_words];
+	unsigned char *tmp3 = new unsigned char[GF_words+len_punct_vector];
 	blocks_to_process=(noutput_items/out_deint);
 		
 	while (blocks_to_process > 0)
@@ -138,9 +138,9 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 		blocks_to_process--;
 		
 	}
-	free(tmp);
-	free(tmp2);
-	free(tmp3);
+	delete [] tmp;
+	delete [] tmp2;
+	delete [] tmp3;
 	consume_each((noutput_items/out_deint)*pre_length);
 	return noutput_items;
 }

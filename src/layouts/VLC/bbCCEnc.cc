@@ -67,8 +67,8 @@ int bbCCEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	// "Six tail bits of zerso shall be added at the end of the encoding in order to 
 	//  terminate the convolutional encoder to an all zeros state" -> This is assumed in the encoding function, so there
 	//  is no need to add them
-	int *tmp = (int *)malloc(sizeof(int)*length);
-	int *tmp2 = (int *)malloc(sizeof(int)*(length+K-1)*N);
+	int *tmp = new int[length];
+	int *tmp2 = new int[(length+K-1)*N];
 	blocks_to_process = (noutput_items/out_cc);
 	//printf("Noutput_items:%d\n", noutput_items);
 	while (blocks_to_process>0)
@@ -136,8 +136,8 @@ int bbCCEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			exit(-1);*/
 		blocks_to_process--;
 	}
-	free(tmp);
-	free(tmp2);
+	delete [] tmp;
+	delete [] tmp2;
 	consume_each((noutput_items/out_cc)*length);
 	return noutput_items;
 }

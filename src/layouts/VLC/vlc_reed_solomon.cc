@@ -40,7 +40,7 @@ void vlc_reed_solomon::encode(unsigned char *rs_enc_out, unsigned char *in)
 
 int vlc_reed_solomon::decode(unsigned char *rs_dec_out, unsigned char *in)
 {
-  unsigned char *tmp = (unsigned char *)malloc(sizeof(char)*N);;
+  unsigned char *tmp = new unsigned char[N];
   int ncorrections;
 
   //assert ((sizeof(in)) == N); ->if it is a pointer this is going to fail
@@ -49,6 +49,6 @@ int vlc_reed_solomon::decode(unsigned char *rs_dec_out, unsigned char *in)
   ncorrections = decode_rs_char (d_rs, tmp, 0, 0);
   // copy corrected message to output, skipping prefix zero padding
   memcpy (rs_dec_out, tmp, K);
-  free(tmp);
+  delete [] tmp;
   return ncorrections;
 }
