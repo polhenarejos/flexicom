@@ -117,7 +117,7 @@ DBGLFLAG=/debug
 
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
 
-MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj 
+MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj $(OBJ_DIR)/MSE.obj
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj $(OBJ_DIR)/RxVLC.obj $(OBJ_DIR)/TxVLC.obj \
@@ -126,6 +126,8 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/vlc_reed_solomon.obj $(OBJ_DIR)/bbRSEnc.obj $(OBJ_DIR)/bbVLCInterleaver.obj $(OBJ_DIR)/bbVLC_info_assembler.obj $(OBJ_DIR)/bbVLC_Frame_Generator.obj \
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj  $(OBJ_DIR)/PHY_II_modulator.obj $(OBJ_DIR)/vlc_crc.obj \
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbVLCDeInterleaver.obj
+
+TEST_LAYOUTS=$(OBJ_DIR)/test_RS.obj
         
 TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 
@@ -180,16 +182,18 @@ $(OBJ_DIR)/Layout80211b_moc.obj: $(LAYOUT_DIR)/80211b/Layout80211b.h
 	
 {$(LAYOUT_DIR)/VLC}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
+{$(LAYOUT_DIR)/VLC/test}.cc{$(OBJ_DIR)}.obj:
+	$(CC) $(EXECFLAGS) $(CPPUNIT_INC) /Fd$(OBJ_DIR) $<
 $(OBJ_DIR)/LayoutVLC_moc.obj: $(LAYOUT_DIR)/VLC/LayoutVLC.h
 	$(MOC) $(LAYOUT_DIR)/VLC/LayoutVLC.h -o $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
 	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
 
 #Test Suite
 test: test_files
-	$(LINK) $(LFLAGS) $(TEST_FILES) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(CPPUNIT_LIB) /MAP /OUT:test_$(TARGET).exe
+	$(LINK) $(LFLAGS) $(TEST_FILES) $(TEST_LAYOUTS) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(CPPUNIT_LIB) /MAP /OUT:test_$(TARGET).exe
 	test_$(TARGET).exe
 	
-test_files: $(TEST_FILES) objs
+test_files: $(TEST_FILES) $(TEST_LAYOUTS) objs
 
 {$(TEST_DIR)}.cc{$(OBJ_DIR)}.obj:
 	$(CC) $(EXECFLAGS) $(CPPUNIT_INC) /Fd$(OBJ_DIR) $<
