@@ -6,7 +6,7 @@
 //described in section 10.3
 
 bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _rs_length):
-	gr_block("bbVLCInterleaver", gr_make_io_signature (1,1,sizeof (unsigned char)), gr_make_io_signature (1,1,sizeof(int))),
+	gr_block("bbVLCInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), rs_length(_rs_length)
 {
 	//equations in section 10.3 of IEEE 802.15.7
@@ -69,12 +69,11 @@ bbVLCInterleaver::sptr bbVLCInterleaver::Create(unsigned int _GF, unsigned int _
 	return sptr(new bbVLCInterleaver(_GF, _N, _K, _raw_length, _rs_length));
 }
 
-void bbVLCInterleaver::dec2bi(unsigned char number, int GF, int *bin_number)
+void bbVLCInterleaver::dec2bi(int number, int GF, int *bin_number)
 {
 	//again the same criteria as in the rs-encoder 'left-msb'	
-	int tmp;
-	//tmp = new int;
-	tmp = (int) number;
+	//int tmp;
+	int tmp = number;
 	for (int i=0; i<GF; i++)
     {
         bin_number[GF-(i+1)]= tmp%2;
@@ -93,24 +92,25 @@ void bbVLCInterleaver::forecast(int noutput_items, gr_vector_int &ninput_items_r
 
 int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	unsigned char *iptr= (unsigned char *)input_items[0];
+	//unsigned char *iptr= (unsigned char *)input_items[0];
+	int *iptr = (int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	int blocks_to_process,i,j,l,p;
 	blocks_to_process=(noutput_items/out_int);
 	//printf("Blocks to process:%d\n", blocks_to_process);
 	p =rs_length- (out_int/GF);
-	unsigned char *tmp = new unsigned char[rs_length];
-	unsigned char *tmp2 = new unsigned char[rs_length];
-	unsigned char *tmp3 = new unsigned char[rs_length-p];
+	int *tmp = new int[rs_length];
+	int *tmp2 = new int[rs_length];
+	int *tmp3 = new int[rs_length-p];
 	//int times=0;
 	
 	while (blocks_to_process > 0)
 	{
 		//1.Interleaving
 		//printf("Blocks to process:%d\n", blocks_to_process);
-		memset(tmp,0,sizeof(unsigned char)*rs_length);
-		memset(tmp2,0,sizeof(unsigned char)*rs_length);
-		memcpy(tmp,iptr, sizeof(unsigned char)*rs_length);
+		memset(tmp,0,sizeof(int)*rs_length);
+		memset(tmp2,0,sizeof(int)*rs_length);
+		memcpy(tmp,iptr, sizeof(int)*rs_length);
 		//for (i=0; i<rs_length;i++)
 			//printf("El input al bloque es [%d]=%d\n", i, tmp[i]);
 		iptr = iptr + rs_length;

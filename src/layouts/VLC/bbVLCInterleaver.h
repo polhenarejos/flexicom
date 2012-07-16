@@ -40,7 +40,7 @@ class bbVLCInterleaver : public gr_block
 		int *interleaving_vector;
 		int *puncturing_vector;
 		int *bin_number;
-		void dec2bi(unsigned char , int, int *);
+		void dec2bi(int , int, int *);
 		bool puncture;
 };
 

@@ -106,7 +106,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			else
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-					//here, there could be an inconvenience as the reed solomon generates uchar and the manchester expects ints
 				out_PHY_I_psdu= psdu_cc_encoder->out_cc/4*6;
 				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
 				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
@@ -123,7 +122,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			if(vlc_var.mod_type ==0)
 			{
 				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_interleaver->out_int);
-					//here, there could be an inconvenience as the reed solomon generates uchar and the manchester expects ints
 				out_PHY_I_psdu= psdu_interleaver->out_int*2;
 				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
 				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
@@ -137,7 +135,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 			else
 			{
 				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-					//here, there could be an inconvenience as the reed solomon generates uchar and the manchester expects ints
 				out_PHY_I_psdu=psdu_interleaver->out_int/4*6;
 				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
 				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
@@ -155,7 +152,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		if(vlc_var.mod_type ==0)
 		{
 			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,vlc_var.PSDU_raw_length);
-				//here, there could be an inconvenience as the reed solomon generates uchar and the manchester expects ints
 			out_PHY_I_psdu= vlc_var.PSDU_raw_length*2;
 			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
 			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
@@ -169,7 +165,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		else
 		{
 			bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-				//here, there could be an inconvenience as the reed solomon generates uchar and the manchester expects ints
 			out_PHY_I_psdu=vlc_var.PSDU_raw_length/4*6;
 			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
 			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);

@@ -6,7 +6,7 @@
 
 
 bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
-	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(unsigned char))),
+	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
 	GF(_GF),N(_N),K(_K), phy_type(_phy_type), length(_length)
 {
 	unsigned int poly;
@@ -82,24 +82,18 @@ void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr= (int *)input_items[0];
-	unsigned char *optr= (unsigned char *)output_items[0];
+	//unsigned char *optr= (unsigned char *)output_items[0];
+	int *optr= (int *)output_items[0];
 	unsigned int blocks_to_process, i, GF_words, RS_words;
 	int remaining_bits;
-	unsigned char *tmp = new unsigned char[K];
-	//int times=0;
 	int *samples_block = new int[length+length%GF];
-	//printf("El valor del modulo length con GF:%d\n" ,length%GF);
+	unsigned char *tmp = new unsigned char[K];
 	int *tmp2 = new int[GF*K];
 	unsigned char *tmp3 = new unsigned char[N];
 	blocks_to_process = (noutput_items/out_rs);
 	GF_words = (int) ceil(((double)length/GF));
-	//printf("El valor de GF_words:%d\n", GF_words);
-	//be careful, these measures could be a source of error
 	RS_words = GF_words/K;
-	//printf("Las que sobran:%d\n", GF_words%K);
 	unsigned int index;
-	//printf("El valor de RS_words:%d\n", RS_words);
-	//printf("blocks_to_process:%d\n", blocks_to_process);
 	while (blocks_to_process>0)
 	{
 		//First, adapt the samples to process
@@ -120,12 +114,16 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				//printf("El valor de tmp[%d]=%u\n",i, tmp[i]);
 				//iptr=iptr+GF;
 			}
-			vlc_rs->encode(optr,tmp);
-			/*for (i=0;i<N; i++)
+			memset(tmp3,0, sizeof(unsigned char)*N);
+			vlc_rs->encode(tmp3, tmp);
+			//vlc_rs->encode(optr,tmp);
+			for (i=0;i<N; i++)
 			{
-				printf("output[%d] es:%u\n", i,optr[i]);
-			}*/
-			optr=optr + N;		
+				optr[0] = (int)tmp3[i];
+				optr ++;
+				//printf("output[%d] es:%u\n", i,optr[i]);
+			}
+			//optr=optr + N;		
 			//RS_words--;
 			index++;
 		}
@@ -147,23 +145,29 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			//	printf("El clandemor tmp[%d]=%d\n",i,tmp[i]);
 			}
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
-			/*for (i=0;i<N; i++)
+			for (i=0;i<(GF_words%K); i++)
 			{
-				printf("la que sobra[%d] es:%u\n", i,tmp3[i]);
-			}*/
-			memcpy(optr, tmp3,sizeof(unsigned char)*(GF_words%K));
+				optr[0]= (int)tmp3[i];
+				optr++;
+				
+			}
+			/*memcpy(optr, tmp3,sizeof(unsigned char)*(GF_words%K));
 			optr =optr + (GF_words%K);
 			memcpy(optr, &tmp3[K], sizeof(unsigned char)*(N-K));
-			optr = optr + N-K;
+			optr = optr + N-K;*/
+			for (i=K; i<K+(N-K); i++)
+			{
+				optr[0]=(int)tmp3[i];
+				optr++;
+			}
 			if (phy_type==0)
 			{
 				//move the zeros to the end, which are the punctured positions
-				memset(optr, 0, sizeof(unsigned char)*(K-GF_words%K));
+				memset(optr, 0, sizeof(int)*(K-GF_words%K));
 				optr = optr + (K-GF_words%K);				
 			}
 		}
 		blocks_to_process--;
-		//RS_words = GF_words/K; //reset because it achieves the zero value ->no needed due to the use of index variable
 		/*times ++;
 		if (times==2)
 			exit(-1);*/
