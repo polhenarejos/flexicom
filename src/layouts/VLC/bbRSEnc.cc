@@ -81,28 +81,24 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	blocks_to_process = (noutput_items/out_rs);
 	GF_words = (int) ceil(((double)length/GF));
 	RS_words = GF_words/K;
-	unsigned int index;
 	while (blocks_to_process>0)
 	{
 		//First, adapt the samples to process
 		memcpy(samples_block, iptr, sizeof(int)*length);
 		std::fill_n(samples_block+length, length%GF, *(iptr+length-1));
 		iptr += length;
-		index=0;
-		while(index<RS_words)
+		for (int idx = 0; idx < RS_words; idx++)
 		{
-			std::fill_n(tmp, K, 0);
 			for (i=0; i<K; i++)
 			{
-				tmp[i]=LayoutVLC::bi2dec(&samples_block[(index*K*GF)+i*GF],GF);
+				tmp[i]=LayoutVLC::bi2dec(&samples_block[(idx*K*GF)+i*GF],GF);
 				//printf("El valor de tmp[%d]=%u\n",i, tmp[i]);
 				//iptr=iptr+GF;
 			}
-			memset(tmp3, 0, sizeof(unsigned char)*N);
+			//memset(tmp3, 0, sizeof(unsigned char)*N);
 			vlc_rs->encode(tmp3, tmp);
 			std::copy(tmp3, tmp3+N, optr);
 			optr += N;
-			index++;
 		}
 		if ((GF_words%K) !=0)
 		{
@@ -114,8 +110,7 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*remaining_bits);
 			//for (i=0; i<remaining_bits;i++)
 				//printf("Los remaining_bits[%d] son:%d\n",i, tmp2[i]);
-			memset(tmp,0, sizeof(unsigned char)*K);
-			memset(tmp3,0, sizeof(unsigned char)*N);
+			//memset(tmp3,0, sizeof(unsigned char)*N);
 			for (i=0; i<K; i++)
 			{
 				tmp[i]=LayoutVLC::bi2dec(&tmp2[i*GF],GF);

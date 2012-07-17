@@ -5,7 +5,7 @@
 //this block performs the interleaving and the puncturing process
 //described in section 10.3
 
-bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _pre_length):
+bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _pre_length):
 	gr_block("bbVLCDeInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), pre_length(_pre_length)
 {
@@ -61,7 +61,7 @@ bbVLCDeInterleaver::~bbVLCDeInterleaver()
 	}
 }
 		
-bbVLCDeInterleaver::sptr bbVLCDeInterleaver::Create(unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _pre_length)
+bbVLCDeInterleaver::sptr bbVLCDeInterleaver::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _pre_length)
 {
 	return sptr(new bbVLCDeInterleaver(_GF, _N, _K, _raw_length, _pre_length));
 }

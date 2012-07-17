@@ -5,7 +5,7 @@
 //this block performs the interleaving and the puncturing process
 //described in section 10.3
 
-bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _rs_length):
+bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length):
 	gr_block("bbVLCInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), rs_length(_rs_length)
 {
@@ -64,7 +64,7 @@ bbVLCInterleaver::~bbVLCInterleaver()
 	}
 }
 		
-bbVLCInterleaver::sptr bbVLCInterleaver::Create(unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _rs_length)
+bbVLCInterleaver::sptr bbVLCInterleaver::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length)
 {
 	return sptr(new bbVLCInterleaver(_GF, _N, _K, _raw_length, _rs_length));
 }

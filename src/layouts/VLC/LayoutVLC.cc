@@ -441,7 +441,7 @@ void LayoutVLC::TrackChanges()
 unsigned char LayoutVLC::bi2dec(int *in, unsigned int GF)
 {
 	unsigned char o = 0;
-	for (int i = 0; i < GF; i++)
+	for (unsigned int i = 0; i < GF; i++)
 		o += *in++*(1<<((GF-1)-i));
 	return o;
 }

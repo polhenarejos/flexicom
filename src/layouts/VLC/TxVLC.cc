@@ -27,8 +27,8 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 {
 	//variable initialization, to make easier the pass of parameters. Prepared for PHY I 
 	init_var();
-	int phr_words;
-	int psdu_words;
+	unsigned int phr_words;
+	unsigned int psdu_words;
 	int out_PHY_I_phr;
 	int out_PHY_I_psdu;
 	

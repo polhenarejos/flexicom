@@ -23,19 +23,19 @@ class bbVLCDeInterleaver : public gr_block
        * @param _raw_length: length in bits at the input of the rs_encoder
        * @param _rs_length: length at the output of the rs_encoder (in GF space elements)
        */
-		static sptr Create(unsigned int,unsigned int, unsigned int, int, int);
+		static sptr Create(unsigned int,unsigned int, unsigned int, unsigned int, unsigned int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbVLCDeInterleaver();
 		int out_deint; /**< [out] indicates the length in GF words at the output of the bbVLCDeInterleaver block*/
 	
 	private:
-		bbVLCDeInterleaver(unsigned int,unsigned int, unsigned int, int, int);
+		bbVLCDeInterleaver(unsigned int,unsigned int, unsigned int, unsigned int, unsigned int);
 		unsigned int N; //the length of the output reed-solomon codeword
 		unsigned int K; //the length of the input reed-solomon codeword
 		unsigned int GF; //number of bits of each word
-		int raw_length; //length at the input of the rs_encoder
-		int pre_length; //length at the output of the previous block: cc_decoder or the output of the RLL decoder
+		unsigned int raw_length; //length at the input of the rs_encoder
+		unsigned int pre_length; //length at the output of the previous block: cc_decoder or the output of the RLL decoder
 		
 		int *interleaving_vector;
 		int *puncturing_vector;
