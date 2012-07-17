@@ -60,10 +60,10 @@ vlc_convolutional_coding::~vlc_convolutional_coding()
 {
 	if (xor_table && punct_matrix && poly && output_reverse_int)
 	{
-		delete xor_table;
-		delete punct_matrix;
-		delete poly;
-		delete output_reverse_int;
+		delete [] xor_table;
+		delete [] punct_matrix;
+		//delete poly;
+		delete [] output_reverse_int;
 		xor_table =0;
 		punct_matrix =0;
 		poly =0;

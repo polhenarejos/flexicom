@@ -37,7 +37,7 @@ bbCCEnc::~bbCCEnc()
 	if(vlc_cc && poly)
 	{
 		delete vlc_cc;
-		delete [] poly;
+		//delete [] poly;
 		vlc_cc = 0;
 		poly = 0;
 	}
