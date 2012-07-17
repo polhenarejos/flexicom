@@ -74,7 +74,6 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			gt->connect(mse, 0, vec, 0);
 			gt->run();
 			std::vector<float> data = vec->data();
-			printf("Hola\n");	
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
 		}
