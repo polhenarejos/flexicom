@@ -12,7 +12,7 @@ PHY_II_modulator::PHY_II_modulator(VLCvar *_vlc_var_phy) :
 {
 	//the PHR has to be coded according to the parameters corresponding 
 	//to the minimum data_rate of the current negotiated clock
-	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.pre_rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->phy_type, vlc_var_phy->PHR_raw_length);
+	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(&vlc_var_phy->GF, &vlc_var_phy->_rs_code.pre_rs_out, &vlc_var_phy->_rs_code.pre_rs_in, &vlc_var_phy->phy_type, &vlc_var_phy->PHR_raw_length);
 	bb8b10bEnc::sptr RLL_phr = bb8b10bEnc::Create(); //always on/off keying
 	out_PHY_II_phr= rs_enc_phr->out_rs/8*10; //due to the manchester codification
 		
@@ -24,7 +24,7 @@ PHY_II_modulator::PHY_II_modulator(VLCvar *_vlc_var_phy) :
 	//PSDU
 	if (vlc_var_phy->_rs_code.rs_in !=0)
 	{
-		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.rs_out,vlc_var_phy->_rs_code.rs_in,vlc_var_phy->phy_type, vlc_var_phy->PSDU_raw_length);		
+		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(&vlc_var_phy->GF, &vlc_var_phy->_rs_code.rs_out,&vlc_var_phy->_rs_code.rs_in,&vlc_var_phy->phy_type, &vlc_var_phy->PSDU_raw_length);		
 		connect(self(), 1, rs_enc_data, 0);
 		if (vlc_var_phy->mod_type == 0)
 		{

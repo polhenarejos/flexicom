@@ -18,10 +18,10 @@
 
 struct rs_code
 {
-	int pre_rs_in;
-	int pre_rs_out;
-	int rs_in;
-	int rs_out;
+	unsigned int pre_rs_in;
+	unsigned int pre_rs_out;
+	unsigned int rs_in;
+	unsigned int rs_out;
 };
 
 struct cc_code
@@ -36,18 +36,18 @@ struct cc_code
 
 struct VLCvar
 {
-	int phy_type;
+	unsigned int phy_type;
 	int mod_type;
 	int clock_rate;
 	int tx_mode;
-	int psdu_units;
+	unsigned int psdu_units;
 	int operating_mode;
 	rs_code _rs_code;
 	cc_code _cc_code;
-	int GF;
-	int frame_size;
-	int PHR_raw_length; //raw length prior to modulation
-	int PSDU_raw_length; //raw length prior to modulation
+	unsigned int GF;
+	unsigned int frame_size;
+	unsigned int PHR_raw_length; //raw length prior to modulation
+	unsigned int PSDU_raw_length; //raw length prior to modulation
 	int *MCSID; //field for the PHR preamble
 	int flp_length;
 };
@@ -73,7 +73,7 @@ class TxVLC : public gr_hier_block2
 		~TxVLC();
 		void stop();
 		VLCvar vlc_var; /**< [in] struct which contains the configuration of the VLC system set at the GUI interface.*/
-		
+		void UIChanged();
 		
 	private:
 		int *poly;

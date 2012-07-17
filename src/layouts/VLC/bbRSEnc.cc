@@ -3,28 +3,29 @@
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
+#include "LayoutVLC.h"
 
-
-bbRSEnc::bbRSEnc(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
+bbRSEnc::bbRSEnc(unsigned int *_GF, unsigned int *_N, unsigned int *_K, unsigned int *_phy_type, unsigned int *_length):
 	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
-	GF(_GF),N(_N),K(_K), phy_type(_phy_type), length(_length)
+	pGF(_GF),pN(_N),pK(_K), pphy_type(_phy_type), plength(_length)
 {
-	unsigned int poly;
-	//printf("GF:%d, N:%d, K:%d, phy_type:%d, length:%d\n", GF,N,K, phy_type, length);
-	switch (phy_type)
-	{
-		case 0: //PHY I
-			poly = 0x13;
-			break;
-		case 1: //PHY II
-			poly = 0x11D; 
-			break;
-	}
-	vlc_rs=new vlc_reed_solomon(GF, poly, 1, 1,(N-K));
+	ctor(*pGF, *pN, *pK, *pphy_type, *plength);
+}
+void bbRSEnc::ctor()
+{
+	ctor(*pGF, *pN, *pK, *pphy_type, *plength);
+}
+void bbRSEnc::ctor(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _phy_type, unsigned int _length) 
+{
+	GF = _GF;
+	N = _N;
+	K = _K;
+	phy_type = _phy_type;
+	length = _length;
+	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
 	out_rs=rs_out_elements();
-	//printf("El valor de out_rs es:%d\n", out_rs);
 	set_output_multiple(out_rs);
-	//printf("Reed Solomon\n");
+	set_relative_rate((double)out_rs/length);
 }
 
 bbRSEnc::~bbRSEnc()
@@ -37,7 +38,7 @@ bbRSEnc::~bbRSEnc()
 }
 
 
-bbRSEnc::sptr bbRSEnc::Create(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length )
+bbRSEnc::sptr bbRSEnc::Create(unsigned int *_GF, unsigned int *_N, unsigned int *_K, unsigned int *_phy_type, unsigned int *_length)
 {
 	return sptr(new bbRSEnc(_GF, _N, _K, _phy_type, _length));
 }
@@ -58,19 +59,6 @@ int bbRSEnc::rs_out_elements()
 	return rs_output_bits;
 	//if all divisions were exact, there will not need to do that
 }
-
-unsigned char bbRSEnc::bi2dec(int *in, int GF)
-{
-	unsigned char out=0;
-	for (int i=0; i<GF; i++)
-	{
-		out = out + in[i]*(int)pow((double)2,(GF-1)-i); 
-		//para mantener concordancia con el modelo matlab 'left-msb'
-	}
-	return out;
-
-}
-
 void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
 	int ninputs = ninput_items_required.size();
@@ -98,33 +86,22 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	{
 		//First, adapt the samples to process
 		memcpy(samples_block, iptr, sizeof(int)*length);
-		iptr = iptr + length-1;
-		for (i=length; i<length+length%GF; i++)
-		{
-			samples_block[i]=iptr[0]; //we replicate the last sample
-		}
-		iptr++;
+		std::fill_n(samples_block+length, length%GF, *(iptr+length-1));
+		iptr += length;
 		index=0;
 		while(index<RS_words)
 		{
-			memset(tmp,0,sizeof(unsigned char)*K);
+			std::fill_n(tmp, K, 0);
 			for (i=0; i<K; i++)
 			{
-				tmp[i]=bi2dec(&samples_block[(index*K*GF)+i*GF],GF);
+				tmp[i]=LayoutVLC::bi2dec(&samples_block[(index*K*GF)+i*GF],GF);
 				//printf("El valor de tmp[%d]=%u\n",i, tmp[i]);
 				//iptr=iptr+GF;
 			}
-			memset(tmp3,0, sizeof(unsigned char)*N);
+			memset(tmp3, 0, sizeof(unsigned char)*N);
 			vlc_rs->encode(tmp3, tmp);
-			//vlc_rs->encode(optr,tmp);
-			for (i=0;i<N; i++)
-			{
-				optr[0] = (int)tmp3[i];
-				optr ++;
-				//printf("output[%d] es:%u\n", i,optr[i]);
-			}
-			//optr=optr + N;		
-			//RS_words--;
+			std::copy(tmp3, tmp3+N, optr);
+			optr += N;
 			index++;
 		}
 		if ((GF_words%K) !=0)
@@ -141,30 +118,23 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			memset(tmp3,0, sizeof(unsigned char)*N);
 			for (i=0; i<K; i++)
 			{
-				tmp[i]=bi2dec(&tmp2[i*GF],GF);
+				tmp[i]=LayoutVLC::bi2dec(&tmp2[i*GF],GF);
 			//	printf("El clandemor tmp[%d]=%d\n",i,tmp[i]);
 			}
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
-			for (i=0;i<(GF_words%K); i++)
-			{
-				optr[0]= (int)tmp3[i];
-				optr++;
-				
-			}
+			std::copy(tmp3, tmp3+(GF_words%K), optr);
+			optr += GF_words%K;
 			/*memcpy(optr, tmp3,sizeof(unsigned char)*(GF_words%K));
 			optr =optr + (GF_words%K);
 			memcpy(optr, &tmp3[K], sizeof(unsigned char)*(N-K));
 			optr = optr + N-K;*/
-			for (i=K; i<K+(N-K); i++)
-			{
-				optr[0]=(int)tmp3[i];
-				optr++;
-			}
+			std::copy(tmp3+K, tmp3+N, optr);
+			optr += N-K;
 			if (phy_type==0)
 			{
 				//move the zeros to the end, which are the punctured positions
 				memset(optr, 0, sizeof(int)*(K-GF_words%K));
-				optr = optr + (K-GF_words%K);				
+				optr += (K-GF_words%K);				
 			}
 		}
 		blocks_to_process--;

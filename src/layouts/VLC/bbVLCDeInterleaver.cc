@@ -1,6 +1,6 @@
 #include "bbVLCDeInterleaver.h"
 #include <gr_io_signature.h>
-#include <math.h>
+#include "LayoutVLC.h"
 
 //this block performs the interleaving and the puncturing process
 //described in section 10.3
@@ -65,25 +65,12 @@ bbVLCDeInterleaver::sptr bbVLCDeInterleaver::Create(unsigned int _GF, unsigned i
 {
 	return sptr(new bbVLCDeInterleaver(_GF, _N, _K, _raw_length, _pre_length));
 }
-
-int bbVLCDeInterleaver::bi2dec(int *in, int GF)
-{
-	int out=0;
-	for (int i=0; i<GF; i++)
-	{
-		out = out + in[i]*(int)pow((double)2,(GF-1)-i); 
-		//para mantener concordancia con el modelo matlab 'left-msb'
-	}
-	return out;
-}
-
 void bbVLCDeInterleaver::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
 	int ninputs = ninput_items_required.size();
 	for (int i=0; i < ninputs; i++)
 		ninput_items_required[i]= (noutput_items/out_deint)*pre_length;
 }
-
 int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr= (int *)input_items[0];
@@ -104,7 +91,7 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 		memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 		for (i=0; i< GF_words; i++)
 		{
-			tmp[i]=bi2dec(iptr,GF);
+			tmp[i]=LayoutVLC::bi2dec(iptr,GF);
 			//printf("El input es[%d]= %d\n",i,tmp[i]);
 			iptr = iptr + GF;
 		}

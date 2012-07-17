@@ -45,6 +45,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		VarVLC *varVLC;
 		void Run();
 		void Stop();
+		static unsigned char bi2dec(int *, unsigned int);
 		
 	public slots:
 		void RadioPressed(bool);
@@ -52,6 +53,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void setPSDUunits(int);
 		void setFramesize(bool);
 		void setDatarate(bool);
+		void TrackChanges();
 };
 
 #endif //_INC_LAYOUTVLC_H_

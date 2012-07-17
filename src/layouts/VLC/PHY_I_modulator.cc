@@ -20,7 +20,7 @@ PHY_I_modulator::PHY_I_modulator(VLCvar *_vlc_var_phy) :
 			
 	//the PHR has to be coded according to the parameters corresponding 
 	//to the minimum data_rate of the current negotiated clock
-	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.pre_rs_out, vlc_var_phy->_rs_code.pre_rs_in, vlc_var_phy->phy_type, vlc_var_phy->PHR_raw_length);
+	bbRSEnc::sptr rs_enc_phr = bbRSEnc::Create(&vlc_var_phy->GF, &vlc_var_phy->_rs_code.pre_rs_out, &vlc_var_phy->_rs_code.pre_rs_in, &vlc_var_phy->phy_type, &vlc_var_phy->PHR_raw_length);
 	switch(vlc_var_phy->phy_type)
 	{
 		case 0:
@@ -45,7 +45,7 @@ PHY_I_modulator::PHY_I_modulator(VLCvar *_vlc_var_phy) :
 	//PSDU
 	if (vlc_var_phy->_rs_code.rs_in !=0)
 	{
-		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(vlc_var_phy->GF, vlc_var_phy->_rs_code.rs_out,vlc_var_phy->_rs_code.rs_in,vlc_var_phy->phy_type, vlc_var_phy->PSDU_raw_length);		
+		bbRSEnc::sptr rs_enc_data = bbRSEnc::Create(&vlc_var_phy->GF, &vlc_var_phy->_rs_code.rs_out,&vlc_var_phy->_rs_code.rs_in,&vlc_var_phy->phy_type,&vlc_var_phy->PSDU_raw_length);		
 		switch (vlc_var_phy->phy_type)
 		{
 			case 0:

@@ -191,11 +191,12 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 {
 	uint i;
 	//Tx.Mode
-	varVLC->l_tx_mode= new QLabel("Tx. Mode:");
+	varVLC->l_tx_mode= new QLabel("Tx Mode:");
 	varVLC->cb_tx_mode = new QComboBox(p);
 	varVLC->cb_tx_mode->addItem(tr("Single"));
 	varVLC->cb_tx_mode->addItem(tr("Packed"));
 	varVLC->cb_tx_mode->addItem(tr("Burst"));
+	QObject::connect(varVLC->cb_tx_mode, SIGNAL(currentIndexChanged(int)), this, SLOT(TrackChanges()));
 	
 	//PSDU_units
 	varVLC->l_psdu_units= new QLabel("PSDU_units:");
@@ -207,19 +208,23 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	varVLC->sp_psdu_units[0]->setRange(1,1);
 	varVLC->sp_psdu_units[0]->setSingleStep(1);
 	varVLC->sp_psdu_units[0]->setHidden(false);
+	QObject::connect(varVLC->sp_psdu_units[0], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	
 	varVLC->sp_psdu_units[1] = new QSpinBox(p);
 	varVLC->sp_psdu_units[1]->setRange(2,10);
 	varVLC->sp_psdu_units[1]->setSingleStep(1);
 	varVLC->sp_psdu_units[1]->setHidden(true);
+	QObject::connect(varVLC->sp_psdu_units[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	
 	//Phy_type
 	varVLC->l_phy_type = new QLabel("Phy Type:");
 	varVLC->rb_phy_type[0] = new QRadioButton;
 	varVLC->rb_phy_type[0]->setText(tr("PHY I"));
 	varVLC->rb_phy_type[0]->setChecked(true);
+	QObject::connect(varVLC->rb_phy_type[0], SIGNAL(toggled(bool)), this, SLOT(TrackChanges()));
 	varVLC->rb_phy_type[1] = new QRadioButton;
 	varVLC->rb_phy_type[1]->setText(tr("PHY II"));
+	QObject::connect(varVLC->rb_phy_type[1], SIGNAL(toggled(bool)), this, SLOT(TrackChanges()));
 	
 	//FLP_length
 	varVLC->l_flp_length= new QLabel("FLP length:");
@@ -227,14 +232,17 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	varVLC->sp_flp_length->setRange(64,16384);
 	varVLC->sp_flp_length->setSingleStep(100);
 	varVLC->sp_flp_length->setHidden(false);
+	QObject::connect(varVLC->sp_flp_length, SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 		
 	//Modulation
 	varVLC->l_phy_modulation = new QLabel("Modulation:");
 	varVLC->rb_phy_modulation[0] = new QRadioButton;
 	varVLC->rb_phy_modulation[0]->setText(tr("OOK"));
 	varVLC->rb_phy_modulation[0]->setChecked(true);
+	QObject::connect(varVLC->rb_phy_modulation[0], SIGNAL(toggled(bool)), this, SLOT(TrackChanges()));
 	varVLC->rb_phy_modulation[1] = new QRadioButton;
 	varVLC->rb_phy_modulation[1]->setText(tr("VPPM"));
+	QObject::connect(varVLC->rb_phy_modulation[1], SIGNAL(toggled(bool)), this, SLOT(TrackChanges()));
 	
 	//Operating mode
 	varVLC->l_phy_op_mode = new QLabel("Phy operating mode:");
@@ -256,9 +264,13 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 		varVLC->cb_phy_op_mode[3]->addItem(QString("%1: %2 Mb/s").arg(i+1).arg(rate_phy2_v[i]));
 	
 	varVLC->cb_phy_op_mode[0]->setHidden(false);
+	QObject::connect(varVLC->cb_phy_op_mode[0], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[1]->setHidden(true);
+	QObject::connect(varVLC->cb_phy_op_mode[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[2]->setHidden(true);
+	QObject::connect(varVLC->cb_phy_op_mode[2], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[3]->setHidden(true);
+	QObject::connect(varVLC->cb_phy_op_mode[3], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	
 	//frame_size
 	varVLC->l_frame_size = new QLabel("Frame size (bytes):");
@@ -271,11 +283,13 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	varVLC->sp_frame_size[0]->setRange(0,1023);
 	varVLC->sp_frame_size[0]->setSingleStep(100);
 	varVLC->sp_frame_size[0]->setHidden(false);
+	QObject::connect(varVLC->sp_frame_size[0], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	
 	varVLC->sp_frame_size[1] = new QSpinBox(p);
 	varVLC->sp_frame_size[1]->setRange(0,65535);
 	varVLC->sp_frame_size[1]->setSingleStep(500);
 	varVLC->sp_frame_size[1]->setHidden(true);
+	QObject::connect(varVLC->sp_frame_size[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 }
 
 void LayoutVLC::SaveSettings(QSettings &s)
@@ -418,4 +432,16 @@ void LayoutVLC::setDatarate(bool a)
 		break;
 	}
 	
+}
+void LayoutVLC::TrackChanges()
+{
+	if (tx)
+		tx->UIChanged();	
+}
+unsigned char LayoutVLC::bi2dec(int *in, unsigned int GF)
+{
+	unsigned char o = 0;
+	for (int i = 0; i < GF; i++)
+		o += *in++*(1<<((GF-1)-i));
+	return o;
 }

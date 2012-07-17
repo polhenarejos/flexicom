@@ -40,7 +40,6 @@ class bbVLCDeInterleaver : public gr_block
 		int *interleaving_vector;
 		int *puncturing_vector;
 		int len_punct_vector;
-		int bi2dec(int *, int );
 		bool depuncture;
 };
 

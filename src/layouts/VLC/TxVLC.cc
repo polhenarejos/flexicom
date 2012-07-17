@@ -47,7 +47,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	
 	//PHR CHAIN
-	bbRSEnc::sptr phr_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in ,vlc_var.phy_type , vlc_var.PHR_raw_length);
+	bbRSEnc::sptr phr_rs_encoder = bbRSEnc::Create(&vlc_var.GF, &vlc_var._rs_code.pre_rs_out , &vlc_var._rs_code.pre_rs_in ,&vlc_var.phy_type , &vlc_var.PHR_raw_length);
 	switch(vlc_var.phy_type)
 	{
 		case 0:
@@ -73,7 +73,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	//PSDU CHAIN
 	if (vlc_var._rs_code.rs_in!=0)
 	{
-		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in ,vlc_var.phy_type,vlc_var.PSDU_raw_length);
+		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(&vlc_var.GF, &vlc_var._rs_code.rs_out , &vlc_var._rs_code.rs_in ,&vlc_var.phy_type,&vlc_var.PSDU_raw_length);
 		connect(PSDU_gen, 0, psdu_rs_encoder, 0);
 		switch (vlc_var.phy_type)
 		{
@@ -470,4 +470,7 @@ void TxVLC::stop()
 		rxth = NULL;
 	}*/
 }
-
+void TxVLC::UIChanged()
+{
+	init_var();
+}

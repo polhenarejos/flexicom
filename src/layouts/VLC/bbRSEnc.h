@@ -24,21 +24,23 @@ class bbRSEnc : public gr_block
        * @param _phy_type: distinguish between PHY operating modes (PHY I-PHY II) in order to generate the proper polynomial
        * @param _length: number of elements in bits in a block of data to be encoded.
        */
-		static sptr Create(unsigned int, unsigned int, unsigned int, int, int);
+		static sptr Create(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		int out_rs; /**< [out] indicates the length in bits of the output of the bbRSEnc block*/
 		~bbRSEnc();
 	
 	private:
-		bbRSEnc(unsigned int, unsigned int, unsigned int, int, int);
+		bbRSEnc(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
+		void ctor();
+		void ctor(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+		unsigned int *pGF, *pN, *pK, *pphy_type, *plength;
 		unsigned int GF; //dimension of the galois Field in bits PHY I=4 bits, PHYII=8 bits
 		unsigned int N; //length of the output block
 		unsigned int K; //length of the input block
-		int phy_type;
-		int length; //length in bits of the input data
+		unsigned int phy_type;
+		unsigned int length; //length in bits of the input data
 		vlc_reed_solomon *vlc_rs;
-		unsigned char bi2dec ( int *, int);
 		int rs_out_elements();
 };
 

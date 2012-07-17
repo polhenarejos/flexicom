@@ -24,7 +24,7 @@ class TestReedSolomon : public CppUnit::TestFixture
 		{
 			unsigned int GF = 4, N = 15, K = 7, phy = 0, len = 54;
 			gr_top_block_sptr gt = gr_make_top_block("RSEncode15_7_PHR");
-			bbRSEnc::sptr rs = bbRSEnc::Create(GF, N, K, phy, len);
+			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_in_rs_15_7.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_rs_15_7.dat");
 			MSE::sptr mse = MSE::Create();
@@ -50,7 +50,7 @@ class TestReedSolomon : public CppUnit::TestFixture
 		{
 			unsigned int GF = 4, N = 15, K = 7, phy = 0, len = 80;
 			gr_top_block_sptr gt = gr_make_top_block("RSEncode15_7_PSDU");
-			bbRSEnc::sptr rs = bbRSEnc::Create(GF, N, K, phy, len);
+			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_rs_15_7.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_rs_15_7.dat");
 			MSE::sptr mse = MSE::Create();
@@ -76,7 +76,7 @@ class TestReedSolomon : public CppUnit::TestFixture
 		{
 			unsigned int GF = 4, N = 15, K = 11, phy = 0, len = 80;
 			gr_top_block_sptr gt = gr_make_top_block("RSEncode15_11_PSDU");
-			bbRSEnc::sptr rs = bbRSEnc::Create(GF, N, K, phy, len);
+			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_rs_15_11.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_rs_15_11.dat");
 			MSE::sptr mse = MSE::Create();
