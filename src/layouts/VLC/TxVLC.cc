@@ -190,7 +190,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 
 TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
 {
-	return sptr(new TxVLC(_ly));
+	return gnuradio::get_initial_sptr(new TxVLC(_ly));
 }
 
 void TxVLC::init_var()

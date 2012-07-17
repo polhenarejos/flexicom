@@ -18,5 +18,5 @@ MSE::MSE() :
 }
 MSE::sptr MSE::Create()
 {
-	return sptr(new MSE());
+	return gnuradio::get_initial_sptr(new MSE());
 }

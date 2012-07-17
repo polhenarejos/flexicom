@@ -56,8 +56,8 @@ void Layout80211b::RadioPressed(bool check)
 	if (check)
 	{
 		mw->AddCustomTab(CreateTabOpts(), tr("Options"));
-		mw->panel->rb_chain[RB_TX]->setEnabled(false);
-		mw->panel->rb_chain[RB_RX]->setEnabled(true);
+		mw->panel->rb_chain[RB_TX]->setHidden(true);
+		mw->panel->rb_chain[RB_RX]->setHidden(false);
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
 		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));

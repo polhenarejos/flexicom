@@ -112,8 +112,8 @@ void LayoutVLC::RadioPressed(bool checked)
 	if (checked)
 	{
 		mw->AddCustomTab(CreateTabOpts(), QString("OptionsVLC"));
-		mw->panel->rb_chain[RB_TX]->setEnabled(true);
-		mw->panel->rb_chain[RB_RX]->setEnabled(true);
+		mw->panel->rb_chain[RB_TX]->setHidden(false);
+		mw->panel->rb_chain[RB_RX]->setHidden(false);
 		mw->panel->rb_chain[RB_TX]->setChecked(true);
 		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));

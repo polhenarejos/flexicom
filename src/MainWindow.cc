@@ -108,6 +108,7 @@ void MainWindow::readSettings(QSettings &s)
 	}
 	s.endArray();
 	panel->sp_gain->setValue(s.value("uhd/gain", 40).toInt());
+	panel->le_freq->setText(s.value("uhd/freq", "0").toString());
 }
 void MainWindow::writeSettings(QSettings &s)
 {
@@ -139,6 +140,7 @@ void MainWindow::writeSettings(QSettings &s)
 	}
 	s.endArray();
 	s.setValue("uhd/gain", panel->sp_gain->value());
+	s.setValue("uhd/freq", panel->le_freq->text());
 	emit SaveSettings(s);
 }
 void MainWindow::AddCustomTab(QWidget *w, QString name)
@@ -214,6 +216,8 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	sp_devs->setRange(1, 4);
 	QGridLayout *grid = new QGridLayout(p);
 	QRegExpValidator *v = new QRegExpValidator(QRegExp("^[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]$"), this);
+	grid->addWidget(new QLabel(tr("# USRPs")), 0, 0);
+	grid->addWidget(sp_devs, 0, 1);
 	uint i = 0;
 	for (; i < sizeof(ipfield)/sizeof(IPField); i++)
 	{
@@ -225,11 +229,14 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 		grid->addWidget(ipfield[i].ip, i+1, 1);
 	}
 	i++;
+	le_freq = new QLineEdit(p);
+	grid->addWidget(new QLabel(tr("Central Freq.")), i, 0);
+	grid->addWidget(le_freq, i, 1);
+	grid->addWidget(new QLabel(tr("MHz")), i++, 2);
 	sp_gain = new QSpinBox(p);
 	sp_gain->setRange(10, 70);
 	sp_gain->setSingleStep(5);
-	grid->addWidget(new QLabel(tr("# USRPs")), 0, 0);
-	grid->addWidget(sp_devs, 0, 1);
+	i++;
 	grid->addWidget(new QLabel(tr("Gain")), i, 0);
 	grid->addWidget(sp_gain, i++, 1);
 	SetDevs(sp_devs->value());
@@ -259,7 +266,6 @@ void Panel::StateLayout(MainWindow::StatesLayout s)
 			rb_layout[i]->bt->setEnabled(true);
 	}
 	//Depends on the layout
-	/*
 	if (s == MainWindow::STARTING)
 	{
 		rb_chain[RB_TX]->setEnabled(false);
@@ -270,5 +276,4 @@ void Panel::StateLayout(MainWindow::StatesLayout s)
 		rb_chain[RB_TX]->setEnabled(true);
 		rb_chain[RB_RX]->setEnabled(true);
 	}
-	*/
 }

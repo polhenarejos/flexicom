@@ -37,7 +37,7 @@ RxVLC::RxVLC() :
 }
 RxVLC::sptr RxVLC::Create()
 {
-	return sptr(new RxVLC());
+	return gnuradio::get_initial_sptr(new RxVLC());
 }
 RxVLC::~RxVLC()
 {

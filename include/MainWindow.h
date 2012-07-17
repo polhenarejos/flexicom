@@ -82,6 +82,7 @@ class Panel : public QTabWidget
 		IPField ipfield[8];
 		QSpinBox *sp_devs;
 		QSpinBox *sp_gain;
+		QLineEdit *le_freq;
 		QRadioButton *rb_chain[2];
 	
 	public slots:

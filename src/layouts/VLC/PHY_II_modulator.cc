@@ -62,7 +62,7 @@ PHY_II_modulator::PHY_II_modulator(VLCvar *_vlc_var_phy) :
 
 PHY_II_modulator::sptr PHY_II_modulator::Create(VLCvar *_vlc_var_phy)
 { 
-	return sptr(new PHY_II_modulator(_vlc_var_phy));
+	return gnuradio::get_initial_sptr(new PHY_II_modulator(_vlc_var_phy));
 }
 
 PHY_II_modulator::~PHY_II_modulator()

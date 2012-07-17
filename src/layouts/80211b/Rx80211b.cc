@@ -129,7 +129,7 @@ Rx80211b::Rx80211b(Layout80211b *_ly) :
 }
 Rx80211b::sptr Rx80211b::Create(Layout80211b *_ly)
 {
-	return sptr(new Rx80211b(_ly));
+	return gnuradio::get_initial_sptr(new Rx80211b(_ly));
 }
 Rx80211b::~Rx80211b()
 {
