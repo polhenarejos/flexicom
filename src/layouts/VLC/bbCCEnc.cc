@@ -34,12 +34,10 @@ bbCCEnc::bbCCEnc( int _N, int _K, int *_poly, int _length, int _data_rate):
 
 bbCCEnc::~bbCCEnc()
 {
-	if(vlc_cc && poly)
+	if(vlc_cc)
 	{
 		delete vlc_cc;
-		//delete [] poly;
 		vlc_cc = 0;
-		poly = 0;
 	}
 }
 
