@@ -24,9 +24,7 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 	public:
 		void test_Encode_1_4_PHR()
 		{
-			int *poly;
-			poly = new int[3];
-			poly[0]=0133; poly[1]=0171;	poly[2]=0165;
+			int poly[] = { 0133, 0171, 0165 };
 			int N = 3, K = 7, len = 120, data_rate=0; //30*4
 			gr_top_block_sptr gt = gr_make_top_block("CCEncode_1_4_PHR");
 			bbCCEnc::sptr cc = bbCCEnc::Create(N, K, poly, len, data_rate);
@@ -50,17 +48,13 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			std::vector<float> data = vec->data();
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
-   			delete [] poly;
 		}
 		
 		void test_Encode_1_4_PSDU()
 		{
-			int *poly;
-			poly = new int[3];
-			poly[0]=0133; poly[1]=0171;	poly[2]=0165;
+			int poly[] = { 0133, 0171, 0165 };
 			int N = 3, K = 7, len = 176, data_rate=0; //44*4
 			gr_top_block_sptr gt = gr_make_top_block("CCEncode_1_4_PSDU");
-			
 			bbCCEnc::sptr cc = bbCCEnc::Create(N, K, poly, len, data_rate);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_4.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_4.dat");
@@ -83,17 +77,13 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			printf("Hola\n");	
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
-   			delete [] poly;
 		}
 		
 		void test_Encode_1_3_PSDU()
 		{
-			int *poly;
-			poly = new int[3];
-			poly[0]=0133; poly[1]=0171;	poly[2]=0165;
-			int N = 3, K = 7, len = 112, data_rate=1; //33*4
+			int poly[] = { 0133, 0171, 0165 };
+			int N = 3, K = 7, len = 112; //33*4
 			gr_top_block_sptr gt = gr_make_top_block("CCEncode_1_3_PSDU");
-			
 			bbCCEnc::sptr cc = bbCCEnc::Create(N, K, poly, len, 1);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_3.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_3.dat");
@@ -115,17 +105,13 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			std::vector<float> data = vec->data();
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
-   			delete [] poly;
 		}
 		
 		void test_Encode_2_3_PSDU()
 		{
-			int *poly;
-			poly = new int[3];
-			poly[0]=0133; poly[1]=0171;	poly[2]=0165;
+			int poly[] = { 0133, 0171, 0165 };
 			int N = 3, K = 7, len = 112, data_rate=2; //33*4
 			gr_top_block_sptr gt = gr_make_top_block("CCEncode_2_3_PSDU");
-			
 			bbCCEnc::sptr cc = bbCCEnc::Create(N, K, poly, len, data_rate);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_2_3.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_2_3.dat");
@@ -147,7 +133,6 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			std::vector<float> data = vec->data();
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
-   			delete [] poly;
 		}
 };
 CPPUNIT_TEST_SUITE_REGISTRATION(TestConvolutionalCode);
