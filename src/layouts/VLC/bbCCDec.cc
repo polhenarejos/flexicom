@@ -34,12 +34,10 @@ bbCCDec::bbCCDec( int _N, int _K, int *_poly, int _length, int _data_rate):
 
 bbCCDec::~bbCCDec()
 {
-	if(vlc_cc && poly)
+	if(vlc_cc)
 	{
 		delete vlc_cc;
-		delete [] poly;
 		vlc_cc = 0;
-		poly = 0;
 	}
 }
 
@@ -66,11 +64,11 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int size;
 	int *tmp;
 	int *tmp2;
+	int amp=2;
 	//tmp= new int[length];
 	tmp2=new int[out_cc_dec];
 	blocks_to_process = (noutput_items/out_cc_dec);
 	int times=0;
-	//printf("Noutput_items:%d\n", noutput_items);
 	while (blocks_to_process>0)
 	{
 		memset(tmp2,0,sizeof(int)*out_cc_dec);
@@ -80,7 +78,15 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			size = length/2;
 			for (i=0; i<length/2;i++)
 			{
-				tmp[i]= iptr[0];
+				switch(iptr[0])
+				{
+					case 0:
+						tmp[i]=1*amp;
+						break;
+					case 1:
+						tmp[i]=-1*amp;
+				}
+				//tmp[i]= iptr[0];
 				iptr = iptr + 2;
 			}
 		}
@@ -88,20 +94,30 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		{
 			tmp = new int[length];
 			size= length;
-			memcpy(tmp, iptr, sizeof(int)*length);
-			iptr = iptr + length;
+			for (i=0; i<length;i++)
+			{
+				switch(iptr[0])
+				{
+					case 0:
+						tmp[i]=1*amp;
+						break;
+					case 1:
+						tmp[i]=-1*amp;
+				}
+				iptr++;
+			}
+			//memcpy(tmp, iptr, sizeof(int)*length);
+			//iptr = iptr + length;
 		}
-		vlc_cc->decode_punct(tmp,tmp2, out_cc_dec, K, N, vlc_cc->no_states, vlc_cc->output_reverse_int, size, vlc_cc->ones ,2,vlc_cc->punct_matrix);
+		vlc_cc->decode_punct(tmp,tmp2, out_cc_dec, K, N, vlc_cc->no_states, vlc_cc->output_reverse_int, size, vlc_cc->ones,2,vlc_cc->punct_matrix);
 		memcpy(optr, tmp2, sizeof(int)*out_cc_dec);
 		optr = optr + out_cc_dec;
-		
 		blocks_to_process--;
 	}
-	if (tmp && tmp2)
-	{
-		delete [] tmp; tmp=0;
-		delete [] tmp2; tmp2=0;
-	}
+	
+	delete [] tmp; 
+	delete [] tmp2;
+	
 	consume_each((noutput_items/out_cc_dec)*length);
 	return noutput_items;
 }

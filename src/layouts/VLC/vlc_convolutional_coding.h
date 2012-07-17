@@ -41,17 +41,14 @@ class vlc_convolutional_coding {
 		int *punct_matrix; /**< Puncturing matrix. Supported rates: 1/4, 1/3, 2/3 */
 		int *poly; /**< Array containing the generator polynomial. The length of this array is equal to the N value */
 		int encoder_state;
-		
-		
-	
+		int no_states;		
+		int *output_reverse_int;
+		int ones; //count the number of ones in the puncturing_matrix
+			
 	private:
 		
-		int *output_reverse_int;
-		
-		int no_states;
 		int length;
 		int data_rate;
-		int ones; //count the number of ones in the puncturing_matrix
 		//encoding auxiliary functions
 		void set_generator_polynomials(int *, int *, int , int ,int, int *);
 		int weight_int(int, int);

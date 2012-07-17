@@ -1,5 +1,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include "bbCCEnc.h"
+#include "bbCCDec.h"
 #include <gr_file_source.h>
 #include <gr_top_block.h>
 #include <gr_vector_sink_f.h>
@@ -19,6 +20,10 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 	CPPUNIT_TEST(test_Encode_1_4_PSDU);	
 	CPPUNIT_TEST(test_Encode_1_3_PSDU);	
 	CPPUNIT_TEST(test_Encode_2_3_PSDU);	
+	CPPUNIT_TEST(test_Decode_1_4_PHR);
+	CPPUNIT_TEST(test_Decode_1_4_PSDU);
+	CPPUNIT_TEST(test_Decode_1_3_PSDU);
+	CPPUNIT_TEST(test_Decode_2_3_PSDU);
 	CPPUNIT_TEST_SUITE_END();
 	
 	public:
@@ -133,5 +138,118 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			for (unsigned int i = 0; i < data.size(); i++)
    				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
 		}
+		
+		void test_Decode_1_4_PHR()
+		{
+			int poly[] = { 0133, 0171, 0165 };
+			int N = 3, K = 7, len = 504, data_rate=0; 
+			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_4_PHR");
+			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_cc_1_4.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_in_cc_1_4.dat");
+			MSE::sptr mse = MSE::Create();
+			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
+			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
+			gr_vector_sink_f_sptr vec = gr_make_vector_sink_f(1);
+			gr_float_to_int_sptr f2i = gr_make_float_to_int();
+			gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+			gt->connect(fi, 0, f2i, 0);
+			gt->connect(f2i, 0, cc, 0);
+			gt->connect(cc, 0, i2f, 0);
+			gt->connect(i2f, 0, f2c0, 0);
+			gt->connect(fo, 0, f2c1, 0);
+			gt->connect(f2c0, 0, mse, 0);
+			gt->connect(f2c1, 0, mse, 1);
+			gt->connect(mse, 0, vec, 0);
+			gt->run();
+			std::vector<float> data = vec->data();
+			for (unsigned int i = 0; i < data.size(); i++)
+   				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
+		}
+		
+		void test_Decode_1_4_PSDU()
+		{
+			int poly[] = { 0133, 0171, 0165 };
+			int N = 3, K = 7, len = 728, data_rate=0; 
+			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_4_PSDU");
+			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_4.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_4.dat");
+			MSE::sptr mse = MSE::Create();
+			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
+			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
+			gr_vector_sink_f_sptr vec = gr_make_vector_sink_f(1);
+			gr_float_to_int_sptr f2i = gr_make_float_to_int();
+			gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+			gt->connect(fi, 0, f2i, 0);
+			gt->connect(f2i, 0, cc, 0);
+			gt->connect(cc, 0, i2f, 0);
+			gt->connect(i2f, 0, f2c0, 0);
+			gt->connect(fo, 0, f2c1, 0);
+			gt->connect(f2c0, 0, mse, 0);
+			gt->connect(f2c1, 0, mse, 1);
+			gt->connect(mse, 0, vec, 0);
+			gt->run();
+			std::vector<float> data = vec->data();
+			for (unsigned int i = 0; i < data.size(); i++)
+   				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
+		}
+		
+		void test_Decode_1_3_PSDU()
+		{
+			int poly[] = { 0133, 0171, 0165 };
+			int N = 3, K = 7, len = 354, data_rate=1; 
+			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_3_PSDU");
+			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_3.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_3.dat");
+			MSE::sptr mse = MSE::Create();
+			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
+			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
+			gr_vector_sink_f_sptr vec = gr_make_vector_sink_f(1);
+			gr_float_to_int_sptr f2i = gr_make_float_to_int();
+			gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+			gt->connect(fi, 0, f2i, 0);
+			gt->connect(f2i, 0, cc, 0);
+			gt->connect(cc, 0, i2f, 0);
+			gt->connect(i2f, 0, f2c0, 0);
+			gt->connect(fo, 0, f2c1, 0);
+			gt->connect(f2c0, 0, mse, 0);
+			gt->connect(f2c1, 0, mse, 1);
+			gt->connect(mse, 0, vec, 0);
+			gt->run();
+			std::vector<float> data = vec->data();
+			for (unsigned int i = 0; i < data.size(); i++)
+   				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
+		}
+		
+		void test_Decode_2_3_PSDU()
+		{
+			int poly[] = { 0133, 0171, 0165 };
+			int N = 3, K = 7, len = 177, data_rate=2; 
+			gr_top_block_sptr gt = gr_make_top_block("CCDecode_2_3_PSDU");
+			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_2_3.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_2_3.dat");
+			MSE::sptr mse = MSE::Create();
+			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
+			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
+			gr_vector_sink_f_sptr vec = gr_make_vector_sink_f(1);
+			gr_float_to_int_sptr f2i = gr_make_float_to_int();
+			gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
+			gt->connect(fi, 0, f2i, 0);
+			gt->connect(f2i, 0, cc, 0);
+			gt->connect(cc, 0, i2f, 0);
+			gt->connect(i2f, 0, f2c0, 0);
+			gt->connect(fo, 0, f2c1, 0);
+			gt->connect(f2c0, 0, mse, 0);
+			gt->connect(f2c1, 0, mse, 1);
+			gt->connect(mse, 0, vec, 0);
+			gt->run();
+			std::vector<float> data = vec->data();
+			for (unsigned int i = 0; i < data.size(); i++)
+   				CPPUNIT_ASSERT_DOUBLES_EQUAL(0, data[i], 10e-9);
+		}
+		
 };
 CPPUNIT_TEST_SUITE_REGISTRATION(TestConvolutionalCode);

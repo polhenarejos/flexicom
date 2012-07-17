@@ -190,23 +190,29 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
   int S0[2]; //S0 and S1
   int i,l,s; //loop variables
   double temp_metric_zero, temp_metric_one;
+  int dm = pow((double)2,N);
   
   //Inizialitations
   //clear visited states
-  int dm = pow((double)2,N);
+  int *temp_sum_metric = new int[no_states];
+  int *temp_rec=new int[N];
   int *delta_metrics= new int[dm]; //size determined by 2^no_outputs=2^n
   int *temp_visited_state = new int[no_states];
   int *path_memory = new int[no_states*block_length];
   int *visited_state = new int[no_states]; //1 means visited state, 0 means not visited state
   int *sum_metric = new int[no_states];
+  
   memset(visited_state,0,sizeof(int)*no_states);
   memset(temp_visited_state,0,sizeof(int)*no_states);
   memset(path_memory,0,sizeof(int)*(no_states*block_length));
   //clear accumulated metrics
   memset(sum_metric,0,sizeof(int)*no_states);
   memset(delta_metrics,0,sizeof(int)*dm);
+  
   visited_state[0]=1; //starts in the zero state
    
+  
+  // evolve up to m where not all states visited
   
   if (block_length - m <=0)
   {
@@ -214,9 +220,6 @@ void vlc_convolutional_coding::decode(int *encoded, int *decoded, int NN, int K,
     exit(-1);
   }
   
-  // evolve up to m where not all states visited
-  int *temp_rec=new int[N];
-  int *temp_sum_metric = new int[no_states];
   for (l = 0; l < m; l++) // all transitions including the tail
   { 
     for (i=0; i<N; i++)
@@ -329,7 +332,6 @@ void vlc_convolutional_coding::decode_punct(int *encoded, int *decoded, int NN, 
 {
   int k = 0, i = 0, p = k_size / total, j;
   int temp_size = p * Period * N;
-  int m=K-1;
   // number of punctured bits in a fraction of the puncture matrix
   // correcponding to the end of the received_signal vector
   p = k_size - p * total;
@@ -379,7 +381,7 @@ void vlc_convolutional_coding::decode_punct(int *encoded, int *decoded, int NN, 
     }
   } // while
 
-  decode(temp, decoded, NN, m, N, no_states, output_reverse_int);
+  decode(temp, decoded, NN, K, N, no_states, output_reverse_int);
   delete [] temp;
 }
 
