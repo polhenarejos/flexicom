@@ -1,4 +1,5 @@
-SOURCES=main.cc MainWindow.cc MainWindow_moc.cc
+SOURCES=MainWindow.cc MainWindow_moc.cc
+TESTS=test.cc test_example.cc 
 LAYOUTS=BBN_PLCP.cc BBN_Slicer.cc BBN_DPSKDemod.cc Layout80211b.cc Rx80211b.cc \
 				Layout80211b_moc.cc
 LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEnc.cc \
@@ -6,11 +7,14 @@ LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEn
 					bbVLC_info_assembler.cc bbVLCInterleaver.cc LayoutVLC.cc PHY_I_modulator.cc \
 					PHY_II_modulator.cc RxVLC.cc TxVLC.cc vlc_convolutional_coding.cc vlc_crc.cc \
 					vlc_reed_solomon.cc LayoutVLC_moc.cc
-MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc
-VPATH=layouts/80211b:layouts/VLC:modules
+TESTS+=test_CC.cc test_RLL.cc test_RS.cc test_VLCInterleaver.cc
+MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc
+VPATH=layouts/80211b:layouts/VLC:modules:layouts/VLC/test:../test
+CFLAGS_LAYOUTS=-Ilayouts/VLC -Ilayouts/80211b
 OBJS=$(SOURCES:%.cc=$(OUTDIR)/%.o)
 LAYOBJS=$(LAYOUTS:%.cc=$(OUTDIR)/%.o)
 MODOBJS=$(MODULES:%.cc=$(OUTDIR)/%.o)
+TESTOBJS=$(TESTS:%.cc=$(OUTDIR)/%.o)
 
 INCLUDES=$(INCLUDEDIR)/LayoutFactory.h $(INCLUDEDIR)/MainWindow.h
 MAKEARGS='CFLAGS=${CFLAGS}' \
@@ -28,12 +32,10 @@ MAKEARGS='CFLAGS=${CFLAGS}' \
 		'OUTDIR=${OUTDIR}' \
 		'TESTDIR=${TESTDIR}'
 
-
-
 MAKE=make $(MAKEARGS)
 all: build
 
-build: $(OBJS) $(LAYOBJS) $(MODOBJS)
+build: $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o
 	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(LDFLAGS) $(LIBS)
 	@$(CP) $(OUTDIR)/$(TARGET) ../$(TARGET)
 
@@ -54,7 +56,12 @@ $(OUTDIR)/QtBlock.o: modules/QtBlock.cc $(INCLUDES)
 	$(CC) $(CFLAGS) -D_REENTRANT -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -c modules/QtBlock.cc -o $(OUTDIR)/QtBlock.o 
 	
 $(OUTDIR)/%.o: %.cc $(INCLUDES)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CFLAGS_LAYOUTS) -c $< -o $@
 
 clean:
 	$(RM) -f $(OUTDIR)/* $(OBJS)
+
+test: $(OBJS) $(LAYOBJS) $(MODOBJS) $(TESTOBJS)
+	$(CC) $(CFLAGS) -o $(OUTDIR)/test_$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(TESTOBJS) -lcppunit $(LDFLAGS) $(LIBS)
+	@$(CP) $(OUTDIR)/test_$(TARGET) ../test_$(TARGET)
+	

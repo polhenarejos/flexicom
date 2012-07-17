@@ -22,7 +22,6 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	sequence_number = 1;
 	//FILE READING
 	fp = fopen(_f.c_str(), "r");
-	int tmp;
 	if (fp ==NULL)
   	{
   		printf("The file is not available\n");

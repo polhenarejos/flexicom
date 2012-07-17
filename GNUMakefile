@@ -50,3 +50,9 @@ clean:
 
 frame_conversor: tools/frame_conversor.cc
 	g++ tools/frame_conversor.cc -o frame_conversor $(CFLAGS)
+
+test: do_test
+do_test:
+	cd src; ${MAKE} ${MAKEARGS} 'TARGET=${TARGET}' test; 
+	./test_$(TARGET)
+	

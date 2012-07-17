@@ -13,6 +13,9 @@
 
 #include <gr_null_sink.h>
 #include <gr_sig_source_f.h>
+#include <gr_float_to_complex.h>
+#include <gr_file_source.h>
+#include "bbMatlab.h"
 
 const char *LayoutVLC::name = "VLC";
 
@@ -55,22 +58,27 @@ void LayoutVLC::Run()
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		usrp_rx = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-		usrp_rx->set_samp_rate(10e6);
-		usrp_rx->set_center_freq(2462e6);
+		usrp_rx = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc16"));
+		usrp_rx->set_samp_rate(800e3);
+		usrp_rx->set_center_freq(0);
 		usrp_rx->set_gain(mw->panel->sp_gain->value());
-		rx = RxVLC::Create();
-		grTop->connect(usrp_rx, 0, rx, 0);
+		//rx = RxVLC::Create();
+		bbMatlab::sptr bbm = bbMatlab::Create("rx.txt", sizeof(std::complex<float>));
+		grTop->connect(usrp_rx, 0, bbm, 0);
 		grTop->start();
 	}
 	else //transmitter
 	{
 		/*usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-		usrp_tx->set_samp_rate(10e6);
+		usrp_tx->set_samp_rate(800e3);
 		usrp_tx->set_center_freq(0);
 		usrp_tx->set_gain(mw->panel->sp_gain->value());
-		gr_sig_source_f_sptr sig = gr_make_sig_source_f(10e6, GR_SQR_WAVE, 200e3, 5, 0);
-		grTop->connect(sig, 0, usrp_tx, 0);
+		//gr_sig_source_f_sptr sig = gr_make_sig_source_f(20e6, GR_SIN_WAVE, 200e3, 1, 0);
+		gr_file_source_sptr sig = gr_make_file_source(sizeof(float), "src/layouts/VLC/input_data.txt.dat", true);
+		gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
+		grTop->connect(sig, 0, f2c, 0);
+		grTop->connect(f2c, 0, usrp_tx, 0);
+		grTop->start();
 		*/tx = TxVLC::Create(this);
 		if (tx->vlc_var.phy_type)
 		{
