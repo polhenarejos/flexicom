@@ -6,7 +6,7 @@
 //described in section 10.3
 
 bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, int _raw_length, int _pre_length):
-	gr_block("bbVLCDeInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(unsigned char))),
+	gr_block("bbVLCDeInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), pre_length(_pre_length)
 {
 	//equations in section 10.3 of IEEE 802.15.7
@@ -29,12 +29,11 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 	for (i=0; i<S_block; i++)
 	{
 		interleaving_vector[i]= (i%D)*N + (int) floor(((double)i/D));
-		//printf("Interleaving_vector[%d]= %d\n", i, interleaving_vector[i]);
+		//printf("El valor de interleaving_vector[%d]=%d\n", i,interleaving_vector[i]);
 	}
 	for (i=0; i<p; i++)
 	{
 		puncturing_vector[i]= (N-p+1)*D + (i*D)-1;
-		//printf("puncturing_vector[%d]= %d\n", i, puncturing_vector[i]);
 	}
 	if (p< K)
 	{
@@ -47,7 +46,7 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 		out_deint= pre_length/GF;
 	}
 	len_punct_vector= p;
-	//printf("El valor de out_int:%d\n",out_int);
+	//printf("El valor de out_deint:%d\n",out_deint);
 	set_output_multiple(out_deint);
 }
 
@@ -67,9 +66,9 @@ bbVLCDeInterleaver::sptr bbVLCDeInterleaver::Create(unsigned int _GF, unsigned i
 	return sptr(new bbVLCDeInterleaver(_GF, _N, _K, _raw_length, _pre_length));
 }
 
-unsigned char bbVLCDeInterleaver::bi2dec(int *in, int GF)
+int bbVLCDeInterleaver::bi2dec(int *in, int GF)
 {
-	unsigned char out=0;
+	int out=0;
 	for (int i=0; i<GF; i++)
 	{
 		out = out + in[i]*(int)pow((double)2,(GF-1)-i); 
@@ -88,27 +87,31 @@ void bbVLCDeInterleaver::forecast(int noutput_items, gr_vector_int &ninput_items
 int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr= (int *)input_items[0];
-	unsigned char *optr= (unsigned char *)output_items[0];
+	int *optr= (int *)output_items[0];
 	int blocks_to_process,i,j,l;
 	int GF_words = pre_length/GF; //this division will be always an integer number
-	unsigned char *tmp = new unsigned char[GF_words];
-	unsigned char *tmp2 = new unsigned char[GF_words];
-	unsigned char *tmp3 = new unsigned char[GF_words+len_punct_vector];
-	blocks_to_process=(noutput_items/out_deint);
+	//printf("\n\n GF_words: %d\n", GF_words);
+	int *tmp = new int[GF_words];
+	int *tmp2 = new int[GF_words];
+	int *tmp3 = new int[GF_words+len_punct_vector];
 		
+	blocks_to_process=(noutput_items/out_deint);
+	
 	while (blocks_to_process > 0)
 	{
-		memset(tmp,0,sizeof(unsigned char)*GF_words);
-		memset(tmp2,0, sizeof(unsigned char)*GF_words);
+		memset(tmp,0,sizeof(int)*GF_words);
+		memset(tmp2,0, sizeof(int)*GF_words);
+		memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 		for (i=0; i< GF_words; i++)
 		{
 			tmp[i]=bi2dec(iptr,GF);
+			//printf("El input es[%d]= %d\n",i,tmp[i]);
 			iptr = iptr + GF;
 		}
 		if(len_punct_vector< K)
 		{
 			j=0; l=0;
-			memset(tmp3,0, sizeof(unsigned char)*(GF_words+ len_punct_vector));
+			
 			for(i=0; i<GF_words + len_punct_vector; i++)
 			{
 				if (i != puncturing_vector[l])
@@ -126,13 +129,16 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 		}
 		else
 		{
-			memset(tmp3,0, sizeof(unsigned char)*GF_words);
+			//memset(tmp3,0, sizeof(int)*(GF_words+len_punct_vector));
 			for (i=0; i<GF_words; i++)
 				tmp3[i]= tmp[i];				
 		}
 		
+		//deinterleaving properly said
 		for(i=0; i<GF_words; i++)
+		{
 			optr[interleaving_vector[i]]=tmp3[i];
+		}
 		
 		optr = optr + GF_words;		
 		blocks_to_process--;
