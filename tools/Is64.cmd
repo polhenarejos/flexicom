@@ -1,5 +1,3 @@
-# $Id$
-
 @echo off
 set CC=cl
 
