@@ -31,7 +31,7 @@ class bbVLC_info_assembler : public gr_block
 		bbVLC_info_assembler(int,int,int,int);
 		int TDP; //indicates topology, currently not available, always broadcast = 2
 		int PSDU_units;
-		int *TDP_pattern;
+		int TDP_pattern[4*15];
 		int length_PHR; //length of modulated PHR
 		int length_data_payload; // length of modulated data
 		int length_frame;

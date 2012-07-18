@@ -34,7 +34,7 @@ class PHY_I_modulator : public gr_hier_block2
 		int out_PHY_I_psdu; /**< [out] indicates the length in bits of the encoded PSDU block of data*/
 		
 	private:
-		int *poly;
+		int poly[3];
 		PHY_I_modulator(VLCvar *vlc_var_phy);
 };
 

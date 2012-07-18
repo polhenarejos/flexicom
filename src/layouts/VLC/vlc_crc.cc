@@ -19,7 +19,7 @@ vlc_crc::~vlc_crc ()
 
 void vlc_crc::generate_crc(int *data, int *out, int size)
 {
-	int *tmp = new int [4];
+	int tmp[4];
 	unsigned int i;
 		//tab_len = length_data + crc_length;
 	int *tab_ops = new int[size];
@@ -50,7 +50,6 @@ void vlc_crc::generate_crc(int *data, int *out, int size)
 	memcpy(&out[size-crc_length],shift_reg, sizeof(int)*crc_length);
 	delete [] tab_ops;
 	delete [] shift_reg;
-	delete [] tmp;
 	return;
 }
 

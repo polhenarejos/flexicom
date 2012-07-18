@@ -10,6 +10,7 @@ bbRSEnc::bbRSEnc(unsigned int *_GF, unsigned int *_N, unsigned int *_K, unsigned
 	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
 	pGF(_GF),pN(_N),pK(_K), pphy_type(_phy_type), plength(_length)
 {
+	vlc_rs = NULL;
 	ctor(*pGF, *pN, *pK, *pphy_type, *plength);
 }
 void bbRSEnc::ctor()
@@ -23,6 +24,8 @@ void bbRSEnc::ctor(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 	K = _K;
 	phy_type = _phy_type;
 	length = _length;
+	if (vlc_rs)
+		delete vlc_rs;
 	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
 	out_rs=rs_out_elements();
 	set_output_multiple(out_rs);

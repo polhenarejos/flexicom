@@ -21,7 +21,7 @@ class bb4b6bEnc : public gr_block
 	
 	private:
 		bb4b6bEnc();
-		int *outputTable6b;
+		int outputTable6b[6*16];
 };
 
 #endif //_INC_BB4B6BENC_H_

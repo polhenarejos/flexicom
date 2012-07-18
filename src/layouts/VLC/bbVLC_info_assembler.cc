@@ -17,8 +17,6 @@ bbVLC_info_assembler::bbVLC_info_assembler(int _topology, int _PSDU_units, int _
 	gr_block("bbVLC_info_assembler", gr_make_io_signature(2,2,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), TDP(_topology), 
 	PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload)
 {
-	
-	TDP_pattern=new int[4*15];	
 	switch (TDP)
 	{
 		case 0:	 //topology independent
@@ -54,12 +52,6 @@ bbVLC_info_assembler::bbVLC_info_assembler(int _topology, int _PSDU_units, int _
 
 bbVLC_info_assembler::~bbVLC_info_assembler()
 {
-	if (TDP_pattern)
-	{
-		delete [] TDP_pattern;
-		TDP_pattern = 0;
-	}
-		
 }
 
 bbVLC_info_assembler::sptr bbVLC_info_assembler::Create(int _topology, int _PSDU_units, int _length_PHR, int _length_data_payload)

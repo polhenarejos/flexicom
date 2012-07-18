@@ -77,7 +77,7 @@ class TxVLC : public gr_hier_block2
 		void UIChanged();
 		
 	private:
-		int *poly;
+		int poly[3];
 		TxVLC(LayoutVLC *);
 		LayoutVLC *ly;
 		void init_var();

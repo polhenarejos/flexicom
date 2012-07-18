@@ -14,7 +14,6 @@ PHY_I_modulator::PHY_I_modulator(VLCvar *_vlc_var_phy) :
 	gr_hier_block2("PHY_I_modulator", gr_make_io_signature(2,2,sizeof(int)), gr_make_io_signature(2,2,sizeof(int))),
 	vlc_var_phy(_vlc_var_phy)
 {
-	poly=new int[3];
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	int psdu_words;
 	int phr_words;
@@ -125,11 +124,9 @@ PHY_I_modulator::sptr PHY_I_modulator::Create(VLCvar *_vlc_var_phy)
 
 PHY_I_modulator::~PHY_I_modulator()
 {
-	if (poly && vlc_var_phy)
+	if (vlc_var_phy)
 	{
-		delete [] poly;
 		delete vlc_var_phy;
-		poly = 0;
 		vlc_var_phy = 0;
 	}
 	stop();
