@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_LAYOUTFACTORY_H_
 #define _INC_LAYOUTFACTORY_H_
 

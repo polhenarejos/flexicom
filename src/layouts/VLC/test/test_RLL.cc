@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #include <cppunit/extensions/HelperMacros.h>
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"

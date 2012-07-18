@@ -1,3 +1,4 @@
+// $Id$
 #include <stdexcept>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/CompilerOutputter.h>

@@ -1,3 +1,4 @@
+// $Id$
 #include <cppunit/extensions/HelperMacros.h>
 #include "bbRSEnc.h"
 #include <gr_file_source.h>

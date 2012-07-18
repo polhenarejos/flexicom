@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #include "bbVLCDeInterleaver.h"
 #include <gr_io_signature.h>
 #include "LayoutVLC.h"
@@ -137,4 +138,3 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 	consume_each((noutput_items/out_deint)*pre_length);
 	return noutput_items;
 }
-	

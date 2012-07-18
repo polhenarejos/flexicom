@@ -1,3 +1,4 @@
+// $Id$
 #include "MainWindow.h"
 #include "LayoutFactory.h"
 #include "layouts/VLC/LayoutVLC.h"

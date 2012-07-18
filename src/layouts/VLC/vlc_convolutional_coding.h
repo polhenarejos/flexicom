@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #ifndef _VLC_CONVOLUTIONAL_CODING_H_
 #define _VLC_CONVOLUTIONAL_CODING_H_
 

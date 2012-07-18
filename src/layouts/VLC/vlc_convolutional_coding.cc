@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #include "vlc_convolutional_coding.h"
 #include <assert.h>
 #include <string.h>

@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_COMPAT_H_
 #define _INC_COMPAT_H_
 

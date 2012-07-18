@@ -1,3 +1,5 @@
+## $Id$
+
 DEBUG=1
 CMDLINE=1
 

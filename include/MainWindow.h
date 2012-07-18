@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_MAINWINDOW_H_
 #define _INC_MAINWINDOW_H_
 

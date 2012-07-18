@@ -1,3 +1,6 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+#ifndef _INC_VARVLC_H_
+#define _INC_VARVLC_H_
 #include <QRadioButton>
 #include <QPushButton>
 #include <QLineEdit>
@@ -30,3 +33,4 @@ typedef struct
 	
 	
 }VarVLC;
+#endif //_INC_VARVLC_H_

@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_LAYOUTVLC_H_
 #define _INC_LAYOUTVLC_H_
 

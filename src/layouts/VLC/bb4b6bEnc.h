@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #ifndef _INC_BB4B6BENC_H_
 #define _INC_BB4B6BENC_H_
 

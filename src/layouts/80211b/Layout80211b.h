@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_LAYOUT80211B_H_
 #define _INC_LAYOUT80211B_H_
 

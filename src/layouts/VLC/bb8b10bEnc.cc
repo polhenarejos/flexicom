@@ -1,3 +1,4 @@
+// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
 #include "bb8b10bEnc.h"
 #include <gr_io_signature.h>
 #include <math.h>

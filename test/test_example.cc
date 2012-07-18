@@ -1,3 +1,4 @@
+// $Id$
 #include <cppunit/extensions/HelperMacros.h>
 
 class TestExample : public CppUnit::TestFixture

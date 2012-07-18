@@ -1,3 +1,4 @@
+// $Id$
 #ifndef _INC_QT_H_
 #define _INC_QT_H_
 
