@@ -201,7 +201,7 @@ void TxVLC::init_var()
 	{
 		if (ly->varVLC->rb_phy_type[i]->isChecked())
 			vlc_var.phy_type = i; //phy_type=0 PHY I, otherwise PHY II
-		else if (ly->varVLC->rb_phy_modulation[i]->isChecked())
+		if (ly->varVLC->rb_phy_modulation[i]->isChecked())
 			vlc_var.mod_type = i; //mod_type=0 OOK, otherwise PHY II
 	}
 	if ((vlc_var.phy_type == 0) && (vlc_var.mod_type==0))

@@ -106,9 +106,9 @@ class TestVLCInterleaver : public CppUnit::TestFixture
 		
 		void test_DeInterleave_PSDU()
 		{
-			unsigned int GF = 4, N = 15, K = 7, phr_len = 10*8, len = 176;
+			unsigned int GF = 4, N = 15, K = 7, psdu_len = 10*8, len = 176;
 			gr_top_block_sptr gt = gr_make_top_block("DeInterleave_PSDU");
-			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, N, K , phr_len, len);
+			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, N, K , psdu_len, len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_deinterleaver.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_deinterleaver.dat");
 			MSE::sptr mse = MSE::Create();
