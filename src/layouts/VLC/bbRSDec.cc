@@ -3,7 +3,7 @@
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
-
+#include "LayoutVLC.h"
 
 bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
 	gr_block("bbRSDec", gr_make_io_signature (1,1, sizeof(unsigned char)), gr_make_io_signature (1,1, sizeof(int))),
@@ -50,21 +50,6 @@ int bbRSDec::rs_out_elements()
 	return rs_output_bits;
 	//if all divisions were exact, there will not need to do that
 }
-
-void bbRSDec::dec2bi(unsigned char number, int GF, int *bin_number)
-{
-	//again the same criteria as in the rs-encoder 'left-msb'	
-	int tmp;
-	//tmp = new int;
-	tmp = (int) number;
-	for (int i=0; i<GF; i++)
-    {
-        bin_number[GF-(i+1)]= tmp%2;
-        tmp = tmp /2;
-    }
-    return;       
-}
-
 void bbRSDec::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
 	int ninputs = ninput_items_required.size();
@@ -92,7 +77,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			corrections = vlc_rs->decode(tmp2,tmp);
 			for (j=0; j< K; j++)
 			{
-				dec2bi(tmp2[j], GF,optr);
+				LayoutVLC::dec2bi(tmp2[j], GF,optr);
 				optr = optr + GF;
 			}
 			iptr = iptr + N;
@@ -108,7 +93,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			corrections = vlc_rs->decode(tmp2,tmp);
 			for (i=0; i< remaining_words; i++)
 			{
-				dec2bi(tmp2[i],GF,optr);
+				LayoutVLC::dec2bi(tmp2[i],GF,optr);
 				optr = optr + GF;
 			}
 			iptr = iptr + (length%N);

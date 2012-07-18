@@ -195,15 +195,13 @@ TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
 
 void TxVLC::init_var()
 {
-	vlc_var.MCSID=new int[6];
-	
+	memset(vlc_var.MCSID, 0, sizeof(vlc_var.MCSID));
 	vlc_var.flp_length=ly->varVLC->sp_flp_length->value();
-	
 	for (int i=0; i<2; i++)
 	{
 		if (ly->varVLC->rb_phy_type[i]->isChecked())
 			vlc_var.phy_type = i; //phy_type=0 PHY I, otherwise PHY II
-		if (ly->varVLC->rb_phy_modulation[i]->isChecked())
+		else if (ly->varVLC->rb_phy_modulation[i]->isChecked())
 			vlc_var.mod_type = i; //mod_type=0 OOK, otherwise PHY II
 	}
 	if ((vlc_var.phy_type == 0) && (vlc_var.mod_type==0))
@@ -212,18 +210,10 @@ void TxVLC::init_var()
 		//dimming capabilities are not developed
 	else
 		vlc_var.PHR_raw_length = 32 + 16 + 0 * 32; //
-
-	
-	vlc_var.tx_mode = ly->varVLC->cb_tx_mode->currentIndex();
-	switch (vlc_var.tx_mode)
-	{
-		case 0:
-			vlc_var.psdu_units = ly->varVLC->sp_psdu_units[0]->value();
-		break;
-		default:
-			vlc_var.psdu_units = ly->varVLC->sp_psdu_units[1]->value();
-		break;
-	}
+	if ((vlc_var.tx_mode = ly->varVLC->cb_tx_mode->currentIndex()) == 0)
+		vlc_var.psdu_units = ly->varVLC->sp_psdu_units[0]->value();
+	else
+		vlc_var.psdu_units = ly->varVLC->sp_psdu_units[1]->value();
 	switch (vlc_var.phy_type)
 	{
 		case 0: //PHY I
@@ -245,40 +235,34 @@ void TxVLC::init_var()
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 1;
 							vlc_var._cc_code.cc_out = 4;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
 							break;
 						case 1:
 							vlc_var._rs_code.rs_in = 11;
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 1;
 							vlc_var._cc_code.cc_out = 3;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[5]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 11;
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 2;
 							vlc_var._cc_code.cc_out = 3;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[4]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 11;
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 0;
 							vlc_var._cc_code.cc_out = 0;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
 							vlc_var._cc_code.cc_in = 0;
 							vlc_var._cc_code.cc_out = 0;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[3]=1;
 							break;
 					}
 					break;
@@ -296,26 +280,22 @@ void TxVLC::init_var()
 						case 0:
 							vlc_var._rs_code.rs_in = 2;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.rs_in = 4;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 7;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=0; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[2]=1;
 							break;
 					}
 					break;
@@ -340,64 +320,55 @@ void TxVLC::init_var()
 							vlc_var._rs_code.pre_rs_in = 32;
 							vlc_var._rs_code.pre_rs_out = 64;
 							vlc_var.clock_rate=15e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 160;
 							vlc_var.clock_rate=15e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.pre_rs_in = 64;
 							vlc_var._rs_code.pre_rs_out = 128;
 							vlc_var.clock_rate=30e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 160;
 							vlc_var.clock_rate=30e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.pre_rs_in = 32;
 							vlc_var._rs_code.pre_rs_out =64;
 							vlc_var.clock_rate=60e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[5]=1;
 							break;
 						case 5:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 160;
 							vlc_var.clock_rate=60e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4]=1;
 							break;
 						case 6:
 							vlc_var._rs_code.pre_rs_in = 32;
 							vlc_var._rs_code.pre_rs_out = 64;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 7:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 164;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3]=1;
 							break;
 						case 8:
 							vlc_var._rs_code.pre_rs_in = 0;
 							vlc_var._rs_code.pre_rs_out = 0;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=1;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 					}
 					break;
@@ -409,36 +380,31 @@ void TxVLC::init_var()
 							vlc_var._rs_code.pre_rs_in = 32;
 							vlc_var._rs_code.pre_rs_out = 64;
 							vlc_var.clock_rate=3.75e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 164;
 							vlc_var.clock_rate=3.75e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[5]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.pre_rs_in = 32;
 							vlc_var._rs_code.pre_rs_out = 64;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[4]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.pre_rs_in = 128;
 							vlc_var._rs_code.pre_rs_out = 164;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=0; vlc_var.MCSID[4]=1; vlc_var.MCSID[5]=1;
+							vlc_var.MCSID[1] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.pre_rs_in = 0;
 							vlc_var._rs_code.pre_rs_out = 0;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[0]=0; vlc_var.MCSID[1]=1; vlc_var.MCSID[2]=0;
-							vlc_var.MCSID[3]=1; vlc_var.MCSID[4]=0; vlc_var.MCSID[5]=0;
+							vlc_var.MCSID[1] = vlc_var.MCSID[3]=1; 
 							break;
 
 					}
@@ -451,12 +417,8 @@ void TxVLC::init_var()
 
 TxVLC::~TxVLC()
 {
-	if(poly && vlc_var.MCSID)
-	{
-		delete [] poly;
-		delete [] vlc_var.MCSID;
-	}
-			
+	if(poly)
+		delete [] poly;			
 	//stop();
 }
 

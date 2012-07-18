@@ -5,6 +5,7 @@
 #ifdef _WIN
 #include <io.h>
 #endif
+#include "LayoutVLC.h"
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
 	gr_sync_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
@@ -12,7 +13,6 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 {
 	crc=new vlc_crc(PSDU_length);
 	//we assume we are transmitting in broadcast mode
-	MHR = new int[40];
 	int crc_length=16;
 	generate_MHR_preamble(MHR);
 	int i;
@@ -44,24 +44,18 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	set_output_multiple(PSDU_length);
 
 }
-
 bbPSDU_generation::~bbPSDU_generation()
 {
 	if (MHR && data_payload && crc && fp)
 	{
-		delete [] MHR; MHR =0;
 		delete [] data_payload; data_payload = 0;
 		delete crc; crc=0;
-		delete fp; fp=0;
 	}
 }
-
 bbPSDU_generation::sptr bbPSDU_generation::Create(std::string _f, int _PSDU_length)
 {
 	return sptr(new bbPSDU_generation(_f, _PSDU_length));
 }
-
-
 void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 {
 	// This is a particular codification for the MHR, taking into account simplicity
@@ -69,7 +63,7 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	// a total of 40 bits. See section 5.2 of IEEE 802.15.7
 	
 	//Frame_Control_field
-	memset(MHR, 0, sizeof(int) * 40);
+	memset(MHR, 0, sizeof(MHR));
 	// the first 6 bits are 0: frame_version and reserved.
 	// the 8th version is equal to 1, according to Table 7 (Page 76), data frame.
 	//memset(&MHR[8],1,sizeof(int)*1);
@@ -92,21 +86,6 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 		MHR[24+i]= 1;
 	
 }
-
-void bbPSDU_generation::dec2bi(int number, int GF, int *bin_number)
-{
-	//again the same criteria as in the rs-encoder 'left-msb'	
-	
-	for (int i=0; i<GF; i++)
-    {
-        bin_number[GF-(i+1)]= number%2;
-        number = number/2;
-    }
-    return;       
-}
-
-
-
 int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
@@ -117,7 +96,7 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 	{
 		//1-Set the correct MHR, we have to change the sequence_number
 		//memset(tmp,0, sizeof(int)*PSDU_length);
-		dec2bi(sequence_number,8,&MHR[16]);
+		LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
 		memcpy(tmp, MHR, sizeof(int)*40);
 		memcpy(&tmp[40],data_payload, sizeof(int)*length_payload);
 		crc->generate_crc(tmp, tmp, PSDU_length);

@@ -25,10 +25,9 @@ class bbPSDU_generation : public gr_sync_block
 	
 	private:
 		bbPSDU_generation(std::string, int);
-		void dec2bi(int, int, int *);
 		void generate_MHR_preamble (int *);
 		int PSDU_length; //length of the PSDU in bytes
-		int *MHR;
+		int MHR[40];
 		int *data_payload;
 		int length_payload;
 		int sequence_number;

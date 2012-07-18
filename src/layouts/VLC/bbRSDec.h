@@ -34,7 +34,6 @@ class bbRSDec : public gr_block
 		int phy_type;
 		int length; //length in bits of the input data
 		vlc_reed_solomon *vlc_rs;
-		void dec2bi(unsigned char , int, int *);
 		int rs_out_elements();
 };
 

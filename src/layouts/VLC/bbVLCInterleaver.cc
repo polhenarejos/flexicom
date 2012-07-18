@@ -1,6 +1,7 @@
 #include "bbVLCInterleaver.h"
 #include <gr_io_signature.h>
 #include <math.h>
+#include "LayoutVLC.h"
 
 //this block performs the interleaving and the puncturing process
 //described in section 10.3
@@ -68,20 +69,6 @@ bbVLCInterleaver::sptr bbVLCInterleaver::Create(unsigned int _GF, unsigned int _
 {
 	return sptr(new bbVLCInterleaver(_GF, _N, _K, _raw_length, _rs_length));
 }
-
-void bbVLCInterleaver::dec2bi(int number, int GF, int *bin_number)
-{
-	//again the same criteria as in the rs-encoder 'left-msb'	
-	//int tmp;
-	int tmp = number;
-	for (int i=0; i<GF; i++)
-    {
-        bin_number[GF-(i+1)]= tmp%2;
-        tmp = tmp /2;
-    }
-    return;       
-}
-
 void bbVLCInterleaver::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
 	int ninputs = ninput_items_required.size();
@@ -138,7 +125,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 			}
 			for (i=0; i<rs_length-p; i++)
 			{	
-				dec2bi(tmp3[i],GF,bin_number);
+				LayoutVLC::dec2bi(tmp3[i],GF,bin_number);
 				//printf("El valor de tmp3[%d]:%d\n", i, tmp3[i]);
 				//for (j=0; j<GF;j++)
 					//printf("El valor de bin_number[%d,%d]=%d\n", i,j,bin_number[j]);
@@ -151,7 +138,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 		{
 			for (i=0; i<rs_length; i++)
 			{	
-				dec2bi(tmp2[i],GF,bin_number);
+				LayoutVLC::dec2bi(tmp2[i],GF,bin_number);
 				//printf("El valor de tmp2[%d]=%d\n", i,tmp2[i]);
 				//for (j=0;j<GF;j++)
 					//printf("Bin_number[%d,%d]=%d\n",i,j,bin_number[j]);

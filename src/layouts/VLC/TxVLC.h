@@ -48,7 +48,7 @@ struct VLCvar
 	unsigned int frame_size;
 	unsigned int PHR_raw_length; //raw length prior to modulation
 	unsigned int PSDU_raw_length; //raw length prior to modulation
-	int *MCSID; //field for the PHR preamble
+	int MCSID[6]; //field for the PHR preamble
 	int flp_length;
 };
 

@@ -27,12 +27,12 @@ class bbPHR_generation : public gr_sync_block
 	
 	private:
 		bbPHR_generation(int, int, int, int *);
-		void dec2bi(int, int, int *);
 		int tx_mode; //tx_mode: single, packed, burst
 		int PSDU_length; //length of the PSDU, raw, without any modulation, in octects
 		int PHR_length; //length of the PHR, raw, without any modulation, in bits
 		int *MCSID; //field of the preamble, precomputed at beginning. See Table 83
-		int *phr_crc;
+		static const int crc_length = 16;
+		int phr_crc[32+crc_length];
 		vlc_crc *crc;
 };
 

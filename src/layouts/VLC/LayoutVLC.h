@@ -46,6 +46,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void Run();
 		void Stop();
 		static unsigned char bi2dec(int *, unsigned int);
+		static void dec2bi(int, unsigned int, int *);
 		
 	public slots:
 		void RadioPressed(bool);

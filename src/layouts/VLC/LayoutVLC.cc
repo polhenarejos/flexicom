@@ -442,6 +442,13 @@ unsigned char LayoutVLC::bi2dec(int *in, unsigned int GF)
 {
 	unsigned char o = 0;
 	for (unsigned int i = 0; i < GF; i++)
-		o += *in++*(1<<((GF-1)-i));
+		o = (o<<1|*in++);
 	return o;
+}
+void LayoutVLC::dec2bi(int number, unsigned int GF, int *bin_number)
+{
+	//again the same criteria as in the rs-encoder 'left-msb'	
+	for (int i=GF-1; i >= 0; i--)
+		*bin_number++ = (number >> i) & 0x1;
+    return;       
 }
