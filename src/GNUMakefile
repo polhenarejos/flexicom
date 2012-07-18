@@ -8,7 +8,7 @@ LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEn
 					bbPHR_generation.cc bbPSDU_generation.cc bbRSEnc.cc bbVLC_Frame_Generator.cc \
 					bbVLC_info_assembler.cc bbVLCInterleaver.cc LayoutVLC.cc PHY_I_modulator.cc \
 					PHY_II_modulator.cc RxVLC.cc TxVLC.cc vlc_convolutional_coding.cc vlc_crc.cc \
-					vlc_reed_solomon.cc LayoutVLC_moc.cc
+					vlc_reed_solomon.cc LayoutVLC_moc.cc bbVLCDeInterleaver.cc bbCCDec.cc
 TESTS+=test_CC.cc test_RLL.cc test_RS.cc test_VLCInterleaver.cc
 MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc
 VPATH=layouts/80211b:layouts/VLC:modules:layouts/VLC/test:../test

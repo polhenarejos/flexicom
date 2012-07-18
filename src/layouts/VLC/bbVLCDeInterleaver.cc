@@ -11,9 +11,8 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), pre_length(_pre_length)
 {
 	//equations in section 10.3 of IEEE 802.15.7
-	int S_frame, D,S, S_block,p;
-	int tmp;
-	int i;
+	int S_frame, D,S;
+	unsigned int p, i, S_block;
 	//raw_length is a number of bits
 	//pre_length is a number of the incoming bits
 	//out_deint is a number of decimal values	
@@ -26,7 +25,7 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 	//printf ("El valor de S_frame:%d, el valor de S:%d, el valor de D:%d, S_block:%d, p:%d\n", S_frame,S,D, S_block,p);
 	
 	interleaving_vector = new int[S_block]; //l vector
-	puncturing_vector = new int[p]; //z vector
+	puncturing_vector = new unsigned int[p]; //z vector
 	for (i=0; i<S_block; i++)
 	{
 		interleaving_vector[i]= (i%D)*N + (int) floor(((double)i/D));
@@ -76,8 +75,8 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 {
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
-	int blocks_to_process,i,j,l;
-	int GF_words = pre_length/GF; //this division will be always an integer number
+	int blocks_to_process,l;
+	unsigned int GF_words = pre_length/GF, i, j; //this division will be always an integer number
 	//printf("\n\n GF_words: %d\n", GF_words);
 	int *tmp = new int[GF_words];
 	int *tmp2 = new int[GF_words];

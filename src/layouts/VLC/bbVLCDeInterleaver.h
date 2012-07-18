@@ -32,15 +32,15 @@ class bbVLCDeInterleaver : public gr_block
 	
 	private:
 		bbVLCDeInterleaver(unsigned int,unsigned int, unsigned int, unsigned int, unsigned int);
+		unsigned int GF; //number of bits of each word
 		unsigned int N; //the length of the output reed-solomon codeword
 		unsigned int K; //the length of the input reed-solomon codeword
-		unsigned int GF; //number of bits of each word
 		unsigned int raw_length; //length at the input of the rs_encoder
 		unsigned int pre_length; //length at the output of the previous block: cc_decoder or the output of the RLL decoder
 		
 		int *interleaving_vector;
-		int *puncturing_vector;
-		int len_punct_vector;
+		unsigned int *puncturing_vector;
+		unsigned int len_punct_vector;
 		bool depuncture;
 };
 
