@@ -265,13 +265,13 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 		varVLC->cb_phy_op_mode[3]->addItem(QString("%1: %2 Mb/s").arg(i+1).arg(rate_phy2_v[i]));
 	
 	varVLC->cb_phy_op_mode[0]->setHidden(false);
-	QObject::connect(varVLC->cb_phy_op_mode[0], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
+	QObject::connect(varVLC->cb_phy_op_mode[0], SIGNAL(currentIndexChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[1]->setHidden(true);
-	QObject::connect(varVLC->cb_phy_op_mode[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
+	QObject::connect(varVLC->cb_phy_op_mode[1], SIGNAL(currentIndexChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[2]->setHidden(true);
-	QObject::connect(varVLC->cb_phy_op_mode[2], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
+	QObject::connect(varVLC->cb_phy_op_mode[2], SIGNAL(currentIndexChanged(int)), this, SLOT(TrackChanges()));
 	varVLC->cb_phy_op_mode[3]->setHidden(true);
-	QObject::connect(varVLC->cb_phy_op_mode[3], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
+	QObject::connect(varVLC->cb_phy_op_mode[3], SIGNAL(currentIndexChanged(int)), this, SLOT(TrackChanges()));
 	
 	//frame_size
 	varVLC->l_frame_size = new QLabel("Frame size (bytes):");
