@@ -1,4 +1,4 @@
-// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+// $Id$
 #ifndef _INC_BBVLC_FRAME_GENERATOR_H
 #define _INC_BBVLC_FRAME_GENERATOR_H
 

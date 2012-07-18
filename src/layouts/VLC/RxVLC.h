@@ -1,4 +1,4 @@
-// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+// $Id$
 #ifndef _INC_RXVLC_H_
 #define _INC_RXVLC_H_
 

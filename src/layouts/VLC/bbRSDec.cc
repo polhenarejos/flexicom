@@ -1,4 +1,4 @@
-// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+// $Id$
 #include "bbRSDec.h"
 #include <gr_io_signature.h>
 #include "vlc_reed_solomon.h"

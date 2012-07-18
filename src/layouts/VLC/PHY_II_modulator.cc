@@ -1,4 +1,4 @@
-// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+// $Id$
 #include "PHY_II_modulator.h"
 #include "TxVLC.h"
 #include "vlc_reed_solomon.h"

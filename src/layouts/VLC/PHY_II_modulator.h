@@ -1,4 +1,4 @@
-// $Id: GUI.cc 1071 2010-12-13 10:26:46Z phenarejos $
+// $Id$
 #ifndef _INC_PHY_II_MODULATOR_H_
 #define _INC_PHY_II_MODULATOR_H_
 
