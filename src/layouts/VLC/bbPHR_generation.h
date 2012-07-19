@@ -2,7 +2,7 @@
 #ifndef _INC_BBPHR_GENERATION_H
 #define _INC_BBPHR_GENERATION_H
 
-#include <gr_sync_block.h>
+#include <gr_block.h>
 #include "vlc_crc.h"
 
 /*! \brief bbPHR_generation generates the PHY Header of an IEEE 802.15.7 frame as specified in section 8.6.2 according to the input parameters
@@ -11,7 +11,7 @@
    change throughout the frame between the preamble, header, and payload.
 */
 
-class bbPHR_generation : public gr_sync_block
+class bbPHR_generation : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<bbPHR_generation> sptr;
@@ -23,8 +23,9 @@ class bbPHR_generation : public gr_sync_block
        * @param _MCSID: sequence of 6 bits which specifies the PHY layer and the data rate used (and by default the encoding scheme).
        */
 		static sptr Create(int, int, int, int *);
-		int work(int, gr_vector_const_void_star&, gr_vector_void_star&);
+		int general_work(int, gr_vector_int &, gr_vector_const_void_star&, gr_vector_void_star&);
 		~bbPHR_generation();
+		void forecast(int, gr_vector_int &);
 	
 	private:
 		bbPHR_generation(int, int, int, int *);

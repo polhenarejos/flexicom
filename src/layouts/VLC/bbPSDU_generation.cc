@@ -9,7 +9,7 @@
 #include "LayoutVLC.h"
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
-	gr_sync_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(uint64_t)), gr_make_io_signature(1, 1, sizeof(int))),
 	PSDU_length(_PSDU_length*8)
 {
 	crc=new vlc_crc(PSDU_length);
@@ -47,7 +47,7 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 }
 bbPSDU_generation::~bbPSDU_generation()
 {
-	if (MHR && data_payload && crc && fp)
+	if (data_payload && crc)
 	{
 		delete [] data_payload; data_payload = 0;
 		delete crc; crc=0;
@@ -56,6 +56,10 @@ bbPSDU_generation::~bbPSDU_generation()
 bbPSDU_generation::sptr bbPSDU_generation::Create(std::string _f, int _PSDU_length)
 {
 	return sptr(new bbPSDU_generation(_f, _PSDU_length));
+}
+void bbPSDU_generation::forecast(int no, gr_vector_int &in)
+{
+	in[0] = no/PSDU_length;
 }
 void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 {
@@ -87,14 +91,25 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 		MHR[24+i]= 1;
 	
 }
-int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
+int bbPSDU_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
+	//const uint64_t *iptr = (const uint64_t *)input_items[0];
 	int *tmp= new int[PSDU_length];
 	int cycles = noutput_items / (PSDU_length);
 	//printf("The number of cycles:%d\n", cycles);
+	static uint64_t prev_confver = 0, cc = 0;
 	while (cycles>0)
 	{
+		/*
+		uint64_t confver = *iptr++;
+		if (prev_confver != confver)
+		{
+			prev_confver = confver;
+			printf("PSDU Tagging %d at #%d\n", prev_confver, cc);
+		}
+		cc++;
+		*/
 		//1-Set the correct MHR, we have to change the sequence_number
 		//memset(tmp,0, sizeof(int)*PSDU_length);
 		LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
@@ -105,7 +120,9 @@ int bbPSDU_generation::work(int noutput_items, gr_vector_const_void_star &input_
 		cycles--;
 		sequence_number = (sequence_number +1)%256;
 		optr = optr + PSDU_length;
+		printf("*%d\n",cc++);
 	}
     delete [] tmp;
+    consume_each(noutput_items / PSDU_length);
 	return noutput_items;
 }

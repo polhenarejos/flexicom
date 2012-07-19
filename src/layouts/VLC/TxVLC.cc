@@ -18,6 +18,7 @@
 #include "PHY_I_modulator.h"
 #include "bbVLC_info_assembler.h"
 #include "bbVLC_Frame_Generator.h"
+#include "TxTagger.h"
 
 #include "bbMatlab.h"
 
@@ -27,6 +28,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	ly(_ly)
 {
 	//variable initialization, to make easier the pass of parameters. Prepared for PHY I 
+	vlc_var.count = 0;
 	init_var();
 	unsigned int phr_words;
 	unsigned int psdu_words;
@@ -45,6 +47,10 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
 	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
+	
+	TxTagger::sptr tagger = TxTagger::Create(this);
+	connect(tagger, 0, PHR_gen, 0);
+	connect(tagger, 0, PSDU_gen, 0);
 	
 	//PHR CHAIN
 	bbRSEnc::sptr phr_rs_encoder = bbRSEnc::Create(&vlc_var.GF, &vlc_var._rs_code.pre_rs_out , &vlc_var._rs_code.pre_rs_in ,&vlc_var.phy_type , &vlc_var.PHR_raw_length);
@@ -195,6 +201,7 @@ TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
 
 void TxVLC::init_var()
 {
+	boost::lock_guard<boost::mutex> lock(mutex);
 	memset(vlc_var.MCSID, 0, sizeof(vlc_var.MCSID));
 	vlc_var.flp_length=ly->varVLC->sp_flp_length->value();
 	for (int i=0; i<2; i++)
@@ -412,7 +419,7 @@ void TxVLC::init_var()
 			}
 			break;
 	}
-
+	vlc_var.count++;
 }
 
 TxVLC::~TxVLC()
@@ -432,5 +439,15 @@ void TxVLC::stop()
 }
 void TxVLC::UIChanged()
 {
+	UpdateConfigVer();
+}
+void TxVLC::UpdateConfigVer()
+{
 	init_var();
+}
+uint64_t TxVLC::GetConfigVer()
+{
+	boost::lock_guard<boost::mutex> lock(mutex);
+	uint64_t v = vlc_var.count;
+	return v;
 }

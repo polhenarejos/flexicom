@@ -3,6 +3,7 @@
 #define _INC_TXVLC_H_
 
 #include <gr_hier_block2.h>
+#include <boost/thread.hpp>
 //#include <gr_msg_queue.h>
 //#include <QThread>
 
@@ -51,6 +52,7 @@ struct VLCvar
 	unsigned int PSDU_raw_length; //raw length prior to modulation
 	int MCSID[6]; //field for the PHR preamble
 	int flp_length;
+	uint64_t count;
 };
 
 class LayoutVLC;
@@ -75,12 +77,15 @@ class TxVLC : public gr_hier_block2
 		void stop();
 		VLCvar vlc_var; /**< [in] struct which contains the configuration of the VLC system set at the GUI interface.*/
 		void UIChanged();
+		uint64_t GetConfigVer();
+		void UpdateConfigVer();
 		
 	private:
 		int poly[3];
 		TxVLC(LayoutVLC *);
 		LayoutVLC *ly;
 		void init_var();
+		boost::mutex mutex;
 };
 
 #endif //_INC_TXVLC_H_

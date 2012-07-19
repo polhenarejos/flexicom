@@ -2,7 +2,7 @@
 #ifndef _INC_BBPSDU_GENERATION_H
 #define _INC_BBPSDU_GENERATION_H
 
-#include <gr_sync_block.h>
+#include <gr_block.h>
 #include "vlc_crc.h"
 
 /*! \brief bbPSDU_generation generates the PSDU field of an IEEE 802.15.7 frame as specified in section 8.6.5 according to the input parameters
@@ -11,7 +11,7 @@
 *  5.2.2.2 of IEEE 802.15.7 corresponding to a data frame
 */
 
-class bbPSDU_generation : public gr_sync_block
+class bbPSDU_generation : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<bbPSDU_generation> sptr;
@@ -21,8 +21,9 @@ class bbPSDU_generation : public gr_sync_block
        * @param _PSDU_length: specifies the total number of bits containted in the PSDU.
        */
 		static sptr Create(std::string, int);
-		int work(int, gr_vector_const_void_star&, gr_vector_void_star&);
+		int general_work(int, gr_vector_int &, gr_vector_const_void_star&, gr_vector_void_star&);
 		~bbPSDU_generation();
+		void forecast(int, gr_vector_int &);
 	
 	private:
 		bbPSDU_generation(std::string, int);
