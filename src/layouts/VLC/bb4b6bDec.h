@@ -3,6 +3,12 @@
 
 #include <gr_block.h>
 
+/*! \brief bb4b6bDec class defines the RLL decoding operation of the process defined in section 10.5.1 of IEEE 802.15.7.
+
+* All VPPM PHY I modes shall use 4B6B encoding. The 4B6B decoder takes 6-bit encoded symbols with
+  DC balance and returns its 4-bit representation. The decoding process is based in a correlation-distance measurement.
+*/
+
 class bb4b6bDec : public gr_block
 {
 	public:
