@@ -142,7 +142,7 @@ class TestReedSolomon : public CppUnit::TestFixture
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, N, K, phy, len);
 			bb_bit_removal::sptr br = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_rs_15_7.dat");
-			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_rs_15_7.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_data.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
 			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
@@ -171,7 +171,7 @@ class TestReedSolomon : public CppUnit::TestFixture
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, N, K, phy, len);
 			bb_bit_removal::sptr br = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_rs_15_11.dat");
-			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_rs_15_11.dat");
+			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_data.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
 			gr_float_to_complex_sptr f2c1 = gr_make_float_to_complex();
