@@ -19,7 +19,7 @@ class bbRSDec : public gr_block
        * @param _N: the output number of elements of an encoded word.
        * @param _K: the minimum number of elements to obtain a N-element encoded word.
        * @param _phy_type: distinguish between PHY operating modes (PHY I-PHY II) in order to generate the proper polynomial
-       * @param _pre_length: number of elements in a block of data to be decoded coming from the deinterleaver
+       * @param _length: number of elements in a block of data to be decoded coming from the deinterleaver
        */
 		static sptr Create(unsigned int, unsigned int, unsigned int, int, int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);

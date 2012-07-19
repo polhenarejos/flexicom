@@ -22,9 +22,9 @@ class bbVLCDeInterleaver : public gr_block
        * @param _N: the output number of elements of an encoded word.
        * @param _K: the minimum number of elements to obtain a N-element encoded word.
        * @param _raw_length: length in bits at the input of the rs_encoder
-       * @param _rs_length: length at the output of the rs_encoder (in GF space elements)
+       * @param _pre_length: length at the output of the rs_encoder (in GF space elements)
        */
-		static sptr Create(unsigned int,unsigned int, unsigned int, unsigned int, unsigned int);
+       	static sptr Create(unsigned int,unsigned int, unsigned int, unsigned int, unsigned int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbVLCDeInterleaver();

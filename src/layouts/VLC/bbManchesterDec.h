@@ -17,7 +17,7 @@ class bbManchesterDec : public gr_block
 		/**
        * The creation of the bbManchesterDec requires 2 parameters: 
        * @param mode: selects in which mode works the block. Two options: 0 and 1. 0 is for OOK and 1 is used with VPPM with 50% dimming (assuming double clock frequency than in OOK)
-       * @param d_flag_cc: indicates whether the next block in the chain will be a CC decoder. In the case of CC decoding, the signal at the input of this block must be adapted.
+       * @param flag_cc: indicates whether the next block in the chain will be a CC decoder. In the case of CC decoding, the signal at the input of this block must be adapted.
        */
 		static sptr Create(int,int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
