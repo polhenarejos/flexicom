@@ -78,15 +78,15 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			size = length/2;
 			for (i=0; i<length/2;i++)
 			{
-				switch(iptr[0])
+				/*switch(iptr[0])
 				{
 					case 0:
 						tmp[i]=1*amp;
 						break;
 					case 1:
 						tmp[i]=-1*amp;
-				}
-				//tmp[i]= iptr[0];
+				}*/
+				tmp[i]= iptr[0];
 				iptr = iptr + 2;
 			}
 		}
@@ -94,7 +94,7 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		{
 			tmp = new int[length];
 			size= length;
-			for (i=0; i<length;i++)
+			/*for (i=0; i<length;i++)
 			{
 				switch(iptr[0])
 				{
@@ -105,9 +105,9 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 						tmp[i]=-1*amp;
 				}
 				iptr++;
-			}
-			//memcpy(tmp, iptr, sizeof(int)*length);
-			//iptr = iptr + length;
+			}*/
+			memcpy(tmp, iptr, sizeof(int)*length);
+			iptr = iptr + length;
 		}
 		vlc_cc->decode_punct(tmp,tmp2, out_cc_dec, K, N, vlc_cc->no_states, vlc_cc->output_reverse_int, size, vlc_cc->ones,2,vlc_cc->punct_matrix);
 		memcpy(optr, tmp2, sizeof(int)*out_cc_dec);

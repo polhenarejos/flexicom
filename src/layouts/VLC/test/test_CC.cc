@@ -146,7 +146,7 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			int N = 3, K = 7, len = 504, data_rate=0; 
 			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_4_PHR");
 			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
-			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_cc_1_4.dat");
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_cc_1_4_bis.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_in_cc_1_4.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
@@ -174,7 +174,7 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			int N = 3, K = 7, len = 728, data_rate=0; 
 			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_4_PSDU");
 			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
-			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_4.dat");
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_4_bis.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_4.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
@@ -202,7 +202,7 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			int N = 3, K = 7, len = 354, data_rate=1; 
 			gr_top_block_sptr gt = gr_make_top_block("CCDecode_1_3_PSDU");
 			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
-			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_3.dat");
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_3_bis.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_3.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
@@ -230,7 +230,7 @@ class TestConvolutionalCode : public CppUnit::TestFixture
 			int N = 3, K = 7, len = 177, data_rate=2; 
 			gr_top_block_sptr gt = gr_make_top_block("CCDecode_2_3_PSDU");
 			bbCCDec::sptr cc = bbCCDec::Create(N, K, poly, len, data_rate);
-			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_2_3.dat");
+			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_2_3_bis.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_2_3.dat");
 			MSE::sptr mse = MSE::Create();
 			gr_float_to_complex_sptr f2c0 = gr_make_float_to_complex();
