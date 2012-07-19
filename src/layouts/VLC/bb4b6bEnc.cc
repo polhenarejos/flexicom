@@ -30,7 +30,7 @@ void bb4b6bEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required
 {
 	uint ninputs = ninput_items_required.size();
 	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i]= noutput_items/6*4; //for each two input bits, we generate 1 output bit
+		ninput_items_required[i]= noutput_items/6*4; //for each 4 input bits, we generate 6 output bits
 }
 
 int bb4b6bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
