@@ -16,6 +16,7 @@
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"
 #include "PHY_I_modulator.h"
+#include "PHY_II_modulator.h"
 #include "bbVLC_info_assembler.h"
 #include "bbVLC_Frame_Generator.h"
 #include "TxTagger.h"
@@ -27,7 +28,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(float))),
 	ly(_ly)
 {
-	//variable initialization, to make easier the pass of parameters. Prepared for PHY I 
+	//variable initialization, to make easier the pass of parameters. 
 	vlc_var.count = 0;
 	init_var();
 	unsigned int phr_words;
@@ -52,137 +53,36 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	connect(tagger, 0, PHR_gen, 0);
 	connect(tagger, 0, PSDU_gen, 0);
 	
-	//PHR CHAIN
-	bbRSEnc::sptr phr_rs_encoder = bbRSEnc::Create(&vlc_var.GF, &vlc_var._rs_code.pre_rs_out , &vlc_var._rs_code.pre_rs_in ,&vlc_var.phy_type , &vlc_var.PHR_raw_length);
-	switch(vlc_var.phy_type)
+	//PHY I
+	if (vlc_var.phy_type==0) // PHY I
 	{
-		case 0:
-			phr_words = (int)  ceil(((double)vlc_var.PHR_raw_length/(vlc_var.GF*vlc_var._rs_code.pre_rs_in)))*vlc_var._rs_code.pre_rs_out;
-		break;
-		case 1:
-			phr_words = phr_rs_encoder->out_rs / vlc_var.GF;
-		break;
+		PHY_I_modulator::sptr phr = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.pre_rs_in, vlc_var._rs_code.pre_rs_out, vlc_var.GF, vlc_var._cc_code.pre_cc_in,vlc_var._cc_code.pre_cc_out, vlc_var.PHR_raw_length,0);			
+		PHY_I_modulator::sptr psdu = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.pre_rs_in, vlc_var._rs_code.pre_rs_out, vlc_var.GF, vlc_var._cc_code.cc_in,vlc_var._cc_code.cc_out, vlc_var.PHR_raw_length,vlc_var.operating_mode);
+		connect(PHR_gen, 0, phr,0);
+		connect(PSDU_gen, 0, psdu, 0);
+		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, phr->out_PHY_I_mod, psdu->out_PHY_I_mod);
+		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_I_mod, psdu->out_PHY_I_mod,3);
+		connect(phr,0,INFO_ass,0);
+		connect(psdu,0,INFO_ass,1);
+		connect(INFO_ass,0, FRAME_gen,0);
+		connect(FRAME_gen,0,i2f,0);
+		connect(i2f,0,self(),0);
 	}
-	bbVLCInterleaver::sptr phr_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.pre_rs_out , vlc_var._rs_code.pre_rs_in , vlc_var.PHR_raw_length, phr_words);
-	bbCCEnc::sptr phr_cc_encoder = bbCCEnc::Create(3, 7, poly, phr_interleaver->out_int, 0);
-	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0,phr_cc_encoder->out_cc); //always on/off keying
-	out_PHY_I_phr= phr_cc_encoder->out_cc*2;
-		
-	//PHR connections
-	connect(PHR_gen,0,phr_rs_encoder,0);
-	connect(phr_rs_encoder,0,phr_interleaver,0);
-	connect(phr_interleaver,0,phr_cc_encoder,0);
-	connect(phr_cc_encoder, 0, phr_RLL,0);
-	//connect(phr_RLL, 0, i2f,0);
-	//connect(i2f,0,self(),0);
-	
-	//PSDU CHAIN
-	if (vlc_var._rs_code.rs_in!=0)
+	//PHY II
+	else // PHY II
 	{
-		bbRSEnc::sptr psdu_rs_encoder = bbRSEnc::Create(&vlc_var.GF, &vlc_var._rs_code.rs_out , &vlc_var._rs_code.rs_in ,&vlc_var.phy_type,&vlc_var.PSDU_raw_length);
-		connect(PSDU_gen, 0, psdu_rs_encoder, 0);
-		switch (vlc_var.phy_type)
-		{
-			case 0:
-				psdu_words = (int) ceil(((double)vlc_var.PSDU_raw_length/(vlc_var.GF*vlc_var._rs_code.rs_in)))*vlc_var._rs_code.rs_out;
-			break;
-			case 1:
-				psdu_words = psdu_rs_encoder->out_rs / vlc_var.GF;
-			break;
-		}
-		bbVLCInterleaver::sptr psdu_interleaver = bbVLCInterleaver::Create(vlc_var.GF, vlc_var._rs_code.rs_out , vlc_var._rs_code.rs_in , vlc_var.PSDU_raw_length, psdu_words);		
-		connect(psdu_rs_encoder, 0, psdu_interleaver, 0);
-		if(vlc_var._cc_code.cc_in !=0) 
-		{
-			bbCCEnc::sptr psdu_cc_encoder = bbCCEnc::Create(3, 7, poly, psdu_interleaver->out_int, vlc_var.operating_mode);
-			connect(psdu_interleaver, 0, psdu_cc_encoder, 0);
-			if(vlc_var.mod_type ==0)
-			{
-				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_cc_encoder->out_cc);
-				out_PHY_I_psdu= psdu_cc_encoder->out_cc*2;
-				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(phr_RLL,0,INFO_ass,0);
-				connect(psdu_RLL,0,INFO_ass,1);
-				connect(INFO_ass,0, FRAME_gen,0);
-				connect(FRAME_gen,0,i2f,0);
-				connect(i2f,0,self(),0);
-			}
-			else
-			{
-				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-				out_PHY_I_psdu= psdu_cc_encoder->out_cc/4*6;
-				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-				connect(psdu_cc_encoder,0,psdu_RLL,0);
-				connect(phr_RLL,0,INFO_ass,0);
-				connect(psdu_RLL,0,INFO_ass,1);
-				connect(INFO_ass,0, FRAME_gen,0);
-				connect(FRAME_gen,0,i2f,0);
-				connect(i2f,0,self(),0);
-			}
-		}
-		else
-		{
-			if(vlc_var.mod_type ==0)
-			{
-				bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,psdu_interleaver->out_int);
-				out_PHY_I_psdu= psdu_interleaver->out_int*2;
-				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(phr_RLL,0,INFO_ass,0);
-				connect(psdu_RLL,0,INFO_ass,1);
-				connect(INFO_ass,0, FRAME_gen,0);
-				connect(FRAME_gen,0,i2f,0);
-				connect(i2f,0,self(),0);
-			}
-			else
-			{
-				bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-				out_PHY_I_psdu=psdu_interleaver->out_int/4*6;
-				bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-				bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-				connect(psdu_interleaver,0,psdu_RLL,0);
-				connect(phr_RLL,0,INFO_ass,0);
-				connect(psdu_RLL,0,INFO_ass,1);
-				connect(INFO_ass,0, FRAME_gen,0);
-				connect(FRAME_gen,0,i2f,0);
-				connect(i2f,0,self(),0);
-			}	
-		}
+		PHY_II_modulator::sptr phr = PHY_II_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.pre_rs_in, vlc_var._rs_code.pre_rs_out, vlc_var.GF, vlc_var.PHR_raw_length);
+		PHY_II_modulator::sptr psdu = PHY_II_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.rs_in, vlc_var._rs_code.rs_out, vlc_var.GF, vlc_var.PSDU_raw_length);
+		connect(PHR_gen, 0, phr,0);
+		connect(PSDU_gen, 0, psdu, 0);
+		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, phr->out_PHY_II_mod, psdu->out_PHY_II_mod);
+		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_II_mod, psdu->out_PHY_II_mod,3);
+		connect(phr,0,INFO_ass,0);
+		connect(psdu,0,INFO_ass,1);
+		connect(INFO_ass,0, FRAME_gen,0);
+		connect(FRAME_gen,0,i2f,0);
+		connect(i2f,0,self(),0);
 	}
-	else
-	{
-		if(vlc_var.mod_type ==0)
-		{
-			bbManchesterEnc::sptr psdu_RLL = bbManchesterEnc::Create(0,vlc_var.PSDU_raw_length);
-			out_PHY_I_psdu= vlc_var.PSDU_raw_length*2;
-			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(phr_RLL,0,INFO_ass,0);
-			connect(psdu_RLL,0,INFO_ass,1);
-			connect(INFO_ass,0, FRAME_gen,0);
-			connect(FRAME_gen,0,i2f,0);
-			connect(i2f,0,self(),0);
-		}
-		else
-		{
-			bb4b6bEnc::sptr psdu_RLL = bb4b6bEnc::Create();
-			out_PHY_I_psdu=vlc_var.PSDU_raw_length/4*6;
-			bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, out_PHY_I_phr,out_PHY_I_psdu);
-			bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,out_PHY_I_phr,out_PHY_I_psdu,3);
-			connect(PSDU_gen,0,psdu_RLL,0);
-			connect(phr_RLL,0,INFO_ass,0);
-			connect(psdu_RLL,0,INFO_ass,1);
-			connect(INFO_ass,0, FRAME_gen,0);
-			connect(FRAME_gen,0,i2f,0);
-			connect(i2f,0,self(),0);
-		}	
-	}
-	
 	
 	if (0)
 	{
@@ -192,7 +92,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	}
 	
 }
-
 
 TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
 {
@@ -324,56 +223,56 @@ void TxVLC::init_var()
 					switch (ly->varVLC->cb_phy_op_mode[2]->currentIndex())
 					{
 						case 0:
-							vlc_var._rs_code.pre_rs_in = 32;
-							vlc_var._rs_code.pre_rs_out = 64;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=15e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 						case 1:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 160;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=15e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
-							vlc_var._rs_code.pre_rs_in = 64;
-							vlc_var._rs_code.pre_rs_out = 128;
+							vlc_var._rs_code.rs_in = 64;
+							vlc_var._rs_code.rs_out = 128;
 							vlc_var.clock_rate=30e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 3:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 160;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=30e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2]=1;
 							break;
 						case 4:
-							vlc_var._rs_code.pre_rs_in = 32;
-							vlc_var._rs_code.pre_rs_out =64;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out =64;
 							vlc_var.clock_rate=60e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[5]=1;
 							break;
 						case 5:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 160;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=60e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4]=1;
 							break;
 						case 6:
-							vlc_var._rs_code.pre_rs_in = 32;
-							vlc_var._rs_code.pre_rs_out = 64;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=120e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 7:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 164;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 164;
 							vlc_var.clock_rate=120e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3]=1;
 							break;
 						case 8:
-							vlc_var._rs_code.pre_rs_in = 0;
-							vlc_var._rs_code.pre_rs_out = 0;
+							vlc_var._rs_code.rs_in = 0;
+							vlc_var._rs_code.rs_out = 0;
 							vlc_var.clock_rate=120e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
@@ -384,32 +283,32 @@ void TxVLC::init_var()
 					switch (ly->varVLC->cb_phy_op_mode[3]->currentIndex())
 					{
 						case 0:
-							vlc_var._rs_code.pre_rs_in = 32;
-							vlc_var._rs_code.pre_rs_out = 64;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=3.75e6;
 							vlc_var.MCSID[1]=1;
 							break;
 						case 1:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 164;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 164;
 							vlc_var.clock_rate=3.75e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[5]=1;
 							break;
 						case 2:
-							vlc_var._rs_code.pre_rs_in = 32;
-							vlc_var._rs_code.pre_rs_out = 64;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=7.5e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[4]=1;
 							break;
 						case 3:
-							vlc_var._rs_code.pre_rs_in = 128;
-							vlc_var._rs_code.pre_rs_out = 164;
+							vlc_var._rs_code.rs_in = 128;
+							vlc_var._rs_code.rs_out = 164;
 							vlc_var.clock_rate=7.5e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 4:
-							vlc_var._rs_code.pre_rs_in = 0;
-							vlc_var._rs_code.pre_rs_out = 0;
+							vlc_var._rs_code.rs_in = 0;
+							vlc_var._rs_code.rs_out = 0;
 							vlc_var.clock_rate=7.5e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[3]=1; 
 							break;

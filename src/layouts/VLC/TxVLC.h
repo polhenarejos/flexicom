@@ -57,10 +57,10 @@ struct VLCvar
 
 class LayoutVLC;
 
-/*! \brief The class where the layout of the VLC communication system is defined
+/*! \brief The class where the layout of the VLC communication system (transmitter part) is defined
 
 * In this class, the TXVLC or the RXVLC is connected to the usrp class object to stablish the stream of samples
-* Another functionality of this class is to manage the tab which configures the VLC system.
+* Another functionality of this class is to read the tab which configures the VLC system.
 
 */
 
