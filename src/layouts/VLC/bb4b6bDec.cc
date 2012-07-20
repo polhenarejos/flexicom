@@ -1,3 +1,5 @@
+// $Id$
+
 #include "bb4b6bDec.h"
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
