@@ -61,14 +61,14 @@ void Layout80211b::RadioPressed(bool check)
 		mw->panel->rb_chain[RB_RX]->setHidden(false);
 		mw->panel->rb_chain[RB_RX]->setChecked(true);
 		ReadSettings(mw->s);
-		QObject::connect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
+		QObject::connect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));
 		DrawPlots();
 	}
 	else
 	{
 		SaveSettings(mw->s);
 		mw->RemoveCustomTabs();
-		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings &)), this, SLOT(SaveSettings(QSettings &)));
+		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));
 		RemovePlots();
 	}
 }
@@ -86,13 +86,13 @@ QWidget *Layout80211b::CreateTabOpts()
 	grid->addWidget(gBox, 0, 0);
 	return p;
 }
-void Layout80211b::SaveSettings(QSettings &s)
+void Layout80211b::SaveSettings(QSettings *s)
 {
-	s.setValue("80211b/chan", cb_chans->currentIndex());
+	s->setValue("80211b/chan", cb_chans->currentIndex());
 }
-void Layout80211b::ReadSettings(QSettings &s)
+void Layout80211b::ReadSettings(QSettings *s)
 {
-	cb_chans->setCurrentIndex(s.value("80211b/chan").toInt());
+	cb_chans->setCurrentIndex(s->value("80211b/chan").toInt());
 }
 void Layout80211b::DrawPlots()
 {

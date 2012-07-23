@@ -26,7 +26,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		int radioID;
 		QWidget *CreateTabOpts();
 		QComboBox *cb_chans;
-		void ReadSettings(QSettings &);
+		void ReadSettings(QSettings *);
 		void DrawPlots();
 		void RemovePlots();
 		
@@ -40,7 +40,7 @@ class Layout80211b : public QObject, public LayoutFactory
 		
 	public slots:
 		void RadioPressed(bool);
-		void SaveSettings(QSettings &);
+		void SaveSettings(QSettings *);
 };
 
 #endif //_INC_LAYOUT80211B_H_

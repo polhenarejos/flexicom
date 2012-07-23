@@ -51,7 +51,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	
 	TxTagger::sptr tagger = TxTagger::Create(this);
 	connect(tagger, 0, PHR_gen, 0);
-	connect(tagger, 0, PSDU_gen, 0);
+	connect(tagger, 1, PSDU_gen, 0);
 	
 	//PHY I
 	if (vlc_var.phy_type==0) // PHY I

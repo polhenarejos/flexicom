@@ -6,6 +6,7 @@
 #include "RxVLC.h"
 #include "TxVLC.h"
 #include "VarVLC.h"
+#include "MainWindow.h"
 #include <gr_top_block.h>
 #include <QObject>
 #include <QComboBox>
@@ -37,7 +38,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		int radioID;
 		QWidget *CreateTabOpts();
 		void init_v_VLC (VarVLC *, QWidget *);
-		void ReadSettings(QSettings &);
+		void ReadSettings(QSettings *);
 			
 	public:
 		LayoutVLC(MainWindow *, int);
@@ -51,11 +52,12 @@ class LayoutVLC : public QObject , public LayoutFactory
 		
 	public slots:
 		void RadioPressed(bool);
-		void SaveSettings(QSettings &);
+		void SaveSettings(QSettings *);
 		void setPSDUunits(int);
 		void setFramesize(bool);
 		void setDatarate(bool);
 		void TrackChanges();
+		void StateLayout(MainWindow::StatesLayout);
 };
 
 #endif //_INC_LAYOUTVLC_H_

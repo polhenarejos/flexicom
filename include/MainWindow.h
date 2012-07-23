@@ -13,11 +13,18 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QGridLayout>
+#include <QMenu>
+#include <QMenubar>
+#include <QAction>
+#include <QStatusbar>
+#include <QFileinfo>
 #include "LayoutFactory.h"
 
 class Panel;
 #define RB_TX 0
 #define RB_RX 1
+
+#define MAINWINDOW_TITLE "FlexiCom"
 
 /*! \brief MainWindow class is used for handling GUI Window
 */
@@ -30,9 +37,20 @@ class MainWindow : public QMainWindow
 		LayoutFactory::sptr layoutFactory;
 		void RunLayout();
 		void StopLayout();
-		void writeSettings(QSettings &);
-		void readSettings(QSettings &);
+		void writeSettings(QSettings * = NULL);
+		void readSettings(QSettings * = NULL);
 		std::vector<int> tabs;
+		void CreateMenu();
+		QMenu *projectMenu;
+		QAction *saveAct;
+		QAction *saveAsAct;
+		QAction *newAct;
+		QAction *loadAct;
+		QAction *closeAct;
+		QMenu *helpMenu;
+		QAction *aboutAct;
+		QFileInfo *qfi;
+		void SetSignalModified();
 		
 	public:
 		//! Constructor
@@ -40,7 +58,7 @@ class MainWindow : public QMainWindow
 		bool initd;
 		Panel *panel;
 		void closeEvent(QCloseEvent *);
-		QSettings s;
+		QSettings *s;
 		QGridLayout *plotGrid;
 		//! Method which allow the creation of particular tab for the selected communication system
 		void AddCustomTab(QWidget *, QString);
@@ -52,9 +70,16 @@ class MainWindow : public QMainWindow
 		
 	public slots:
 		void clickMainButtons(QAbstractButton *);
+		void newProject();
+    	void loadProject();
+    	void saveProject();
+    	void saveAsProject();
+    	bool closeProject();
+    	void aboutHelp();
+    	void WindowModified();
 		
 	signals:
-		void SaveSettings(QSettings &);
+		void SaveSettings(QSettings * = NULL);
 		void StateLayoutChanged(MainWindow::StatesLayout);
 		
 };

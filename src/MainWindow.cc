@@ -9,6 +9,8 @@
 #include <QDialogButtonBox>
 #include <QRegExpValidator>
 #include <QComboBox>
+#include <QMessageBox>
+#include <QFileDialog>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
 CreateFunc layouts[] = {
@@ -21,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
 	initd = false;
+	s = new QSettings();
+	qfi = NULL;
 	QWidget *w = new QWidget(this);
-	setCentralWidget(w);
 	run_bt = new QPushButton(tr("Run!"));
 	QDialogButtonBox *qDBB = new QDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, w);
 	qDBB->addButton(run_bt, QDialogButtonBox::ActionRole);
@@ -35,8 +38,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	plotBox->setLayout(plotGrid);
 	grid->addWidget(plotBox, 0, 1);
 	grid->addWidget(qDBB, 1, 1);
-	setWindowTitle(tr("FlexiCom"));
+	CreateMenu();
+	statusBar()->showMessage("Welcome");
+	statusBar()->setSizeGripEnabled(true);
+	statusBar()->addPermanentWidget(run_bt);
+	setCentralWidget(w);
 	readSettings(s);
+	setWindowTitle(tr(MAINWINDOW_TITLE " - Untitled[*]"));
+	SetSignalModified();
 	initd = true;
 }
 void MainWindow::clickMainButtons(QAbstractButton *b)
@@ -86,63 +95,70 @@ void MainWindow::StopLayout()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	//if (userReallyWantsToQuit()) 
+	if (closeProject())
 	{
 		StopLayout();
-		writeSettings(s);
 		event->accept();
 	}
-	//else
-	//	event->ignore();
+	else
+		event->ignore();
 }
-void MainWindow::readSettings(QSettings &s)
+void MainWindow::readSettings(QSettings *st)
 {
-	resize(s.value("mw/size", QSize(300,50)).toSize());
-	move(s.value("mw/pos", QPoint(200, 200)).toPoint());
-	panel->rb_layout[s.value("layout/layout", 0).toInt()]->bt->setChecked(true);
-	panel->rb_chain[s.value("layout/chain", 0).toInt()]->setChecked(true);
-	panel->sp_devs->setValue(s.value("uhd/devs", 1).toInt());
-	int siz = s.beginReadArray("uhd/ip");
+	if (!st)
+		st = s;
+	resize(st->value("mw/size", QSize(300,50)).toSize());
+	move(st->value("mw/pos", QPoint(200, 200)).toPoint());
+	panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
+	panel->rb_chain[st->value("layout/chain", 0).toInt()]->setChecked(true);
+	panel->sp_devs->setValue(st->value("uhd/devs", 1).toInt());
+	int siz = st->beginReadArray("uhd/ip");
 	for (int i = 0; i < siz; i++)
 	{
-		s.setArrayIndex(i);
-		panel->ipfield[i].ip->setText(s.value("ip", "0.0.0.0").toString());
+		st->setArrayIndex(i);
+		panel->ipfield[i].ip->setText(st->value("ip", "0.0.0.0").toString());
 	}
-	s.endArray();
-	panel->sp_gain->setValue(s.value("uhd/gain", 40).toInt());
-	panel->le_freq->setText(s.value("uhd/freq", "0").toString());
+	st->endArray();
+	panel->sp_gain->setValue(st->value("uhd/gain", 40).toInt());
+	panel->le_freq->setText(st->value("uhd/freq", "0").toString());
 }
-void MainWindow::writeSettings(QSettings &s)
+void MainWindow::writeSettings(QSettings *st)
 {
-	s.setValue("mw/size", size());
-	s.setValue("mw/pos", pos());
-	s.setValue("mw/fullScreen", isFullScreen());
-	for (uint i = 0; i < panel->rb_layout.size(); i++)
+	if (!st)
+		st = s;
+	st->setValue("mw/size", size());
+	st->setValue("mw/pos", pos());
+	st->setValue("mw/fullScreen", isFullScreen());
+	if (st != s)
 	{
-		if (panel->rb_layout[i]->bt->isChecked())
+		for (uint i = 0; i < panel->rb_layout.size(); i++)
 		{
-			s.setValue("layout/layout", i);
-			break;
+			if (panel->rb_layout[i]->bt->isChecked())
+			{
+				st->setValue("layout/layout", i);
+				break;
+			}
 		}
-	}
-	for (uint i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
-	{
-		if (panel->rb_chain[i]->isChecked())
+		for (uint i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
 		{
-			s.setValue("layout/chain", i);
-			break;
+			if (panel->rb_chain[i]->isChecked())
+			{
+				st->setValue("layout/chain", i);
+				break;
+			}
 		}
+		st->setValue("uhd/devs", panel->sp_devs->value());
+		st->beginWriteArray("uhd/ip");
+		for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
+		{
+			st->setArrayIndex(i);
+			st->setValue("ip", panel->ipfield[i].ip->text().remove(' '));
+		}
+		st->endArray();
+		st->setValue("uhd/gain", panel->sp_gain->value());
+		st->setValue("uhd/freq", panel->le_freq->text());
 	}
-	s.setValue("uhd/devs", panel->sp_devs->value());
-	s.beginWriteArray("uhd/ip");
-	for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
-	{
-		s.setArrayIndex(i);
-		s.setValue("ip", panel->ipfield[i].ip->text().remove(' '));
-	}
-	s.endArray();
-	s.setValue("uhd/gain", panel->sp_gain->value());
-	s.setValue("uhd/freq", panel->le_freq->text());
-	emit SaveSettings(s);
+	emit SaveSettings(st);
 }
 void MainWindow::AddCustomTab(QWidget *w, QString name)
 {
@@ -170,6 +186,174 @@ void MainWindow::RemoveCustomPlots()
 		delete item->widget();
 		delete item;
     }
+}
+void MainWindow::CreateMenu()
+{
+	projectMenu = menuBar()->addMenu(tr("&Project"));
+	newAct = new QAction(tr("&New"), this);
+	newAct->setShortcuts(QKeySequence::New);
+	newAct->setStatusTip(tr("Create a new project"));
+	connect(newAct, SIGNAL(triggered()), this, SLOT(newProject()));
+	projectMenu->addAction(newAct);
+	projectMenu->addSeparator();
+	
+	loadAct = new QAction(tr("&Load"), this);
+	loadAct->setShortcuts(QKeySequence::Open);
+	loadAct->setStatusTip(tr("Restores a new project"));
+	connect(loadAct, SIGNAL(triggered()), this, SLOT(loadProject()));
+	projectMenu->addAction(loadAct);
+	
+	saveAct = new QAction(tr("&Save"), this);
+	saveAct->setShortcuts(QKeySequence::Save);
+	saveAct->setStatusTip(tr("Saves the current project"));
+	connect(saveAct, SIGNAL(triggered()), this, SLOT(saveProject()));
+	projectMenu->addAction(saveAct);
+	
+	saveAsAct = new QAction(tr("Sa&ve As..."), this);
+	saveAsAct->setShortcuts(QKeySequence::SaveAs);
+	saveAsAct->setStatusTip(tr("Saves the current project"));
+	connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAsProject()));
+	projectMenu->addAction(saveAsAct);
+	
+	closeAct = new QAction(tr("&Quit"), this);
+#if QT_VERSION > 0x040600
+	closeAct->setShortcuts(QKeySequence::Quit);
+#endif
+	closeAct->setStatusTip(tr("Closes this project"));
+	connect(closeAct, SIGNAL(triggered()), this, SLOT(closeProject()));
+	projectMenu->addSeparator();
+	projectMenu->addAction(closeAct);
+	
+	menuBar()->addSeparator();
+	
+	helpMenu = menuBar()->addMenu(tr("&Help"));
+	aboutAct = new QAction(tr("&About"), this);
+	aboutAct->setStatusTip(tr("About " MAINWINDOW_TITLE));
+	connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutHelp()));
+	helpMenu->addAction(aboutAct);
+}
+void MainWindow::newProject()
+{
+	QMessageBox mb(QMessageBox::Question, "Confirmation", "Are you sure you want to create a new project?", QMessageBox::Yes | QMessageBox::No, this);
+	if (isWindowModified())
+	{
+		mb.addButton(QMessageBox::Save);
+		mb.setDefaultButton(QMessageBox::Yes);
+		mb.setInformativeText("If you do not save your project, it will be lost.");
+		mb.setWindowModality(Qt::WindowModal);
+		int ret = mb.exec();
+		if (ret == QMessageBox::No)
+			return;
+		else if (ret == QMessageBox::Save)
+			saveProject();
+	}
+	if (qfi)
+		delete qfi;
+	qfi = NULL;
+	statusBar()->showMessage("New project created");
+    setWindowTitle(MAINWINDOW_TITLE " - Untitled[*]");
+    setWindowModified(true);
+}
+void MainWindow::loadProject()
+{
+	QFileDialog qf(this, "Load a " MAINWINDOW_TITLE " project", "*.flexproj", MAINWINDOW_TITLE " Projects (*.flexproj)");
+	qf.setDefaultSuffix("flexproj");
+	qf.setAcceptMode(QFileDialog::AcceptOpen);
+	if (!qf.exec())
+		return;
+	newProject();
+	if (qfi)
+		delete qfi;
+	qfi = new QFileInfo(qf.selectedFiles().at(0));
+#ifdef _WIN32
+	QSettings st(qfi->absoluteFilePath(), QSettings::IniFormat, this);
+#else
+	QSettings st(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
+#endif
+	readSettings(&st);
+	statusBar()->showMessage("Project loaded");
+    setWindowTitle(QString(MAINWINDOW_TITLE " - ") + qfi->baseName() + QString("[*]"));
+	setWindowModified(false);
+}
+void MainWindow::saveProject()
+{
+	QString filename;
+	if (!qfi)
+	{
+		QFileDialog qf(this, "Save a " MAINWINDOW_TITLE " project", "*.flexproj", MAINWINDOW_TITLE " Projects (*.flexproj)");
+		qf.setDefaultSuffix("flexproj");
+		qf.setAcceptMode(QFileDialog::AcceptSave);
+		if (!qf.exec())
+			return;
+		if (qfi)
+			delete qfi;
+		qfi = new QFileInfo(qf.selectedFiles().at(0));
+	}
+	QFile(qfi->absoluteFilePath()).remove();
+#ifdef _WIN32
+	QSettings st(qfi->absoluteFilePath(), QSettings::IniFormat, this);
+#else
+	QSettings st(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
+#endif
+	writeSettings(&st);
+}
+void MainWindow::saveAsProject()
+{
+	if (qfi)
+		delete qfi;
+	qfi = NULL;
+	saveProject();
+}
+bool MainWindow::closeProject()
+{
+	QMessageBox mb(QMessageBox::Question, "Confirmation", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No, this);
+	if (isWindowModified())
+		mb.addButton(QMessageBox::Save);
+	mb.setDefaultButton(QMessageBox::Yes);
+	mb.setInformativeText("If you do not save your project, it will be lost.");
+	mb.setWindowModality(Qt::WindowModal);
+	int ret = mb.exec();
+	if (ret == QMessageBox::Yes)
+	{
+		writeSettings();
+		exit(0);
+	}
+	return false;
+}
+void MainWindow::aboutHelp()
+{
+	QMessageBox::about(this, "About", "This is the dialog");
+}
+void MainWindow::SetSignalModified()
+{
+	QList<QRadioButton *> rbs = findChildren<QRadioButton *>();
+	for (int i = 0; i < rbs.size(); i++)
+	{
+		//QObject::disconnect(rbs[i], SIGNAL(toggled(bool)), this, SLOT(WindowModified()));
+		QObject::connect(rbs[i], SIGNAL(toggled(bool)), this, SLOT(WindowModified()));
+	}
+	QList<QComboBox *> cbs = findChildren<QComboBox *>();
+	for (int i = 0; i < cbs.size(); i++)
+	{
+		//QObject::disconnect(cbs[i], SIGNAL(currentIndexChanged(int)), this, SLOT(WindowModified()));
+		QObject::connect(cbs[i], SIGNAL(currentIndexChanged(int)), this, SLOT(WindowModified()));
+	}
+	QList<QSpinBox *> sbs = findChildren<QSpinBox *>();
+	for (int i = 0; i < sbs.size(); i++)
+	{
+		//QObject::disconnect(sbs[i], SIGNAL(valueChanged(int)), this, SLOT(WindowModified()));
+		QObject::connect(sbs[i], SIGNAL(valueChanged(int)), this, SLOT(WindowModified()));
+	}
+	QList<QLineEdit *> tbs = findChildren<QLineEdit *>();
+	for (int i = 0; i < tbs.size(); i++)
+	{
+		//QObject::disconnect(tbs[i], SIGNAL(textChanged(QString)), this, SLOT(WindowModified()));
+		QObject::connect(tbs[i], SIGNAL(textChanged(QString)), this, SLOT(WindowModified()));
+	}
+}
+void MainWindow::WindowModified()
+{
+	setWindowModified(true);
 }
 
 //Panel
