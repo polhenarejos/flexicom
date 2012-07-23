@@ -11,6 +11,8 @@
 #include <QComboBox>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QMenuBar>
+#include <QStatusBar>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
 CreateFunc layouts[] = {

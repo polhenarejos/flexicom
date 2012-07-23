@@ -14,9 +14,7 @@
 #include <QSettings>
 #include <QGridLayout>
 #include <QMenu>
-#include <QMenubar>
 #include <QAction>
-#include <QStatusbar>
 #include <QFileinfo>
 #include "LayoutFactory.h"
 
