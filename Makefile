@@ -128,7 +128,7 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/vlc_reed_solomon.obj $(OBJ_DIR)/bbRSEnc.obj $(OBJ_DIR)/bbVLCInterleaver.obj $(OBJ_DIR)/bbVLC_info_assembler.obj $(OBJ_DIR)/bbVLC_Frame_Generator.obj \
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj  $(OBJ_DIR)/PHY_II_modulator.obj $(OBJ_DIR)/PHY_I_demodulator.obj $(OBJ_DIR)/PHY_II_demodulator.obj \
         $(OBJ_DIR)/vlc_crc.obj $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbVLCDeInterleaver.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \
-        $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj
+        $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj $(OBJ_DIR)/bb_Header_cp.obj
 
 
 

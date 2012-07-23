@@ -10,11 +10,6 @@
 #include <gr_int_to_float.h>
 #include "bbPHR_generation.h"
 #include "bbPSDU_generation.h"
-#include "bbRSEnc.h"
-#include "bbVLCInterleaver.h"
-#include "bbCCEnc.h"
-#include "bbManchesterEnc.h"
-#include "bb4b6bEnc.h"
 #include "PHY_I_modulator.h"
 #include "PHY_II_modulator.h"
 #include "bbVLC_info_assembler.h"
