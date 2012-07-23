@@ -22,8 +22,8 @@ class bb8b10bDec : public gr_block
 	
 	private:
 		bb8b10bDec();
-		int Table6b[6*16];
-		int distance(int *);
+		int distance(int *, int, int);
+		int RD;
 };
 
 #endif //_INC_BB8B10BDEC_H_
