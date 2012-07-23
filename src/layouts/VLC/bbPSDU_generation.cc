@@ -12,7 +12,8 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(uint64_t)), gr_make_io_signature(1, 1, sizeof(int))),
 	PSDU_length(_PSDU_length*8)
 {
-	crc=new vlc_crc(PSDU_length);
+	//crc=new vlc_crc(PSDU_length);
+	crc=new vlc_crc();
 	//we assume we are transmitting in broadcast mode
 	int crc_length=16;
 	generate_MHR_preamble(MHR);

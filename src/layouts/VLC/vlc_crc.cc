@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-vlc_crc::vlc_crc(int _length) :
-				 length_data(_length)
+vlc_crc::vlc_crc() 
+//:length_data(_length)
 {
 	crc_length = 16;
 	poly[0]=16; poly[1]= 12;

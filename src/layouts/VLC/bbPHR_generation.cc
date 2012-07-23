@@ -9,8 +9,9 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	tx_mode(_tx_mode), PSDU_length(_PSDU_length), PHR_length(_PHR_length),MCSID(_MCSID)
 {
 	int tmp[32]; //the CRC is computed always over a length of 32 in the PHR
-	crc = new vlc_crc(32+crc_length);
-	int tmp3[16]; //to pass the PSDU
+	//crc = new vlc_crc(32+crc_length);
+	crc = new vlc_crc();
+	int tmp3[16]; //to pass the PSDU length
 	memset(tmp, 0, sizeof(tmp));
 	if (tx_mode==2)
 		tmp[0]=1;

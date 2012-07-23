@@ -18,7 +18,8 @@ class vlc_crc {
        * Constructor of the vlc_crc class. This method requires 1 parameter: 
        * @param _length: number of bits of the incoming block of data, where the crc will be computed and appended.
        */
-		vlc_crc (int );
+		//vlc_crc (int );
+		vlc_crc();
 		~vlc_crc();
 		/**
          * Computes and appends the 16-bit CRC. 
@@ -29,12 +30,9 @@ class vlc_crc {
 		*/
 		void check_crc (int *, int *, bool *, int);
 		
-		
-		
-	
 	private:
 		int poly[4];
-		int length_data;
+		//int length_data;
 		int crc_length;		
 		
 };
