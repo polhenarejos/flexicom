@@ -111,7 +111,12 @@ void MainWindow::readSettings(QSettings *st)
 		st = s;
 	resize(st->value("mw/size", QSize(300,50)).toSize());
 	move(st->value("mw/pos", QPoint(200, 200)).toPoint());
-	panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
+	for (int i = 0; i < panel->rb_layout.size(); i++)
+		panel->rb_layout[i]->bt->force_toggle(false);	
+	if (panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->isChecked())
+		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->force_toggle(true);
+	else
+		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->setChecked(true);
 	panel->sp_devs->setValue(st->value("uhd/devs", 1).toInt());
 	int siz = st->beginReadArray("uhd/ip");
@@ -126,41 +131,37 @@ void MainWindow::readSettings(QSettings *st)
 }
 void MainWindow::writeSettings(QSettings *st)
 {
-	if (!st)
-		st = s;
 	st->setValue("mw/size", size());
 	st->setValue("mw/pos", pos());
 	st->setValue("mw/fullScreen", isFullScreen());
-	if (st != s)
+	for (uint i = 0; i < panel->rb_layout.size(); i++)
 	{
-		for (uint i = 0; i < panel->rb_layout.size(); i++)
+		if (panel->rb_layout[i]->bt->isChecked())
 		{
-			if (panel->rb_layout[i]->bt->isChecked())
-			{
-				st->setValue("layout/layout", i);
-				break;
-			}
+			st->setValue("layout/layout", i);
+			break;
 		}
-		for (uint i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
-		{
-			if (panel->rb_chain[i]->isChecked())
-			{
-				st->setValue("layout/chain", i);
-				break;
-			}
-		}
-		st->setValue("uhd/devs", panel->sp_devs->value());
-		st->beginWriteArray("uhd/ip");
-		for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
-		{
-			st->setArrayIndex(i);
-			st->setValue("ip", panel->ipfield[i].ip->text().remove(' '));
-		}
-		st->endArray();
-		st->setValue("uhd/gain", panel->sp_gain->value());
-		st->setValue("uhd/freq", panel->le_freq->text());
 	}
+	for (uint i = 0; i < sizeof(panel->rb_chain)/sizeof(QRadioButton *); i++)
+	{
+		if (panel->rb_chain[i]->isChecked())
+		{
+			st->setValue("layout/chain", i);
+			break;
+		}
+	}
+	st->setValue("uhd/devs", panel->sp_devs->value());
+	st->beginWriteArray("uhd/ip");
+	for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
+	{
+		st->setArrayIndex(i);
+		st->setValue("ip", panel->ipfield[i].ip->text().remove(' '));
+	}
+	st->endArray();
+	st->setValue("uhd/gain", panel->sp_gain->value());
+	st->setValue("uhd/freq", panel->le_freq->text());
 	emit SaveSettings(st);
+	setWindowModified(false);
 }
 void MainWindow::AddCustomTab(QWidget *w, QString name)
 {
@@ -258,21 +259,23 @@ void MainWindow::newProject()
 }
 void MainWindow::loadProject()
 {
+	newProject();
 	QFileDialog qf(this, "Load a " MAINWINDOW_TITLE " project", "*.flexproj", MAINWINDOW_TITLE " Projects (*.flexproj)");
 	qf.setDefaultSuffix("flexproj");
 	qf.setAcceptMode(QFileDialog::AcceptOpen);
 	if (!qf.exec())
 		return;
-	newProject();
 	if (qfi)
 		delete qfi;
 	qfi = new QFileInfo(qf.selectedFiles().at(0));
+	if (s)
+		delete s;
 #ifdef _WIN32
-	QSettings st(qfi->absoluteFilePath(), QSettings::IniFormat, this);
+	s = new QSettings(qfi->absoluteFilePath(), QSettings::IniFormat, this);
 #else
-	QSettings st(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
+	s = new QSettings(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
 #endif
-	readSettings(&st);
+	readSettings(s);
 	statusBar()->showMessage("Project loaded");
     setWindowTitle(QString(MAINWINDOW_TITLE " - ") + qfi->baseName() + QString("[*]"));
 	setWindowModified(false);
@@ -292,12 +295,14 @@ void MainWindow::saveProject()
 		qfi = new QFileInfo(qf.selectedFiles().at(0));
 	}
 	QFile(qfi->absoluteFilePath()).remove();
+	if (s)
+		delete s;
 #ifdef _WIN32
-	QSettings st(qfi->absoluteFilePath(), QSettings::IniFormat, this);
+	s = new QSettings(qfi->absoluteFilePath(), QSettings::IniFormat, this);
 #else
-	QSettings st(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
+	s = new QSettings(qfi->absoluteFilePath(), QSettings::NativeFormat, this);
 #endif
-	writeSettings(&st);
+	writeSettings(s);
 }
 void MainWindow::saveAsProject()
 {
@@ -317,7 +322,7 @@ bool MainWindow::closeProject()
 	int ret = mb.exec();
 	if (ret == QMessageBox::Yes)
 	{
-		writeSettings();
+		writeSettings(s);
 		exit(0);
 	}
 	return false;
@@ -384,7 +389,7 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	{
 		RadioLayout *r = new RadioLayout;
 		rb_layout.push_back(r);
-		r->bt = new QRadioButton;
+		r->bt = new RadioButton;
 		r->layout = layouts[i](parent, i);
 		r->bt->setText(tr(r->layout->Name()));
 		vBox->addWidget(rb_layout.back()->bt);

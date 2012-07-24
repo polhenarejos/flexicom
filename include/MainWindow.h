@@ -96,9 +96,14 @@ class Panel : public QTabWidget
 			QLineEdit *ip;
 			QLabel *label;
 		}IPField;
+		class RadioButton : public QRadioButton
+		{
+			public:
+				void force_toggle(bool c) { emit toggled(c); }
+		};
 		typedef struct
 		{
-			QRadioButton *bt;
+			RadioButton *bt;
 			LayoutFactory::sptr layout;
 		}RadioLayout;
 		Panel(MainWindow * = NULL);

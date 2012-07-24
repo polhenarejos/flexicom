@@ -66,7 +66,7 @@ void Layout80211b::RadioPressed(bool check)
 	}
 	else
 	{
-		SaveSettings(mw->s);
+		//SaveSettings(mw->s);
 		mw->RemoveCustomTabs();
 		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));
 		RemovePlots();

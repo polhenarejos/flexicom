@@ -130,7 +130,7 @@ void LayoutVLC::RadioPressed(bool checked)
 	}
 	else
 	{
-		SaveSettings(mw->s);
+		//SaveSettings(mw->s);
 		mw->RemoveCustomTabs();
 		QObject::disconnect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));
 	}
