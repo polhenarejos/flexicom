@@ -28,7 +28,7 @@ class vlc_crc {
 		/**
 		 * Checks the integrity of the incoming block of data
 		*/
-		void check_crc (int *, int *, bool *, int);
+		bool check_crc (int *, int *, int);
 		
 	private:
 		int poly[4];

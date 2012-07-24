@@ -99,7 +99,7 @@ int bbPSDU_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vec
 	int *tmp= new int[PSDU_length];
 	int cycles = noutput_items / (PSDU_length);
 	//printf("The number of cycles:%d\n", cycles);
-	static uint64_t prev_confver = 0, cc = 0;
+	//static uint64_t prev_confver = 0, cc = 0;
 	while (cycles>0)
 	{
 		/*
@@ -121,7 +121,7 @@ int bbPSDU_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vec
 		cycles--;
 		sequence_number = (sequence_number +1)%256;
 		optr = optr + PSDU_length;
-		printf("*%d\n",cc++);
+		//printf("*%d\n",cc++);
 	}
     delete [] tmp;
     consume_each(noutput_items / PSDU_length);

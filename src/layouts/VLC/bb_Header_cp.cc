@@ -42,7 +42,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	int *iptr= (int *)input_items[0];
 	int blocks_to_process,i, ones, zeros;
 	int *tmp;
-	bool *check;
+	bool check;
 	int n_output =0;
 	int length;
 	blocks_to_process= (noutput_items/16);
@@ -64,8 +64,8 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			memcpy(tmp,iptr, sizeof(int)*raw_length);
 		}
 		iptr = iptr + raw_length;
-		crc_cp->check_crc(tmp, &tmp[length-16],check,length);
-		if (check[0] == true) //crc ok!!
+		check = crc_cp->check_crc(tmp, &tmp[length-16],length);
+		if (check == true) //crc ok!!
 		{
 			if (flag==0)
 			{

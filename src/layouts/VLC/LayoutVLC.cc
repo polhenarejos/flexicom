@@ -12,7 +12,8 @@
 #include <QRadioButton>
 #include <iostream>
 
-#include <gr_null_sink.h>
+#include <gr_udp_sink.h>
+#include <gr_udp_source.h>
 #include <gr_sig_source_f.h>
 #include <gr_float_to_complex.h>
 #include <gr_file_source.h>
@@ -60,13 +61,18 @@ void LayoutVLC::Run()
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
+		/*
 		usrp_rx = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc16"));
 		usrp_rx->set_samp_rate(800e3);
 		usrp_rx->set_center_freq(0);
 		usrp_rx->set_gain(mw->panel->sp_gain->value());
 		//rx = RxVLC::Create();
-		bbMatlab::sptr bbm = bbMatlab::Create("rx.txt", sizeof(std::complex<float>));
+		bbMatlab::sptr bbm = bbMatlab::Create("rx.txt", sizeof(std::complex<float>));	
 		grTop->connect(usrp_rx, 0, bbm, 0);
+		*/
+		rx = RxVLC::Create(this);
+		gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
+		grTop->connect(source, 0, rx, 0);
 		grTop->start();
 	}
 	else //transmitter
@@ -101,7 +107,8 @@ void LayoutVLC::Run()
 				break;
 			}
 		}
-		*/gr_null_sink_sptr sink = gr_make_null_sink(sizeof(float));		
+		*/
+		gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
 		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		

@@ -59,7 +59,8 @@ void RxVLCThread::run()
 }
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
-	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(0, 0, 0))
+	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(0, 0, 0)),
+	ly(_ly)
 {
 	msgq = gr_make_msg_queue();
 	rxth = new RxVLCThread(msgq);
@@ -342,7 +343,7 @@ int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, 
 		if (tmp==0)
 			rs_bits= (GF_words/rs_in)*rs_out*gf;
 		else
-			rs_bits= (int)floor(((double)GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
+			rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
 	}
 	else
 	{

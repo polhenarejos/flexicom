@@ -53,11 +53,11 @@ void vlc_crc::generate_crc(int *data, int *out, int size)
 	return;
 }
 
-void vlc_crc::check_crc( int *data, int *out, bool *ok, int size)
+bool vlc_crc::check_crc( int *data, int *out, int size)
 {
 	int i,ord=poly[0];
 	int *error=new int[size];
-    *ok=true;
+    bool ok=true;
 	generate_crc(data, error,size);
 	for (i=0; i < ord; i++)
 	{
@@ -70,4 +70,5 @@ void vlc_crc::check_crc( int *data, int *out, bool *ok, int size)
 	memcpy(out,&data[size-2*crc_length],sizeof(int)*crc_length);
 	//we copy in out the crc
 	delete [] error;
+	return ok;
 }

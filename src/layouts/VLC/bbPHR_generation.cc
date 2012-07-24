@@ -47,7 +47,7 @@ int bbPHR_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vect
 	memset(tmp,0,sizeof(int)*PHR_length);
 	memcpy(tmp,phr_crc, sizeof(int)*48); //48 = 32 + 16
 	int cycles = noutput_items / PHR_length;
-	static uint64_t prev_confver = 0, cc = 0;
+	//static uint64_t prev_confver = 0, cc = 0;
 	while (cycles>0)
 	{
 		/*
@@ -59,7 +59,7 @@ int bbPHR_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vect
 		}
 		cc++;
 		*/
-		printf("!%d\n",cc++);
+		//printf("!%d\n",cc++);
 		memcpy(optr, tmp, sizeof(int)*PHR_length);
 		cycles--;
 		optr = optr + PHR_length;
