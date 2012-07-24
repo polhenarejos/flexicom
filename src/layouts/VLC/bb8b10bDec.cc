@@ -8,28 +8,28 @@
 typedef unsigned int uint;
 
 int bits_3_RD_neg[] = { 0,0,1,0, 1,0,0,1, 1,0,1,0, 1,1,0,0,      
-                             0,1,0,0, 0,1,0,1, 0,1,1,0, 1,0,0,0};                  
+                        0,1,0,0, 0,1,0,1, 0,1,1,0, 1,0,0,0};                  
                                                                              
 int bits_5_RD_neg[] = { 1,1,1,0,0,1, 1,0,1,1,1,0, 1,0,1,1,0,1, 1,0,0,0,1,1,
-                             1,0,1,0,1,1, 1,0,0,1,0,1, 1,0,0,1,1,0, 0,0,0,1,1,1,
-                             1,0,0,1,1,1, 1,0,1,0,0,1, 1,0,1,0,1,0, 0,0,1,0,1,1,
-                             1,0,1,1,0,0, 0,0,1,1,0,1, 0,0,1,1,1,0, 1,1,1,0,1,0,
-                             1,1,0,1,1,0, 1,1,0,0,0,1, 1,1,0,0,1,0, 0,1,0,0,1,1,
-                             1,1,0,1,0,0, 0,1,0,1,0,1, 0,1,0,1,1,0, 0,1,0,1,1,1,
-                             1,1,0,0,1,1, 0,1,1,0,0,1, 0,1,1,0,1,0, 0,1,1,0,1,1,
-                             0,1,1,1,0,0, 0,1,1,1,0,1, 0,1,1,1,1,0, 1,1,0,1,0,1};  
+                        1,0,1,0,1,1, 1,0,0,1,0,1, 1,0,0,1,1,0, 0,0,0,1,1,1,
+                        1,0,0,1,1,1, 1,0,1,0,0,1, 1,0,1,0,1,0, 0,0,1,0,1,1,
+                        1,0,1,1,0,0, 0,0,1,1,0,1, 0,0,1,1,1,0, 1,1,1,0,1,0,
+                        1,1,0,1,1,0, 1,1,0,0,0,1, 1,1,0,0,1,0, 0,1,0,0,1,1,
+                        1,1,0,1,0,0, 0,1,0,1,0,1, 0,1,0,1,1,0, 0,1,0,1,1,1,
+                        1,1,0,0,1,1, 0,1,1,0,0,1, 0,1,1,0,1,0, 0,1,1,0,1,1,
+                        0,1,1,1,0,0, 0,1,1,1,0,1, 0,1,1,1,1,0, 1,1,0,1,0,1};  
                                                                              
 int bits_3_RD_pos[] = { 1,1,0,1, 1,0,0,1, 1,0,1,0, 0,0,1,1,                 
-                             1,0,1,1, 0,1,0,1, 0,1,1,0, 0,1,1,1};                   
+                        1,0,1,1, 0,1,0,1, 0,1,1,0, 0,1,1,1};                   
                                                                              
 int bits_5_RD_pos[] = { 0,0,0,1,1,0, 0,1,0,0,0,1, 0,1,0,0,1,0, 1,0,0,0,1,1, 
-                             0,1,0,1,0,0, 1,0,0,1,0,1, 1,0,0,1,1,0, 1,1,1,0,0,0, 
-                             0,1,1,0,0,0, 1,0,1,0,0,1, 1,0,1,0,1,0, 0,0,1,0,1,1, 
-                             1,0,1,1,0,0, 0,0,1,1,0,1, 0,0,1,1,1,0, 0,0,0,1,0,1, 
-                             0,0,1,0,0,1, 1,1,0,0,0,1, 1,1,0,0,1,0, 0,1,0,0,1,1, 
-                             1,1,0,1,0,0, 0,1,0,1,0,1, 0,1,0,1,1,0, 1,0,1,0,0,0, 
-                             0,0,1,1,0,0, 0,1,1,0,0,1, 0,1,1,0,1,0, 1,0,0,1,0,0, 
-                             0,1,1,1,0,0, 1,0,0,0,1,0, 1,0,0,0,0,1, 0,0,1,0,1,0};   
+                        0,1,0,1,0,0, 1,0,0,1,0,1, 1,0,0,1,1,0, 1,1,1,0,0,0, 
+                        0,1,1,0,0,0, 1,0,1,0,0,1, 1,0,1,0,1,0, 0,0,1,0,1,1, 
+                        1,0,1,1,0,0, 0,0,1,1,0,1, 0,0,1,1,1,0, 0,0,0,1,0,1, 
+                        0,0,1,0,0,1, 1,1,0,0,0,1, 1,1,0,0,1,0, 0,1,0,0,1,1, 
+                        1,1,0,1,0,0, 0,1,0,1,0,1, 0,1,0,1,1,0, 1,0,1,0,0,0, 
+                        0,0,1,1,0,0, 0,1,1,0,0,1, 0,1,1,0,1,0, 1,0,0,1,0,0, 
+                        0,1,1,1,0,0, 1,0,0,0,1,0, 1,0,0,0,0,1, 0,0,1,0,1,0};   
 
 bb8b10bDec::~bb8b10bDec()
 {
@@ -58,8 +58,12 @@ void bb8b10bDec::forecast(int noutput_items, gr_vector_int &ninput_items_require
 int bb8b10bDec::distance(int *number, int RD_flag, int length)
 {
 	//RD and length flag helps us to diferentiate whether to see in one table or other
-	int i,j,tmp2=0,tmp=0,dist=-100;
+	int i,j,tmp=0,dist=-100;
 	int index;
+	/*printf("El number en funcion distance\n");
+	for (i=0; i<length; i++)
+		printf("%d", number[i]);
+	printf("\n");*/
 	//look for the one with the best correlation
 	switch (RD_flag)
 	{
@@ -71,30 +75,34 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 					for (i=0; i<8; i++)
 					{
 						tmp = 0;
-						for (j = 0; j<4 ; j++)
+						for (j = 0; j<length ; j++)
 						{
-							tmp = tmp + (number[j] * bits_3_RD_neg[i*4+j]);
+							if (number[j]== bits_3_RD_neg[i*length +j])
+								tmp++;
+							//tmp = tmp + (number[j] * bits_3_RD_neg[i*length+j]);
+						}
 							if (tmp>dist)
 							{
 								dist = tmp;
 								index = i;
 							}
-						}
 					}
 					break;
 				case 6:
 					for (i=0; i<32; i++)
 					{
 						tmp = 0;
-						for (j = 0; j<6 ; j++)
-						{
-							tmp = tmp + (number[j] * bits_5_RD_neg[i*6+j]);
+						for (j = 0; j<length ; j++)
+						{	
+							if (number[j]== bits_5_RD_neg[i*length +j])
+								tmp++;
+							//tmp = tmp + (number[j] * bits_5_RD_neg[i*length+j]);
+						}
 							if (tmp>dist)
 							{
 								dist = tmp;
 								index = i;
 							}
-						}
 					}
 					break;
 			}
@@ -107,15 +115,17 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 					for (i=0; i<8; i++)
 					{
 						tmp = 0;
-						for (j = 0; j<4 ; j++)
+						for (j = 0; j<length ; j++)
 						{
-							tmp = tmp + (number[j] * bits_3_RD_pos[i*4+j]);
+							if (number[j]== bits_3_RD_pos[i*length +j])
+								tmp++;
+							//tmp = tmp + (number[j] * bits_3_RD_pos[i*length+j]);
+						}
 							if (tmp>dist)
 							{
 								dist = tmp;
 								index = i;
 							}
-						}
 					}
 					break;
 				case 6:
@@ -124,13 +134,15 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 						tmp = 0;
 						for (j = 0; j<6 ; j++)
 						{
-							tmp = tmp + (number[j] * bits_5_RD_pos[i*6+j]);
+							if (number[j]== bits_5_RD_pos[i*length +j])
+								tmp++;
+							//tmp = tmp + (number[j] * bits_5_RD_pos[i*length+j]);
+						}
 							if (tmp>dist)
 							{
 								dist = tmp;
 								index = i;
 							}
-						}
 					}
 					break;
 			}
@@ -144,17 +156,18 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	int samples_to_process, i,ones;
-	int tmp[4], tmp2[6]; 
+	int tmp[4], tmp2[6];
 	int dist;
 
 	samples_to_process= noutput_items/8*10;
 	//printf("noutput_items: %d\n", noutput_items);
 	while (samples_to_process>0)
 	{
+		//printf("Valor de RD[%d]:%d\n",samples_to_process, RD);
 		ones = 0;
 		memcpy(tmp,iptr,sizeof(int)*4);
 		iptr = iptr +4;
-		for (int i=0; i<4; i++)
+		for (i=0; i<4; i++)
 		{
 			if (tmp[i]==1)
 				ones ++;
@@ -164,9 +177,9 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 		optr = optr +3;
 		memcpy(tmp2,iptr,sizeof(int)*6);
 		iptr = iptr +6;
-		for (int i=0; i<6; i++)
+		for (i=0; i<6; i++)
 		{
-			if (tmp[i]==1)
+			if (tmp2[i]==1)
 				ones ++;
 		}
 		dist = distance(tmp2, RD, 6);
@@ -176,6 +189,7 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 			RD = (RD+1)%2;
 		
 		samples_to_process=samples_to_process-10;
+		//printf("Valor de RD:%d\n", RD);
 		
 	}
 	consume_each(noutput_items/8*10);
