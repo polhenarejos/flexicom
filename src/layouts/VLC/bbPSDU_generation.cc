@@ -9,7 +9,7 @@
 #include "LayoutVLC.h"
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
-	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(uint64_t)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
 	PSDU_length(_PSDU_length*8)
 {
 	//crc=new vlc_crc(PSDU_length);

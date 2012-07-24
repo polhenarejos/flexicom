@@ -5,7 +5,7 @@
 #include "LayoutVLC.h"
 
 bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_length, int *_MCSID) : 
-	gr_block("bbPHR_generation", gr_make_io_signature(1, 1, sizeof(uint64_t)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("bbPHR_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
 	tx_mode(_tx_mode), PSDU_length(_PSDU_length), PHR_length(_PHR_length),MCSID(_MCSID)
 {
 	int tmp[32]; //the CRC is computed always over a length of 32 in the PHR
