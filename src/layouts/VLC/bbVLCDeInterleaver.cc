@@ -38,7 +38,7 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 	if (p< K)
 	{
 		depuncture = true;	
-		out_deint= pre_length/GF - p; //there has been puncturing
+		out_deint= pre_length/GF + p; //there has been puncturing
 	}
 	else
 	{

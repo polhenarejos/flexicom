@@ -24,7 +24,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 		connect(rs_enc, 0, intlv,0);
 		if (cc_in!=0)
 		{
-			bbCCEnc::sptr cc_enc = bbCCEnc::Create(3,7, poly,intlv->out_int,0);
+			bbCCEnc::sptr cc_enc = bbCCEnc::Create(3,7, poly,intlv->out_int, data_rate);
 			connect(intlv,0, cc_enc,0);
 			if (phy_modulation == 0)
 			{
