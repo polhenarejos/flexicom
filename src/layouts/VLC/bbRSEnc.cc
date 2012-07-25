@@ -112,13 +112,8 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		{
 			//we need to process the last word of the block
 			remaining_bits = (GF_words%K)*GF;
-			//printf("Remaining_bits:%d\n", remaining_bits);
-			//RS_words = GF_words/K;
 			memset(tmp2, 0, sizeof(int)*GF*K);
 			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*remaining_bits);
-			//for (i=0; i<remaining_bits;i++)
-				//printf("Los remaining_bits[%d] son:%d\n",i, tmp2[i]);
-			//memset(tmp3,0, sizeof(unsigned char)*N);
 			for (i=0; i<K; i++)
 			{
 				tmp[i]=LayoutVLC::bi2dec(&tmp2[i*GF],GF);
@@ -127,10 +122,6 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
 			std::copy(tmp3, tmp3+(GF_words%K), optr);
 			optr += GF_words%K;
-			/*memcpy(optr, tmp3,sizeof(unsigned char)*(GF_words%K));
-			optr =optr + (GF_words%K);
-			memcpy(optr, &tmp3[K], sizeof(unsigned char)*(N-K));
-			optr = optr + N-K;*/
 			std::copy(tmp3+K, tmp3+N, optr);
 			optr += N-K;
 			if (phy_type==0)
@@ -141,9 +132,6 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			}
 		}
 		blocks_to_process--;
-		/*times ++;
-		if (times==2)
-			exit(-1);*/
 	}
 	delete [] tmp;
 	delete [] tmp2;

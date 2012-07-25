@@ -69,7 +69,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	
 	uint RS_words= pre_length/N;
 	uint blocks_to_process = (noutput_items/out_rs_dec);
-	uint i,j;
+	uint corrections, i,j;
 	unsigned char *tmp = new unsigned char[N];
 	unsigned char *tmp2 = new unsigned char[K];
 	while (blocks_to_process>0)
@@ -79,10 +79,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			memcpy(tmp,iptr,sizeof(unsigned char)*N);
 			for(j=0;j<N;j++)
 				tmp[j]= (unsigned char)iptr[j];
-			//memset(tmp2, 0, sizeof(unsigned char)*K);
-			//printf("corrections:%d\n", corrections);
-			//for(j=0;j<K;j++)
-				//printf("tmp2[%d][%d]=%d\n", i,j, tmp2[j]);
+			corrections = vlc_rs->decode(tmp2,tmp);
 			for (j=0; j< K; j++)
 			{
 				LayoutVLC::dec2bi(tmp2[j], GF,optr);
@@ -99,8 +96,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				tmp[j]=(unsigned char)iptr[j];
 			for (j=K;j<N;j++)
 				tmp[j]=(unsigned char)iptr[j];
-			//memcpy(tmp, iptr, sizeof(unsigned char)*remaining_words);
-			//memcpy(tmp, &iptr[N-K], sizeof(unsigned char)*(N-K));
+			corrections = vlc_rs->decode(tmp2,tmp);
 			for (i=0; i< remaining_words; i++)
 			{
 				LayoutVLC::dec2bi(tmp2[i],GF,optr);
