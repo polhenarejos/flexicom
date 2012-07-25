@@ -4,6 +4,7 @@
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
 #include <gr_file_source.h>
+#include <gr_float_to_int.h>
 //#include <digital_clock_recovery_mm_ff.h>
 
 #include "bbVLC_Frame_Extractor.h"
@@ -32,26 +33,28 @@ void RxVLCThread::run()
 			int *packet = (int *)mesg->msg();
 			if (packet[0] == 0) //phr
 			{
+				
 				printf("EXTRACTING INFORMATION FROM PHR HEADER\n");
 				printf("Burst_mode: %d\n", packet[1]);
-				printf("Channel_number: %c\n", LayoutVLC::bi2dec(&packet[2],3));
-				printf("MCSID(table 83):%c\n", LayoutVLC::bi2dec(&packet[5],6));
-				printf("PSDU_length (in octets): %c\n", LayoutVLC::bi2dec(&packet[11],16));
-				printf("Dimmed_OOK_extenstion : %c\n", packet[27]);
+				printf("Channel_number: %d\n", LayoutVLC::bi2dec(&packet[2],3));
+				printf("MCSID(table 83):%d\n", LayoutVLC::bi2dec(&packet[5],6));
+				printf("PSDU_length (in octets): %d\n", LayoutVLC::bi2dec(&packet[11],16));
+				printf("Dimmed_OOK_extenstion : %d\n", packet[27]);
+				
 			}
 			else //reading mhr
 			{
 				printf("EXTRACTING INFORMATION FROM MAC HEADER\n");
-				printf("Frame_version: %d\n, (0 means that is compatible with IEEE 802.15.7)", LayoutVLC::bi2dec(&packet[1],2));
-				printf("Frame_type: %c\n", LayoutVLC::bi2dec(&packet[7],3));
+				printf("Frame_version: %d, (0 means that is compatible with IEEE 802.15.7)\n", LayoutVLC::bi2dec(&packet[1],2));
+				printf("Frame_type: %d\n", LayoutVLC::bi2dec(&packet[7],3));
 				printf("Security Enabled: %d\n", packet[10]);
 				printf("Frame pending: %d\n", packet[11]);
 				printf("Ack Request: %d\n", packet[12]);
-				printf("Destination address_mode: %c\n", LayoutVLC::bi2dec(&packet[13],2));
-				printf("Source address_mode: %c\n", LayoutVLC::bi2dec(&packet[15],2));
+				printf("Destination address_mode: %d\n", LayoutVLC::bi2dec(&packet[13],2));
+				printf("Source address_mode: %d\n", LayoutVLC::bi2dec(&packet[15],2));
 				printf("Frame_sequence_number: %d\n", (int)LayoutVLC::bi2dec(&packet[17],8));
 				printf("Destination_address: %X:%X:%X:%X\n", packet[25],packet[29],packet[33],packet[37]);
-			}			
+			}	
 		}
 		//else
 			//sleep(1);
@@ -59,7 +62,7 @@ void RxVLCThread::run()
 }
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
-	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(0, 0, 0)),
+	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(0, 0, 0)),
 	ly(_ly)
 {
 	msgq = gr_make_msg_queue();
@@ -67,18 +70,19 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	rxth->start();
 	
 	init_var();
-	
+	gr_float_to_int_sptr f2i = gr_make_float_to_int();
+	connect(self(), 0, f2i, 0);
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	
-	connect(self(),0,phr,0);
-	connect(self(),0,psdu,0);
+	connect(f2i,0,phr,0);
+	connect(f2i,0,psdu,0);
 	
 	if (vlc_var_rx.phy_type ==0) // PHY I
 	{
-		PHY_I_demodulator::sptr phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, vlc_var_rx.operating_mode);
+		PHY_I_demodulator::sptr phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, 0);
 		PHY_I_demodulator::sptr psdu_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length, vlc_var_rx.operating_mode);
 		bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(0,vlc_var_rx.PHR_raw_length, msgq);
 		bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(1,vlc_var_rx.PSDU_raw_length, msgq);
@@ -89,8 +93,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	}
 	else
 	{
-		PHY_II_demodulator::sptr phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length, vlc_var_rx.operating_mode);
-		PHY_II_demodulator::sptr psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length, vlc_var_rx.operating_mode);
+		PHY_II_demodulator::sptr phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length);
+		PHY_II_demodulator::sptr psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length);
 		bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(0,vlc_var_rx.PHR_raw_length, msgq);
 		bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(1,vlc_var_rx.PSDU_raw_length, msgq);
 		connect(phr, 0, phr_dem, 0);
@@ -328,8 +332,8 @@ void RxVLC::init_var()
 			}
 			break;
 	}
-	PHR_modulated_length= RxVLC::get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out, vlc_var_rx.PHR_raw_length);
-	PSDU_modulated_length = RxVLC::get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out, vlc_var_rx.PSDU_raw_length);
+	PHR_modulated_length= get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out, vlc_var_rx.PHR_raw_length);
+	PSDU_modulated_length = get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out, vlc_var_rx.PSDU_raw_length);
 	vlc_var_rx.count++;
 }
 
@@ -343,7 +347,12 @@ int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, 
 		if (tmp==0)
 			rs_bits= (GF_words/rs_in)*rs_out*gf;
 		else
-			rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
+		{
+			//if (phy_type == 0)
+			//	rs_bits = ((int)ceil(((double)GF_words/rs_in))*rs_out)*gf;
+			//else
+				rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
+		}
 	}
 	else
 	{

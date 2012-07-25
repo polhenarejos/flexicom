@@ -52,7 +52,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	if (vlc_var.phy_type==0) // PHY I
 	{
 		PHY_I_modulator::sptr phr = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.pre_rs_in, vlc_var._rs_code.pre_rs_out, vlc_var.GF, vlc_var._cc_code.pre_cc_in,vlc_var._cc_code.pre_cc_out, vlc_var.PHR_raw_length,0);			
-		PHY_I_modulator::sptr psdu = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.pre_rs_in, vlc_var._rs_code.pre_rs_out, vlc_var.GF, vlc_var._cc_code.cc_in,vlc_var._cc_code.cc_out, vlc_var.PHR_raw_length,vlc_var.operating_mode);
+		PHY_I_modulator::sptr psdu = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.rs_in, vlc_var._rs_code.rs_out, vlc_var.GF, vlc_var._cc_code.cc_in,vlc_var._cc_code.cc_out, vlc_var.PSDU_raw_length,vlc_var.operating_mode);
 		connect(PHR_gen, 0, phr,0);
 		connect(PSDU_gen, 0, psdu, 0);
 		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, phr->out_PHY_I_mod, psdu->out_PHY_I_mod);
