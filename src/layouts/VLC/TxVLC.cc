@@ -79,7 +79,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(i2f,0,self(),0);
 	}
 	
-	if (0)
+	if (1)
 	{
 		bbMatlab::sptr gm = bbMatlab::Create("m.txt", sizeof(float));
 		connect(i2f, 0, gm, 0);

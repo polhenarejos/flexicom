@@ -21,8 +21,14 @@ class PHY_II_demodulator : public gr_hier_block2
 	public:
 		typedef boost::shared_ptr<PHY_II_demodulator> sptr;
 	   /**
-       * The creation of PHY_II_demodulator requires 1 parameter: 
-       * @param vlc_var_phy_rx: pointer which contains the configuration of the VLC system set at the GUI interface. 
+       * The creation of PHY_I_demodulator requires 7 parameters: 
+       * @param _phy_type: determines which is the PHY operating mode.
+       * @param _phy_modulation: determines the modulation used in the corresponding phy layer.
+       * @param _rs_in: determines the length of the input words of the reed solomon encoder.
+       * @param _rs_out: determines the length of the output words of the reed solomon encoder.
+       * @param _gf: determines the number of bits needed to create one element of the reed solomon word.
+       * @param _mod_length: is the total length in bits of the block of data to be decoded
+       * @param _raw_length: is the total length in bits of the block of data to be encoded
        */
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 		~PHY_II_demodulator();

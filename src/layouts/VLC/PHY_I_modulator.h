@@ -21,8 +21,16 @@ class PHY_I_modulator : public gr_hier_block2
 	public:
 		typedef boost::shared_ptr<PHY_I_modulator> sptr;
 	   /**
-       * The creation of PHY_I_modulator requires 1 parameter: 
-       * @param vlc_var_phy: pointer which contains the configuration of the VLC system set at the GUI interface. 
+       * The creation of PHY_I_modulator requires 9 parameters: 
+       * @param _phy_type: determines which is the PHY operating mode.
+       * @param _phy_modulation: determines the modulation used in the corresponding phy layer.
+       * @param _rs_in: determines the length of the input words of the reed solomon encoder.
+       * @param _rs_out: determines the length of the output words of the reed solomon encoder.
+       * @param _gf: determines the number of bits needed to create one element of the reed solomon word.
+       * @param _cc_in: determines the number of bits at the input to create the output.
+       * @param _cc_out: determines the number of output bits for each input bit.
+       * @param _raw_length: is the total length in bits of the block of data to be encoded
+       * @param _data_rate: specifies the data rate used for the selected phy type and modulation. Remember for PHR has to be set always to 0
        */
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 		~PHY_I_modulator();

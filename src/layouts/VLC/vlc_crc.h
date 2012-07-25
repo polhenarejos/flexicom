@@ -15,8 +15,7 @@ class vlc_crc {
 	
 	public:	
 		/**
-       * Constructor of the vlc_crc class. This method requires 1 parameter: 
-       * @param _length: number of bits of the incoming block of data, where the crc will be computed and appended.
+       * Constructor of the vlc_crc class.  
        */
 		//vlc_crc (int );
 		vlc_crc();
