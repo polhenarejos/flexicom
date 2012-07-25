@@ -9,9 +9,9 @@
 
 #include <gr_io_signature.h>
 
-PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _mod_length, unsigned int _raw_length, unsigned int _data_rate) :
+PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _mod_length, unsigned int _raw_length) :
 	gr_hier_block2("PHY_II_demodulator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))),
-	phy_type(_phy_type), phy_modulation(_phy_modulation), rs_in(_rs_in), rs_out(_rs_out), GF(_gf), mod_length(_mod_length), raw_length(_raw_length),data_rate(_data_rate)
+	phy_type(_phy_type), phy_modulation(_phy_modulation), rs_in(_rs_in), rs_out(_rs_out), GF(_gf), mod_length(_mod_length), raw_length(_raw_length)
 {
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 			
@@ -55,9 +55,9 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 	}
 }
 
-PHY_II_demodulator::sptr PHY_II_demodulator::Create(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _mod_length, unsigned int _raw_length, unsigned int _data_rate)
+PHY_II_demodulator::sptr PHY_II_demodulator::Create(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _mod_length, unsigned int _raw_length)
 { 
-	return gnuradio::get_initial_sptr(new PHY_II_demodulator(_phy_type, _phy_modulation, _rs_in, _rs_out, _gf, _mod_length, _raw_length, _data_rate));
+	return gnuradio::get_initial_sptr(new PHY_II_demodulator(_phy_type, _phy_modulation, _rs_in, _rs_out, _gf, _mod_length, _raw_length));
 }
 
 PHY_II_demodulator::~PHY_II_demodulator()

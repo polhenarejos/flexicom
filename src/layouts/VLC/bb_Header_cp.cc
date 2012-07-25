@@ -64,7 +64,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			memcpy(tmp,iptr, sizeof(int)*raw_length);
 		}
 		iptr = iptr + raw_length;
-		check = crc_cp->check_crc(tmp, &tmp[length-16],length);
+		check = crc_cp->check_crc(tmp, NULL, length);
 		if (check == true) //crc ok!!
 		{
 			if (flag==0)
@@ -85,7 +85,8 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			}
 			
 		}
-		blocks_to_process--;
+		delete [] tmp;
+		//blocks_to_process--;
 	}
 	consume_each(raw_length*blocks_to_process);
 	return n_output;

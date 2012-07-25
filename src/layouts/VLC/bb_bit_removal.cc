@@ -40,12 +40,15 @@ int bb_bit_removal::general_work(int noutput_items, gr_vector_int &ninput_items,
 	for (int i=0; i<noutput_items; i++)
 	{
 		if(bit_counter<output_length)
-			*optr++ = *iptr++;
-		ci++;
+		{
+			*optr++ = *iptr;
+			ci++;
+		}
+		iptr++;
 		bit_counter = (bit_counter+1)%input_length;
 	}
-	consume_each(ci);
-	return noutput_items;
+	consume_each(noutput_items);
+	return ci;
 	/*while(blocks_to_process>0)	
 	{
 		memcpy(optr,iptr, sizeof(int)*output_length);

@@ -71,7 +71,8 @@ void LayoutVLC::Run()
 		grTop->connect(usrp_rx, 0, bbm, 0);
 		*/
 		rx = RxVLC::Create(this);
-		gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
+		//gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
+		gr_file_source_sptr source = gr_make_file_source(sizeof(float), "frame.txt.dat", true);
 		grTop->connect(source, 0, rx, 0);
 		grTop->start();
 	}
@@ -108,7 +109,8 @@ void LayoutVLC::Run()
 			}
 		}
 		*/
-		gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
+		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
+		bbMatlab::sptr sink = bbMatlab::Create("frame.txt", sizeof(float));
 		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		

@@ -62,7 +62,7 @@ int bbRSEnc::rs_out_elements()
 			//if is not integer, the padded zeros will be removed by the interleaver block
 			rs_output_bits = ((int)ceil(((double)GF_words/K))*N)*GF;
 		else
-			rs_output_bits = ((int)floor(((double)GF_words/K))*N+ tmp + (N-K))*GF;		
+			rs_output_bits = ((GF_words/K)*N+ tmp + (N-K))*GF;		
 	}	
 	return rs_output_bits;
 	//if all divisions were exact, there will not need to do that

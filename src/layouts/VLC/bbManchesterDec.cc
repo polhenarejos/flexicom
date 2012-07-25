@@ -12,7 +12,7 @@ bbManchesterDec::bbManchesterDec(int mode, int flag_cc):
 	gr_block("bbManchesterDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
 	d_mode(mode), d_flag_cc(flag_cc)
 {
-	set_output_multiple(2);
+	//set_output_multiple(2);
 }
 
 
@@ -92,25 +92,23 @@ int bbManchesterDec::general_work(int noutput_items, gr_vector_int &ninput_items
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	int samples_to_process = noutput_items*2;
-	while(samples_to_process>0)
+	for (int n = 0; n < noutput_items; n++)
 	{
 		if (d_flag_cc)
 		{
 			if (iptr[0]>0)
-				optr[0]=-2;
+				*optr++=-2;
 			else 
-				optr[0]=2;
-			optr++;
+				*optr++=2;
 		}
 		else
 		{
 			if (iptr[0]>0)
-				optr[0]=1;
+				*optr++=1;
 			else
-				optr[0] =0;
+				*optr++ =0;
 		}
 		iptr=iptr+2;
-		samples_to_process=samples_to_process-2;
 	}
 	consume_each(noutput_items*2);
 	return noutput_items;

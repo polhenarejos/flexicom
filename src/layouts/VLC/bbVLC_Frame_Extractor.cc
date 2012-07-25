@@ -13,26 +13,26 @@ bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _PHR_m
 	{
 		case 0:
 			IFS= 240; //twice the value of table 77
-			length_sequence = 60 + _PHR_mod_length + _PSDU_mod_length + IFS;
+			length_sequence = 256 + 60 + _PHR_mod_length + _PSDU_mod_length + IFS;
 			break;
 		case 1:
 			IFS= 240; //twice the value of table 77
-			length_sequence = 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
+			length_sequence = 256+60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
 			break;
 		case 2:
 			IFS = 90;
-			length_sequence = 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length+ IFS;
+			length_sequence = 256+60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length+ IFS;
 			break;
 	}
 	
 	if (flag==0) //PHR
 	{
-		begin = 60;
+		begin = 256+60;
 		end = begin + _PHR_mod_length;
 	}
 	else //PSDU
 	{	
-		begin = 60 + _PHR_mod_length;
+		begin = 256+60 + _PHR_mod_length;
 		end = begin + _PSDU_units * _PSDU_mod_length;
 	}
 	 
@@ -50,18 +50,21 @@ bbVLC_Frame_Extractor::sptr bbVLC_Frame_Extractor::Create(int _flag, int _tx_mod
 
 int bbVLC_Frame_Extractor::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0]; //TDP+PHR+PSDU
+	const int *iptr= (const int *)input_items[0]; //TDP+PHR+PSDU
 	int *optr = (int *)output_items[0];
 	int ci = 0;
 	for (int n = 0; n < noutput_items; n++)
 	{
-		if (sample_counter > begin && sample_counter < end)
-			*optr++ = *iptr ++;
-		//each samples that enters is consumed, but not all of them are passed to the output
-		ci++;
+		if (sample_counter >= begin && sample_counter < end)
+		{
+			*optr++ = *iptr;
+			ci++;
+			//each samples that enters is consumed, but not all of them are passed to the output
+		}
+		iptr++;
 		sample_counter = (sample_counter+1)%length_sequence;		
 	}
-	consume_each(ci);
-	return noutput_items;
+	consume_each(noutput_items);
+	return ci;
 }
 

@@ -67,7 +67,8 @@ bool vlc_crc::check_crc( int *data, int *out, int size)
 			break;
 		}
 	}
-	memcpy(out,&data[size-2*crc_length],sizeof(int)*crc_length);
+	if (out)
+		memcpy(out,&data[size-2*crc_length],sizeof(int)*crc_length);
 	//we copy in out the crc
 	delete [] error;
 	return ok;

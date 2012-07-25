@@ -24,7 +24,7 @@ class PHY_II_demodulator : public gr_hier_block2
        * The creation of PHY_II_demodulator requires 1 parameter: 
        * @param vlc_var_phy_rx: pointer which contains the configuration of the VLC system set at the GUI interface. 
        */
-		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 		~PHY_II_demodulator();
 		void stop();
 		//int out_PHY_I_phr; /**< [out] indicates the length in bits of the encoded PHR block of data*/
@@ -32,7 +32,7 @@ class PHY_II_demodulator : public gr_hier_block2
 		
 	private:
 		int poly[3];
-		PHY_II_demodulator(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+		PHY_II_demodulator(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 		unsigned int mod_length;
 		unsigned int raw_length;
 		unsigned int phy_type;
@@ -40,7 +40,6 @@ class PHY_II_demodulator : public gr_hier_block2
 		unsigned int rs_in;
 		unsigned int rs_out;
 		unsigned int GF;
-		unsigned int data_rate;
 };
 
 #endif //_INC_PHY_II_DEMODULATOR_H_

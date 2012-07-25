@@ -113,9 +113,9 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		memcpy(optr, tmp2, sizeof(int)*out_cc_dec);
 		optr = optr + out_cc_dec;
 		blocks_to_process--;
+		delete [] tmp; 
 	}
 	
-	delete [] tmp; 
 	delete [] tmp2;
 	
 	consume_each((noutput_items/out_cc_dec)*length);
