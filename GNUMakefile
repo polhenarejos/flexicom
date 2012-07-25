@@ -20,7 +20,7 @@ MOC=moc
 CFLAGS=-I$(INCLUDEDIR) -I$(INCLUDEDIR)/modules $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags gnuradio-uhd` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` -I/usr/include/qwt `pkg-config --cflags uhd`
 LDFLAGS=-lboost_program_options-mt -lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` -lqwt `pkg-config --libs QtGui` `pkg-config --libs uhd`
 
-XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -DLV_HAVE_GENERIC
+XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -DLV_HAVE_GENERIC -O2
 
 MAKEARGS=-f GNUMakefile 'CFLAGS=${CFLAGS}' \
 		'CC=${CC}' \

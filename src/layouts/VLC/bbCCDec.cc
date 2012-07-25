@@ -65,7 +65,6 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int size;
 	int *tmp;
 	int *tmp2;
-	int amp=2;
 	//tmp= new int[length];
 	tmp2=new int[out_cc_dec];
 	blocks_to_process = (noutput_items/out_cc_dec);

@@ -30,7 +30,7 @@ typedef struct mac_header
 	unsigned char add2[6];
 	unsigned char add3[6];
 	unsigned short sc;
-} mac_header);
+} __attribute__((__packed__)) mac_header);
 PACK(
 typedef struct frame_control
 {
@@ -45,14 +45,14 @@ typedef struct frame_control
 	unsigned more_data:1;
 	unsigned wep:1;
 	unsigned order:1;
-} frame_control);
+} __attribute__((__packed__)) frame_control);
 PACK(
 typedef struct beacon_header
 {
 	unsigned char timestamp[8];
 	unsigned char beacon_interval[2];
 	unsigned char cap_info[2];
-} beacon_header);
+} __attribute__((__packed__)) beacon_header);
 void Rx80211bThread::run()
 {
 	while (1)

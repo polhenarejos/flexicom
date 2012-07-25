@@ -3,6 +3,7 @@
 #include <gr_io_signature.h>
 #include "TxTagger.h"
 #include "TxVLC.h"
+#include <stdio.h>
 
 TxTagger::TxTagger(TxVLC *_txvlc) :
 	gr_sync_block("TxTagger", gr_make_io_signature(0, 0, 0), gr_make_io_signature(2, 2, sizeof(uint64_t))),
@@ -21,7 +22,7 @@ int TxTagger::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_
 	if (prev_confver != txvlc->GetConfigVer())
 	{
 		prev_confver = txvlc->GetConfigVer();
-		printf("Tagging %d\n", prev_confver);
+		printf("Tagging %lu\n", prev_confver);
 	}
 	//It is important to call GetConfigVer for each no as it may change accross the loop by other thread
 	for (int o = 0; o < no; o++)

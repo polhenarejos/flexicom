@@ -339,7 +339,7 @@ void RxVLC::init_var()
 
 int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, int rs_out, int gf, int cc_in, int cc_out, int raw_length)
 {
-	int length, rs_bits, cc_bits;
+	int length = 0, rs_bits = 0, cc_bits = 0;
 	if (rs_in !=0)
 	{
 		int GF_words= ceil(((double)raw_length/gf));

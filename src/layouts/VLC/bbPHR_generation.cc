@@ -3,6 +3,7 @@
 #include <gr_io_signature.h>
 #include <stdlib.h>
 #include "LayoutVLC.h"
+#include <stdio.h>
 
 bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_length, int *_MCSID) : 
 	gr_block("bbPHR_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),

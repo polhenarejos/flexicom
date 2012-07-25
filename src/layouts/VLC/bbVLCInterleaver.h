@@ -38,8 +38,8 @@ class bbVLCInterleaver : public gr_block
 		unsigned int raw_length; //length at the input of the rs_encoder
 		unsigned int rs_length; //length at the output of the rs_encoder
 		
-		int *interleaving_vector;
-		int *puncturing_vector;
+		unsigned int *interleaving_vector;
+		unsigned int *puncturing_vector;
 		int *bin_number;
 		bool puncture;
 };

@@ -6,6 +6,7 @@
 #include <winsock2.h>
 #else
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #endif
 
 TcpIO::TcpIO(const char *addr_str, unsigned short port, bool server, gr_io_signature_sptr in, gr_io_signature_sptr out) :
@@ -47,10 +48,10 @@ TcpIO::~TcpIO()
 	if (svfd != -1)
 #ifdef _WIN
 		closesocket(svfd);
+	WSACleanup();
 #else		
 		close(svfd);
 #endif
-	WSACleanup();
 }
 TcpSource::TcpSource(size_t siz, const char *addr_str, unsigned short port, bool server) :
 	TcpIO(addr_str, port, server, gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, siz))

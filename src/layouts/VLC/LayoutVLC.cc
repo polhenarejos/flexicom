@@ -392,7 +392,7 @@ void LayoutVLC::setFramesize(bool a)
 
 void LayoutVLC::setDatarate(bool a)
 {
-	int checked1,checked2;
+	int checked1 = 0,checked2 = 0;
 	for (uint i=0; i<2; i++)
 	{
 		if (varVLC->rb_phy_type[i]->isChecked())

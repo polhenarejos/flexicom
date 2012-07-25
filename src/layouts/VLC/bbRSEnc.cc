@@ -95,7 +95,7 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		memcpy(samples_block, iptr, sizeof(int)*length);
 		std::fill_n(samples_block+length, length%GF, *(iptr+length-1));
 		iptr += length;
-		for (int idx = 0; idx < RS_words; idx++)
+		for (unsigned int idx = 0; idx < RS_words; idx++)
 		{
 			for (i=0; i<K; i++)
 			{

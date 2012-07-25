@@ -19,7 +19,7 @@ typedef struct oob_hdr_struct
 	ushort length;
 	signed char rssi; /* dB Scale */
 	char rate; /* Receive rate in units of 100 kBps */
-} oob_hdr_t);
+} __attribute__((__packed__)) oob_hdr_t);
 
 #define REVERSE_BITS(c) ( bit_reverse_table[(c) & 0xff])
 

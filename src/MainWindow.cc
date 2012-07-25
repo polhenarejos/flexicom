@@ -111,7 +111,7 @@ void MainWindow::readSettings(QSettings *st)
 		st = s;
 	resize(st->value("mw/size", QSize(300,50)).toSize());
 	move(st->value("mw/pos", QPoint(200, 200)).toPoint());
-	for (int i = 0; i < panel->rb_layout.size(); i++)
+	for (unsigned int i = 0; i < panel->rb_layout.size(); i++)
 		panel->rb_layout[i]->bt->force_toggle(false);	
 	if (panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->isChecked())
 		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->force_toggle(true);

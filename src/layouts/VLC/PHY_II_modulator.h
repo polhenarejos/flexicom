@@ -32,12 +32,12 @@ class PHY_II_modulator : public gr_hier_block2
 				
 	private:
 		PHY_II_modulator(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-		unsigned int raw_length;
 		unsigned int phy_type;
 		unsigned int phy_modulation;
 		unsigned int rs_in;
 		unsigned int rs_out;
 		unsigned int GF;
+		unsigned int raw_length;
 };
 
 #endif //_INC_PHY_I_MODULATOR_H_

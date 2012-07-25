@@ -10,7 +10,7 @@ bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 	gr_block("bbRSDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
 	GF(_GF),N(_N),K(_K), phy_type(_phy_type), pre_length(_length)
 {
-	unsigned int poly;
+	unsigned int poly = 0x0;
 	//printf("GF:%d, N:%d, K:%d, phy_type:%d, length:%d\n", GF,N,K, phy_type, length);
 	switch (phy_type)
 	{
@@ -67,9 +67,9 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	int *iptr= (int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	
-	int RS_words= pre_length/N;
-	int blocks_to_process = (noutput_items/out_rs_dec);
-	int corrections,i,j;
+	uint RS_words= pre_length/N;
+	uint blocks_to_process = (noutput_items/out_rs_dec);
+	uint i,j;
 	unsigned char *tmp = new unsigned char[N];
 	unsigned char *tmp2 = new unsigned char[K];
 	while (blocks_to_process>0)
@@ -80,7 +80,6 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			for(j=0;j<N;j++)
 				tmp[j]= (unsigned char)iptr[j];
 			//memset(tmp2, 0, sizeof(unsigned char)*K);
-			corrections = vlc_rs->decode(tmp2,tmp);
 			//printf("corrections:%d\n", corrections);
 			//for(j=0;j<K;j++)
 				//printf("tmp2[%d][%d]=%d\n", i,j, tmp2[j]);
@@ -93,7 +92,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		}
 		if (pre_length%N!=0)
 		{
-			int remaining_words = pre_length%N - (N-K);
+			uint remaining_words = pre_length%N - (N-K);
 			//we will have to insert zeros in the middle of the frame to perform the rs-decoding
 			memset(tmp,0,sizeof(unsigned char)*N);
 			for (j=0;j<remaining_words;j++)
@@ -102,7 +101,6 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				tmp[j]=(unsigned char)iptr[j];
 			//memcpy(tmp, iptr, sizeof(unsigned char)*remaining_words);
 			//memcpy(tmp, &iptr[N-K], sizeof(unsigned char)*(N-K));
-			corrections = vlc_rs->decode(tmp2,tmp);
 			for (i=0; i< remaining_words; i++)
 			{
 				LayoutVLC::dec2bi(tmp2[i],GF,optr);

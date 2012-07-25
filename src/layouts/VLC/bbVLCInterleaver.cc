@@ -25,8 +25,8 @@ bbVLCInterleaver::bbVLCInterleaver (unsigned int _GF, unsigned int _N, unsigned 
 	p = N - (S%N);
 	//printf ("El valor de S_frame:%d, el valor de S:%d, el valor de D:%d, S_block:%d, p:%d\n", S_frame,S,D, S_block,p);
 	
-	interleaving_vector = new int[S_block]; //l vector
-	puncturing_vector = new int[p]; //z vector
+	interleaving_vector = new uint[S_block]; //l vector
+	puncturing_vector = new uint[p]; //z vector
 	bin_number = new int[GF];
 	memset(bin_number,0,sizeof(int)*GF);
 	for (i=0; i<S_block; i++)
@@ -83,7 +83,7 @@ int bbVLCInterleaver::general_work(int noutput_items, gr_vector_int &ninput_item
 	//unsigned char *iptr= (unsigned char *)input_items[0];
 	int *iptr = (int *)input_items[0];
 	int *optr= (int *)output_items[0];
-	int blocks_to_process,i,j,l,p;
+	unsigned int blocks_to_process,i,j,l,p;
 	blocks_to_process=(noutput_items/out_int);
 	//printf("Blocks to process:%d\n", blocks_to_process);
 	p =rs_length- (out_int/GF);

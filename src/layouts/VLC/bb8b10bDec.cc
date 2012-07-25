@@ -59,7 +59,7 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 {
 	//RD and length flag helps us to diferentiate whether to see in one table or other
 	int i,j,tmp=0,dist=-100;
-	int index;
+	int index = 0;
 	/*printf("El number en funcion distance\n");
 	for (i=0; i<length; i++)
 		printf("%d", number[i]);
@@ -72,7 +72,7 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 			{
 				case 4:
 					
-					for (i=0; i<8; i++)
+					for (i=1; i<8; i++)
 					{
 						tmp = 0;
 						for (j = 0; j<length ; j++)
@@ -89,7 +89,7 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 					}
 					break;
 				case 6:
-					for (i=0; i<32; i++)
+					for (i=1; i<32; i++)
 					{
 						tmp = 0;
 						for (j = 0; j<length ; j++)
@@ -112,7 +112,7 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 			{
 				case 4:
 					
-					for (i=0; i<8; i++)
+					for (i=1; i<8; i++)
 					{
 						tmp = 0;
 						for (j = 0; j<length ; j++)
@@ -129,7 +129,7 @@ int bb8b10bDec::distance(int *number, int RD_flag, int length)
 					}
 					break;
 				case 6:
-					for (i=0; i<32; i++)
+					for (i=1; i<32; i++)
 					{
 						tmp = 0;
 						for (j = 0; j<6 ; j++)

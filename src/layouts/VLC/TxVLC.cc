@@ -26,10 +26,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	//variable initialization, to make easier the pass of parameters. 
 	vlc_var.count = 0;
 	init_var();
-	unsigned int phr_words;
-	unsigned int psdu_words;
-	int out_PHY_I_phr;
-	int out_PHY_I_psdu;
 	
 	/*gr_null_source_sptr null = gr_make_null_source(sizeof(int));
 	bbManchesterEnc::sptr phr_RLL = bbManchesterEnc::Create(0);

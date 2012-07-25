@@ -15,7 +15,7 @@
 #include <QGridLayout>
 #include <QMenu>
 #include <QAction>
-#include <QFileinfo>
+#include <QFileInfo>
 #include "LayoutFactory.h"
 
 class Panel;

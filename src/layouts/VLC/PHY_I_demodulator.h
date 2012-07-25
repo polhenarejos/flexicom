@@ -43,8 +43,6 @@ class PHY_I_demodulator : public gr_hier_block2
 	private:
 		int poly[3];
 		PHY_I_demodulator(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-		unsigned int mod_length;
-		unsigned int raw_length;
 		unsigned int phy_type;
 		unsigned int phy_modulation;
 		unsigned int rs_in;
@@ -52,6 +50,8 @@ class PHY_I_demodulator : public gr_hier_block2
 		unsigned int GF;
 		unsigned int cc_in;
 		unsigned int cc_out;
+		unsigned int mod_length;
+		unsigned int raw_length;
 		unsigned int data_rate;
 };
 
