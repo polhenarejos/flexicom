@@ -16,7 +16,7 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	memset(tmp, 0, sizeof(tmp));
 	if (tx_mode==2)
 		tmp[0]=1;
-	memcpy(&tmp[4],MCSID,sizeof(MCSID)); //the field MCSID has 6 elements
+	memcpy(&tmp[4],MCSID,sizeof(int)*6); //the field MCSID has 6 elements
 	//printf("El valor de PSDU_length;%d\n",PSDU_length);
 	LayoutVLC::dec2bi(PSDU_length, 16,tmp3);
 	memcpy(&tmp[10],tmp3,sizeof(int)*16);
@@ -64,6 +64,10 @@ int bbPHR_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vect
 		memcpy(optr, tmp, sizeof(int)*PHR_length);
 		cycles--;
 		optr = optr + PHR_length;
+		/*for (int i =0; i<PHR_length; i++)
+		printf("%d ", tmp[i]);
+		printf("\n");
+		exit(-1);*/
 	}
 	delete [] tmp;
 	consume_each(noutput_items / PHR_length);
