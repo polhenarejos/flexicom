@@ -28,6 +28,8 @@ class bb_Header_cp : public gr_block
 	private:
 		bb_Header_cp(int, int, gr_msg_queue_sptr );
 		int flag;
+		int phr_enter;
+		int psdu_enter;
 		int raw_length;
 		gr_msg_queue_sptr d_queue;
 		vlc_crc *crc_cp;
