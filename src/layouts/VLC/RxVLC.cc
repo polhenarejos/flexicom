@@ -31,7 +31,7 @@ void RxVLCThread::run()
 		if (mesg)
 		{
 			int *packet = (int *)mesg->msg();
-			/*if (packet[0] == 0) //phr
+			if (packet[0] == 0) //phr
 			{
 				
 				printf("EXTRACTING INFORMATION FROM PHR HEADER\n");
@@ -54,7 +54,7 @@ void RxVLCThread::run()
 				printf("Source address_mode: %d\n", LayoutVLC::bi2dec(&packet[15],2));
 				printf("Frame_sequence_number: %d\n", (int)LayoutVLC::bi2dec(&packet[17],8));
 				printf("Destination_address: %X:%X:%X:%X\n", packet[25],packet[29],packet[33],packet[37]);
-			}	*/
+			}
 		}
 		//else
 			//sleep(1);

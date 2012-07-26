@@ -5,7 +5,6 @@
 
 //this block performs the interleaving and the puncturing process
 //described in section 10.3
-
 bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _pre_length):
 	gr_block("bbVLCDeInterleaver", gr_make_io_signature (1,1,sizeof (int)), gr_make_io_signature (1,1,sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length (_raw_length), pre_length(_pre_length)
@@ -35,16 +34,7 @@ bbVLCDeInterleaver::bbVLCDeInterleaver (unsigned int _GF, unsigned int _N, unsig
 	{
 		puncturing_vector[i]= (N-p+1)*D + (i*D)-1;
 	}
-	if (p< K)
-	{
-		depuncture = true;	
-		out_deint= pre_length/GF + p; //there has been puncturing
-	}
-	else
-	{
-		depuncture = false;
-		out_deint= pre_length/GF;
-	}
+	out_deint= pre_length/GF;
 	len_punct_vector= p;
 	//printf("El valor de out_deint:%d\n",out_deint);
 	set_output_multiple(out_deint);
@@ -81,14 +71,11 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 	int *tmp = new int[GF_words];
 	int *tmp2 = new int[GF_words];
 	int *tmp3 = new int[GF_words+len_punct_vector];
-		
+	memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 	blocks_to_process=(noutput_items/out_deint);
 	
 	while (blocks_to_process > 0)
 	{
-		memset(tmp,0,sizeof(int)*GF_words);
-		memset(tmp2,0, sizeof(int)*GF_words);
-		memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 		for (i=0; i< GF_words; i++)
 		{
 			tmp[i]=LayoutVLC::bi2dec(iptr,GF);
@@ -98,36 +85,26 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 		if(len_punct_vector< K)
 		{
 			j=0; l=0;
-			
 			for(i=0; i<GF_words + len_punct_vector; i++)
 			{
 				if (i != puncturing_vector[l])
-				{
-					tmp2[j]=i;
-					j++;
-				}
+					tmp2[j++]=i;
 				else
 					l++;
 			}
+			assert(j == GF_words);
+			assert(l == len_punct_vector);
 			for (i=0; i<j; i++)
 			{
 				tmp3[tmp2[i]]=tmp[i];
 			}
 		}
 		else
-		{
-			//memset(tmp3,0, sizeof(int)*(GF_words+len_punct_vector));
-			for (i=0; i<GF_words; i++)
-				tmp3[i]= tmp[i];				
-		}
-		
+			memcpy(tmp3, tmp, sizeof(int)*GF_words);	
 		//deinterleaving properly said
 		for(i=0; i<GF_words; i++)
-		{
 			optr[interleaving_vector[i]]=tmp3[i];
-		}
-		
-		optr = optr + GF_words;		
+		optr += GF_words;		
 		blocks_to_process--;
 		
 	}

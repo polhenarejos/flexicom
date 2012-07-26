@@ -41,7 +41,6 @@ class bbVLCDeInterleaver : public gr_block
 		int *interleaving_vector;
 		unsigned int *puncturing_vector;
 		unsigned int len_punct_vector;
-		bool depuncture;
 };
 
 #endif //_INC_BBVLCDEINTERLEAVER_H

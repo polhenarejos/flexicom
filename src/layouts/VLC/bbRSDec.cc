@@ -47,10 +47,10 @@ int bbRSDec::rs_out_elements()
 {
 	//if there is not RS encoding, this block will not be instantiated
 	int rs_output_bits;
-	if (pre_length%N)
-		rs_output_bits = ((pre_length/N)*K + K)*GF;
-	else
-		rs_output_bits = ((pre_length/N)*K )*GF ;
+    if (pre_length%N)
+        rs_output_bits = ((pre_length/N)*K +  (pre_length%N) - (N-K))*GF;
+    else
+        rs_output_bits = ((pre_length/N)*K )*GF ; 
 	return rs_output_bits;
 	//if all divisions were exact, there will not need to do that
 }
@@ -59,7 +59,6 @@ void bbRSDec::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 	int ninputs = ninput_items_required.size();
 	for (int i=0; i < ninputs; i++)
 		ninput_items_required[i]= (noutput_items/out_rs_dec)*pre_length;
-	
 }
 
 int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 

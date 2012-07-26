@@ -111,8 +111,8 @@ void LayoutVLC::Run()
 			}
 		}
 		*/
-		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
+		gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
+		//TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
 		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		

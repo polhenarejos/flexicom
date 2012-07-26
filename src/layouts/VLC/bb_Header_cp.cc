@@ -45,15 +45,10 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	{
 		memset(tmp,0,sizeof(int)*length);
 		memcpy(tmp,iptr, sizeof(int)*raw_length);
-		if (flag == 1)
-		{
-			
-		}
 		iptr += raw_length;
 		check = crc_cp->check_crc(tmp, NULL, length);
 		if (check == true) //crc ok!!
 		{
-			//printf("********************* OK\n");
 			if (flag==0)
 			{
 				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(32+1));
@@ -72,8 +67,6 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			}
 			
 		}
-		//else
-		//	printf("!!!!!!!!!!!!!!!****** NOK\n");
 		//blocks_to_process--;
 	}
 	consume_each(raw_length*blocks_to_process);
