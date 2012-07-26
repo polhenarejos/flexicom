@@ -34,10 +34,11 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
   		// 2 assumptions done here: 
   		//a)I do not check the length of the file , there is enough elements
   		//b)In the first approximation, the data_payload will be the same for all the frames
-  		for (i=0; i<length_payload; i++)
+  		for (i=0; i<length_payload; )
   		{
-  			data_payload[i]=fgetc(fp)-48;  //it returns the ascii code
-  			fgetc(fp); //to read the \n element
+  			char c = fgetc(fp);
+  			if (c != 0xd && c != 0xa) //\r\n
+  				data_payload[i++]=c-48;  //it returns the ascii code
   			//the file could be prepared to do a fread call
   		}
   	}

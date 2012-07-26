@@ -56,11 +56,7 @@ int bbVLC_Frame_Extractor::general_work(int noutput_items, gr_vector_int &ninput
 	for (int n = 0; n < noutput_items; n++)
 	{
 		if (sample_counter >= begin && sample_counter < end)
-		{
-			*optr++ = *iptr;
-			ci++;
-			//each samples that enters is consumed, but not all of them are passed to the output
-		}
+			optr[ci++] = *iptr;
 		iptr++;
 		sample_counter = (sample_counter+1)%length_sequence;		
 	}

@@ -64,12 +64,12 @@ void bbRSDec::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 
 int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0];
+	const int *iptr= (const int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	
 	uint RS_words= pre_length/N;
 	uint blocks_to_process = (noutput_items/out_rs_dec);
-	uint corrections, i,j;
+	uint i,j;
 	unsigned char *tmp = new unsigned char[N];
 	unsigned char *tmp2 = new unsigned char[K];
 	while (blocks_to_process>0)
@@ -79,7 +79,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			memcpy(tmp,iptr,sizeof(unsigned char)*N);
 			for(j=0;j<N;j++)
 				tmp[j]= (unsigned char)iptr[j];
-			corrections = vlc_rs->decode(tmp2,tmp);
+			vlc_rs->decode(tmp2,tmp);
 			for (j=0; j< K; j++)
 			{
 				LayoutVLC::dec2bi(tmp2[j], GF,optr);
@@ -96,7 +96,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				tmp[j]=(unsigned char)iptr[j];
 			for (j=K;j<N;j++)
 				tmp[j]=(unsigned char)iptr[j];
-			corrections = vlc_rs->decode(tmp2,tmp);
+			vlc_rs->decode(tmp2,tmp);
 			for (i=0; i< remaining_words; i++)
 			{
 				LayoutVLC::dec2bi(tmp2[i],GF,optr);

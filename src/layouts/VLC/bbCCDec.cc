@@ -58,7 +58,7 @@ void bbCCDec::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 
 int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0];
+	const int *iptr= (const int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	
 	int blocks_to_process, i;

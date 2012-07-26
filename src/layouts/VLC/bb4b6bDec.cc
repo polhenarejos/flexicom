@@ -40,7 +40,7 @@ int bb4b6bDec::distance(int *number)
 	int i,j,tmp=0,dist=-100;
 	int index = 0;
 	//look for the one with the best correlation
-	for (i=1; i<16; i++)
+	for (i=0; i<16; i++)
 	{
 		tmp =0;
 		for (j=0; j<6; j++)
@@ -56,7 +56,7 @@ int bb4b6bDec::distance(int *number)
 
 int bb4b6bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0];
+	const int *iptr= (const int *)input_items[0];
 	int *optr= (int *)output_items[0];
 	int samples_to_process;
 	int tmp[6], tmp2[4];

@@ -73,7 +73,8 @@ void LayoutVLC::Run()
 		*/
 		rx = RxVLC::Create(this);
 		//gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
-		TcpSource::sptr source = TcpSource::Create(sizeof(float), "127.0.0.1", 5544);
+		//TcpSource::sptr source = TcpSource::Create(sizeof(float), "127.0.0.1", 55344);
+		gr_file_source_sptr source = gr_make_file_source(sizeof(float), "frame.txt.dat", false);
 		grTop->connect(source, 0, rx, 0);
 		grTop->start();
 	}
@@ -111,7 +112,7 @@ void LayoutVLC::Run()
 		}
 		*/
 		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 5544);
+		TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
 		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		
