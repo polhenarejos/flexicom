@@ -70,7 +70,7 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	// a total of 40 bits. See section 5.2 of IEEE 802.15.7
 	
 	//Frame_Control_field
-	memset(MHR, 0, sizeof(MHR));
+	memset(MHR, 0, sizeof(int)*40);
 	// the first 6 bits are 0: frame_version and reserved.
 	// the 8th version is equal to 1, according to Table 7 (Page 76), data frame.
 	//memset(&MHR[8],1,sizeof(int)*1);
