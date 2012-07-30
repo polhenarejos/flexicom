@@ -71,11 +71,12 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 	int *tmp = new int[GF_words];
 	int *tmp2 = new int[GF_words];
 	int *tmp3 = new int[GF_words+len_punct_vector];
-	memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
+	//memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 	blocks_to_process=(noutput_items/out_deint);
 	
 	while (blocks_to_process > 0)
 	{
+		memset(tmp3,0, sizeof(int)*(GF_words+ len_punct_vector));
 		for (i=0; i< GF_words; i++)
 		{
 			tmp[i]=LayoutVLC::bi2dec(iptr,GF);
@@ -98,12 +99,17 @@ int bbVLCDeInterleaver::general_work(int noutput_items, gr_vector_int &ninput_it
 			{
 				tmp3[tmp2[i]]=tmp[i];
 			}
+			//deinterleaving properly said
+			for(i=0; i<GF_words + len_punct_vector; i++)
+				optr[interleaving_vector[i]]=tmp3[i];
 		}
 		else
+		{
 			memcpy(tmp3, tmp, sizeof(int)*GF_words);	
-		//deinterleaving properly said
-		for(i=0; i<GF_words; i++)
-			optr[interleaving_vector[i]]=tmp3[i];
+			//deinterleaving properly said
+			for(i=0; i<GF_words; i++)
+				optr[interleaving_vector[i]]=tmp3[i];
+		}
 		optr += GF_words;		
 		blocks_to_process--;
 		
