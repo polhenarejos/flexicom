@@ -5,6 +5,7 @@
 #include "bbRSEnc.h"
 #include "bb8b10bEnc.h"
 #include "bb4b6bEnc.h"
+#include "bbManchesterEnc.h"
 #include <gr_io_signature.h>
 
 PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _raw_length) :
@@ -24,12 +25,14 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 			connect(rs_enc,0, RLL,0);
 			connect(RLL,0, self(),0);
 		}
-		else
+		else //VPPM
 		{
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-			out_PHY_II_mod= rs_enc->out_rs/4*6;
+			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+			out_PHY_II_mod= (rs_enc->out_rs/4*6)*2;
 			connect(rs_enc,0,RLL,0);
-			connect(RLL,0,self(),0);
+			connect(RLL,0,RLL2,0);
+			connect(RLL2,0,self(),0);
 		}
 	}
 	else //no reed solomon
@@ -41,12 +44,14 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 			connect(self(),0, RLL,0);
 			connect(RLL,0, self(),0);
 		}
-		else
+		else //VPPM
 		{
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-			out_PHY_II_mod= raw_length/4*6;
+			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+			out_PHY_II_mod= (raw_length/4*6)*2;
 			connect(self(),0,RLL,0);
-			connect(RLL,0,self(),0);
+			connect(RLL, 0, RLL2,0);
+			connect(RLL2,0,self(),0);
 		}
 	}
 }

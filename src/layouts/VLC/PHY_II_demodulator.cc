@@ -4,6 +4,7 @@
 #include "vlc_reed_solomon.h"
 #include "bbRSDec.h"
 #include "bb4b6bDec.h"
+#include "bbManchesterDec.h"
 #include "bb8b10bDec.h"
 #include "bb_bit_removal.h"
 
@@ -37,20 +38,23 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 	}
 	else //VPPM
 	{
-		bb4b6bDec::sptr RLL = bb4b6bDec::Create();				
+		bbManchesterDec::sptr RLL = bbManchesterDec::Create(1,0);
+		bb4b6bDec::sptr RLL2 = bb4b6bDec::Create();				
 		if (rs_in!=0)
 		{
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length/6*4);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
-			connect(RLL, 0, rs_dec,0);
+			connect(RLL, 0, RLL2,0);
+			connect(RLL2, 0, rs_dec,0);
 			connect(rs_dec, 0, bbr, 0);
 			connect(bbr, 0, self(),0);	
 		}
 		else 
 		{
 			connect(self(),0,RLL,0);
-			connect(RLL, 0, self(), 0);
+			connect(RLL, 0, RLL2,0);
+			connect(RLL2, 0, self(), 0);
 		}
 	}
 }

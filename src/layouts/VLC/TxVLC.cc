@@ -51,8 +51,8 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		PHY_I_modulator::sptr psdu = PHY_I_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.rs_in, vlc_var._rs_code.rs_out, vlc_var.GF, vlc_var._cc_code.cc_in,vlc_var._cc_code.cc_out, vlc_var.PSDU_raw_length,vlc_var.operating_mode);
 		connect(PHR_gen, 0, phr,0);
 		connect(PSDU_gen, 0, psdu, 0);
-		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, phr->out_PHY_I_mod, psdu->out_PHY_I_mod);
-		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_I_mod, psdu->out_PHY_I_mod,3);
+		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(vlc_var.mod_type, 3,vlc_var.psdu_units, phr->out_PHY_I_mod, psdu->out_PHY_I_mod);
+		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.mod_type, vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_I_mod, psdu->out_PHY_I_mod,3);
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
@@ -66,8 +66,8 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		PHY_II_modulator::sptr psdu = PHY_II_modulator::Create(vlc_var.phy_type, vlc_var.mod_type, vlc_var._rs_code.rs_in, vlc_var._rs_code.rs_out, vlc_var.GF, vlc_var.PSDU_raw_length);
 		connect(PHR_gen, 0, phr,0);
 		connect(PSDU_gen, 0, psdu, 0);
-		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(3,vlc_var.psdu_units, phr->out_PHY_II_mod, psdu->out_PHY_II_mod);
-		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_II_mod, psdu->out_PHY_II_mod,3);
+		bbVLC_info_assembler::sptr INFO_ass = bbVLC_info_assembler::Create(vlc_var.mod_type,3,vlc_var.psdu_units, phr->out_PHY_II_mod, psdu->out_PHY_II_mod);
+		bbVLC_Frame_Generator::sptr FRAME_gen = bbVLC_Frame_Generator::Create(vlc_var.mod_type,vlc_var.flp_length,vlc_var.tx_mode, vlc_var.psdu_units,phr->out_PHY_II_mod, psdu->out_PHY_II_mod,3);
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
@@ -75,7 +75,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(i2f,0,self(),0);
 	}
 	
-	if (1)
+	if (0)
 	{
 		bbMatlab::sptr gm = bbMatlab::Create("m.txt", sizeof(float));
 		connect(i2f, 0, gm, 0);

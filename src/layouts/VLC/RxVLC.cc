@@ -74,8 +74,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(self(), 0, f2i, 0);
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	
-	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
-	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
+	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
+	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	
 	connect(f2i,0,phr,0);
 	connect(f2i,0,psdu,0);
@@ -348,10 +348,7 @@ int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, 
 			rs_bits= (GF_words/rs_in)*rs_out*gf;
 		else
 		{
-			//if (phy_type == 0)
-			//	rs_bits = ((int)ceil(((double)GF_words/rs_in))*rs_out)*gf;
-			//else
-				rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
+			rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
 		}
 	}
 	else
@@ -390,7 +387,7 @@ int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, 
 					break;
 			}
 			break;				
-	}
+	}		
 	return length;
 }
 

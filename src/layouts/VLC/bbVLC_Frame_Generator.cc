@@ -16,8 +16,8 @@ int visibility_patterns[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             1, 1, 1, 1, 0, 1, 1, 1, 1, 1,   
                             1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 
                             
-bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
-	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), FLP_length(_FLP), tx_mode(_tx_mode), 
+bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _d_mode, int _FLP, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
+	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))), d_mode(_d_mode), FLP_length(_FLP), tx_mode(_tx_mode), 
 	PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload), length_burst(_length_burst)
 {
 	assert (FLP_length%2==0);
@@ -28,6 +28,7 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _tx_mode, int _PSDU_u
 		FLP_pattern[i]=1;
 	
 	IFS=0; //IFS stands for Interframe Spacing
+	
 	switch(tx_mode)
 	{
 		case 0:
@@ -41,14 +42,35 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _FLP, int _tx_mode, int _PSDU_u
 		case 2:
 			IFS = 90;
 			length_frame = FLP_length + (60 + length_PHR + PSDU_units * length_data_payload+ IFS)*length_burst;
-			//this is true only the first time, we will have to modify the length_frame variable in the general_work method
 			break;
 	}
+	
+	switch (d_mode)
+	{
+		case 0: // OOK
+			length_frame_bis = length_frame;
+		break;
+		case 1: //VPPM
+			switch(tx_mode)
+			{
+				case 0:
+					length_frame_bis = 2* FLP_length + 2* 60 + length_PHR + length_data_payload + 2*IFS;
+				break;
+				case 1:
+					length_frame_bis = 2*FLP_length + 2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS;
+				break;
+				case 2:
+					length_frame_bis = 2*FLP_length + (2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS)*length_burst;
+				break;
+			}
+		break;
+	}
+		
 	idle_pattern = new int[IFS];
-	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account --fallo
+	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account
 	FLP_counter=0;
 	if (tx_mode != 2) //no burst
-		set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
+		set_output_multiple(length_frame_bis); //worst case scenario in the burst mode so at least we always have 
 }
 
 bbVLC_Frame_Generator::~bbVLC_Frame_Generator()
@@ -63,9 +85,9 @@ bbVLC_Frame_Generator::~bbVLC_Frame_Generator()
 		
 }
 
-bbVLC_Frame_Generator::sptr bbVLC_Frame_Generator::Create(int _FLP_length, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst)
+bbVLC_Frame_Generator::sptr bbVLC_Frame_Generator::Create(int _d_mode, int _FLP_length, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst)
 {
-	return sptr(new bbVLC_Frame_Generator(_FLP_length, _tx_mode, _PSDU_units, _length_PHR, _length_data_payload, _length_burst));
+	return sptr(new bbVLC_Frame_Generator(_d_mode, _FLP_length, _tx_mode, _PSDU_units, _length_PHR, _length_data_payload, _length_burst));
 }
 
 void bbVLC_Frame_Generator::idle_pattern_generation( int *iddle_pattern, int IFS, int dimming)
@@ -152,20 +174,50 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 	int *iptr1= (int *)input_items[0]; //TDP+PHR+PSDU
 	int *optr = (int *)output_items[0];
 	int ci = 0;
-	static int packet_len = 60 + length_PHR + PSDU_units * length_data_payload;
-	for (int n = 0; n < noutput_items; n++)
+	static int packet_len;
+	switch (d_mode)
 	{
-		if (FLP_counter < FLP_length)
-			*optr++ = FLP_pattern[FLP_counter];
-		else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
-			*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
-			//*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)];       
-		else
-		{
-			*optr++ = *iptr1++;
-			ci++;
-		}
-		FLP_counter = (FLP_counter+1)%length_frame;
+		case 0:
+			packet_len = 60 + length_PHR + PSDU_units * length_data_payload;
+			for (int n = 0; n < noutput_items; n++)
+			{
+				if (FLP_counter < FLP_length)
+					*optr++ = FLP_pattern[FLP_counter];
+				else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
+					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
+					//*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)];       
+				else
+				{
+					*optr++ = *iptr1++;
+					ci++;
+				}
+			FLP_counter = (FLP_counter+1)%length_frame;
+			}
+		break;
+		case 1:
+			packet_len = 2* 60 + length_PHR + PSDU_units * length_data_payload;
+			for (int n = 0; n < noutput_items; n++)
+			{
+				if (FLP_counter < FLP_length)
+				{
+					//we copy twice the same sample due to VPPM
+					*optr++ = FLP_pattern[FLP_counter]; 
+					*optr++ = FLP_pattern[FLP_counter];
+				}
+				else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
+				{
+					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
+					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
+				}
+				else
+				{
+					//these samples, do not have to be copied twice as they enter duplicated to the block
+					*optr++ = *iptr1++;
+					ci++;
+				}
+			FLP_counter = (FLP_counter+1)%length_frame;
+			}
+		break;
 	}
 	consume_each(ci);
 	return noutput_items;

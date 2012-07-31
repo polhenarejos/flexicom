@@ -4,11 +4,12 @@
 #include <gr_io_signature.h>
 
 
-bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _PHR_mod_length, int _PSDU_mod_length, int _PSDU_units):
+bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _d_mode, int _PHR_mod_length, int _PSDU_mod_length, int _PSDU_units):
 	gr_block("bbVLC_Frame_Extractor", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
-	flag(_flag) /*,PHR_length(_PHR_mod_length), PSDU_length(_PSDU_mod_length)*/
+	flag(_flag), d_mode(_d_mode) /*,PHR_length(_PHR_mod_length), PSDU_length(_PSDU_mod_length)*/
 {
 	sample_counter=0;
+	
 	switch(_tx_mode)
 	{
 		case 0:
@@ -17,7 +18,7 @@ bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _PHR_m
 			break;
 		case 1:
 			IFS= 240; //twice the value of table 77
-			length_sequence = 256+60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
+			length_sequence = 256+ 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
 			break;
 		case 2:
 			IFS = 90;
@@ -35,6 +36,14 @@ bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _PHR_m
 		begin = 256+60 + _PHR_mod_length;
 		end = begin + _PSDU_units * _PSDU_mod_length;
 	}
+	
+	if (d_mode)
+	{
+		length_sequence = length_sequence *2;
+		begin= begin*2;
+		end = end*2;
+	}
+	
 	 
 }
 
@@ -43,9 +52,9 @@ bbVLC_Frame_Extractor::~bbVLC_Frame_Extractor()
 }
 
 
-bbVLC_Frame_Extractor::sptr bbVLC_Frame_Extractor::Create(int _flag, int _tx_mode, int _PHR_mod_length, int _PSDU_mod_length, int _PSDU_units)
+bbVLC_Frame_Extractor::sptr bbVLC_Frame_Extractor::Create(int _flag, int _tx_mode, int _d_mode,int _PHR_mod_length, int _PSDU_mod_length, int _PSDU_units)
 {
-	return sptr(new bbVLC_Frame_Extractor(_flag, _tx_mode, _PHR_mod_length, _PSDU_mod_length, _PSDU_units));
+	return sptr(new bbVLC_Frame_Extractor(_flag, _tx_mode, _d_mode, _PHR_mod_length, _PSDU_mod_length, _PSDU_units));
 }
 
 int bbVLC_Frame_Extractor::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
