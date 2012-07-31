@@ -28,7 +28,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			connect(intlv,0, cc_enc,0);
 			if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0,cc_enc->out_cc);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
 				out_PHY_I_mod= cc_enc->out_cc*2;
 				connect(cc_enc,0,RLL,0);
 				connect(RLL,0,self(),0);
@@ -36,9 +36,11 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				out_PHY_I_mod= cc_enc->out_cc/4*6;
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				out_PHY_I_mod= (cc_enc->out_cc/4*6)*2;
 				connect(cc_enc,0,RLL,0);
-				connect(RLL,0,self(),0);
+				connect(RLL,0, RLL2,0);
+				connect(RLL2,0,self(),0);
 			}
 				
 		}
@@ -46,7 +48,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 		{
 			if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0,intlv->out_int);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
 				out_PHY_I_mod= intlv->out_int*2;
 				connect(intlv,0,RLL,0);
 				connect(RLL,0,self(),0);
@@ -54,9 +56,11 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				out_PHY_I_mod= intlv->out_int/4*6;
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				out_PHY_I_mod= (intlv->out_int/4*6)*2;
 				connect(intlv,0,RLL,0);
-				connect(RLL,0,self(),0);
+				connect(RLL,0, RLL2,0);
+				connect(RLL2,0,self(),0);
 			}			
 		}
 	}
@@ -64,7 +68,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 	{
 		if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0,raw_length);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
 				out_PHY_I_mod= raw_length*2;
 				connect(self(),0,RLL,0);
 				connect(RLL,0,self(),0);
@@ -72,9 +76,11 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				out_PHY_I_mod= raw_length/4*6;
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				out_PHY_I_mod= (raw_length/4*6)*2;
 				connect(self(),0,RLL,0);
-				connect(RLL,0,self(),0);
+				connect(RLL,0, RLL2,0);
+				connect(RLL2,0,self(),0);
 			}	
 	}
 }

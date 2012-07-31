@@ -13,17 +13,16 @@ class bbManchesterEnc : public gr_block
 	public:
 		typedef boost::shared_ptr<bbManchesterEnc> sptr;
 		/**
-       * The creation of the bbManchesterEnc requires 2 parameters: 
+       * The creation of the bbManchesterEnc requires 1 parameters: 
        * @param mode: selects in which mode works the block. Two options: 0 and 1. 0 is for OOK and 1 is used with VPPM with 50% dimming (assuming double clock frequency than in OOK)
-       * @param length: length of the input block of data to perform the convolutional encoding.
        */
-		static sptr Create(int, int);
+		static sptr Create(int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bbManchesterEnc();
 	
 	private:
-		bbManchesterEnc(int, int);
+		bbManchesterEnc(int);
 		int d_mode;
 		int d_length;
 };

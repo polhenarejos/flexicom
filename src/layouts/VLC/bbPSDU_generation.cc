@@ -21,7 +21,7 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
 	length_payload= PSDU_length-40-crc_length;
 	data_payload = new int[length_payload];
-	sequence_number = 1;
+	sequence_number = 0;
 	//FILE READING
 	fp = fopen(_f.c_str(), "r");
 	if (fp ==NULL)
@@ -104,6 +104,7 @@ int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_v
 	{
 		if (ic == 0)
 		{
+			sequence_number = (sequence_number+1)%256;
 			memset(payload_crc, 0, sizeof(int)*PSDU_length);
 			LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
 			memcpy(payload_crc, MHR, sizeof(int)*40);
