@@ -32,7 +32,7 @@ class TestRLL : public CppUnit::TestFixture
 		{
 			int d_mode=0, len=504;
 			gr_top_block_sptr gt = gr_make_top_block("Encode_Manchester_PHR");
-			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len);
+			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_cc_1_4.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_manchester.dat");
 			MSE::sptr mse = MSE::Create();
@@ -59,7 +59,7 @@ class TestRLL : public CppUnit::TestFixture
 		{
 			int d_mode=0, len=728;
 			gr_top_block_sptr gt = gr_make_top_block("Encode_Manchester_PSDU");
-			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len);
+			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_cc_1_4.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_manchester.dat");
 			MSE::sptr mse = MSE::Create();

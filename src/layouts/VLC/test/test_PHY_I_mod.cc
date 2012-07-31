@@ -43,7 +43,7 @@ class Test_PHY_I_modulator : public CppUnit::TestFixture
 			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
 			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len_int);
 			bbCCEnc::sptr cc = bbCCEnc::Create(N_cc, K_cc, poly, len_cc, data_rate);
-			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len_man);
+			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_data.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_manchester.dat");
 			MSE::sptr mse = MSE::Create();
@@ -81,7 +81,7 @@ class Test_PHY_I_modulator : public CppUnit::TestFixture
 			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
 			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len_int);
 			bbCCEnc::sptr cc = bbCCEnc::Create(N_cc, K_cc, poly, len_cc, data_rate);
-			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len_man);
+			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_data.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_manchester.dat");
 			MSE::sptr mse = MSE::Create();
