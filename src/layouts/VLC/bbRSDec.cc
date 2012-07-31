@@ -115,8 +115,8 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		}
 		blocks_to_process--;
 	}
-	//delete [] tmp;
-	//delete [] tmp2;
+	delete [] tmp;
+	delete [] tmp2;
 	consume_each((noutput_items/out_rs_dec)*pre_length);
 	return noutput_items;
 }
