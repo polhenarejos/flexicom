@@ -10,7 +10,7 @@
 
 bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
 	gr_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
-	PSDU_length(_PSDU_length*8)
+	PSDU_length(_PSDU_length*8), ic(0)
 {
 	//crc=new vlc_crc(PSDU_length);
 	crc=new vlc_crc();
@@ -43,8 +43,9 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
   		}
   	}
   	fclose(fp);
+  	payload_crc = new int[PSDU_length];
 	//this would be to be modified in the future with the addition of dimming capabilities
-	set_output_multiple(PSDU_length);
+	//set_output_multiple(PSDU_length);
 
 }
 bbPSDU_generation::~bbPSDU_generation()
@@ -54,15 +55,18 @@ bbPSDU_generation::~bbPSDU_generation()
 		delete [] data_payload; data_payload = 0;
 		delete crc; crc=0;
 	}
+	delete [] payload_crc;
 }
 bbPSDU_generation::sptr bbPSDU_generation::Create(std::string _f, int _PSDU_length)
 {
 	return sptr(new bbPSDU_generation(_f, _PSDU_length));
 }
+/*
 void bbPSDU_generation::forecast(int no, gr_vector_int &in)
 {
 	in[0] = no/PSDU_length;
 }
+*/
 void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 {
 	// This is a particular codification for the MHR, taking into account simplicity
@@ -93,38 +97,21 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 		MHR[24+i]= 1;
 	
 }
-int bbPSDU_generation::general_work(int noutput_items, gr_vector_int &ni, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
+int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	int *optr = (int *) output_items[0];
-	//const uint64_t *iptr = (const uint64_t *)input_items[0];
-	int *tmp= new int[PSDU_length];
-	int cycles = noutput_items / (PSDU_length);
-	//printf("The number of cycles:%d\n", cycles);
-	//static uint64_t prev_confver = 0, cc = 0;
-	while (cycles>0)
+	for (int n = 0; n < no; n++)
 	{
-		/*
-		uint64_t confver = *iptr++;
-		if (prev_confver != confver)
+		if (ic == 0)
 		{
-			prev_confver = confver;
-			printf("PSDU Tagging %d at #%d\n", prev_confver, cc);
+			memset(payload_crc, 0, sizeof(int)*PSDU_length);
+			LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
+			memcpy(payload_crc, MHR, sizeof(int)*40);
+			memcpy(&payload_crc[40],data_payload, sizeof(int)*length_payload);
+			crc->generate_crc(payload_crc, payload_crc, PSDU_length);
 		}
-		cc++;
-		*/
-		//1-Set the correct MHR, we have to change the sequence_number
-		//memset(tmp,0, sizeof(int)*PSDU_length);
-		LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
-		memcpy(tmp, MHR, sizeof(int)*40);
-		memcpy(&tmp[40],data_payload, sizeof(int)*length_payload);
-		crc->generate_crc(tmp, tmp, PSDU_length);
-		memcpy(optr,tmp,sizeof(int)*PSDU_length);		
-		cycles--;
-		sequence_number = (sequence_number +1)%256;
-		optr = optr + PSDU_length;
-		//printf("*%d\n",cc++);
+		*optr++ = payload_crc[ic];
+		ic = (ic+1)%PSDU_length;
 	}
-    delete [] tmp;
-    consume_each(noutput_items / PSDU_length);
-	return noutput_items;
+	return no;
 }

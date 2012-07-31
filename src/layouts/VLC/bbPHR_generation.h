@@ -25,7 +25,7 @@ class bbPHR_generation : public gr_block
 		static sptr Create(int, int, int, int *);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star&, gr_vector_void_star&);
 		~bbPHR_generation();
-		void forecast(int, gr_vector_int &);
+		//void forecast(int, gr_vector_int &);
 	
 	private:
 		bbPHR_generation(int, int, int, int *);
@@ -36,6 +36,7 @@ class bbPHR_generation : public gr_block
 		static const int crc_length = 16;
 		int phr_crc[32+crc_length];
 		vlc_crc *crc;
+		unsigned int ic;
 };
 
 #endif //_INC_BBPHR_GENERATION_H
