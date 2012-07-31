@@ -5,9 +5,9 @@
 #include "bbRSEnc.h"
 #include "vlc_convolutional_coding.h"
 #include "bbCCEnc.h"
-#include "bbVLCInterleaver.h"
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"
+#include "InterPunct.h"
 #include <gr_io_signature.h>
 
 PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _cc_in, unsigned int _cc_out, unsigned int _raw_length, unsigned int _data_rate) :
@@ -19,17 +19,17 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 	if (rs_in !=0)
 	{
 		bbRSEnc::sptr rs_enc = bbRSEnc::Create(&GF, &rs_out, &rs_in, &phy_type, &raw_length);
-		bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, rs_out, rs_in, raw_length, (rs_enc->out_rs/GF));
+		InterPunct::sptr intlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, (rs_enc->out_rs/GF));
 		connect(self(), 0, rs_enc, 0);
 		connect(rs_enc, 0, intlv,0);
 		if (cc_in!=0)
 		{
-			bbCCEnc::sptr cc_enc = bbCCEnc::Create(3,7, poly,intlv->out_int, data_rate);
-			connect(intlv,0, cc_enc,0);
+			bbCCEnc::sptr cc_enc = bbCCEnc::Create(3, 7, poly, intlv->out, data_rate);
+			connect(intlv, 0, cc_enc, 0);
 			if (phy_modulation == 0)
 			{
 				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
-				out_PHY_I_mod= cc_enc->out_cc*2;
+				out_PHY_I_mod = cc_enc->out_cc*2;
 				connect(cc_enc,0,RLL,0);
 				connect(RLL,0,self(),0);
 			}
@@ -49,7 +49,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			if (phy_modulation == 0)
 			{
 				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
-				out_PHY_I_mod= intlv->out_int*2;
+				out_PHY_I_mod = intlv->out*2;
 				connect(intlv,0,RLL,0);
 				connect(RLL,0,self(),0);
 			}
@@ -57,7 +57,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
 				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
-				out_PHY_I_mod= (intlv->out_int/4*6)*2;
+				out_PHY_I_mod= (intlv->out/4*6)*2;
 				connect(intlv,0,RLL,0);
 				connect(RLL,0, RLL2,0);
 				connect(RLL2,0,self(),0);

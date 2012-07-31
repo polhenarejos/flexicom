@@ -1,7 +1,7 @@
 // $Id$
 #include <cppunit/extensions/HelperMacros.h>
 #include "bbRSEnc.h"
-#include "bbVLCInterleaver.h"
+#include "InterPunct.h"
 #include "bbCCEnc.h"
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"
@@ -40,7 +40,8 @@ class Test_PHY_I_modulator : public CppUnit::TestFixture
 						
 			gr_top_block_sptr gt = gr_make_top_block("PHR_OOK_mod_0");
 			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &phr_len);
-			bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len_int);
 			bbCCEnc::sptr cc = bbCCEnc::Create(N_cc, K_cc, poly, len_cc, data_rate);
 			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len_man);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_data.dat");
@@ -77,7 +78,8 @@ class Test_PHY_I_modulator : public CppUnit::TestFixture
 						
 			gr_top_block_sptr gt = gr_make_top_block("PSDU_OOK_mod_0");
 			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &phr_len);
-			bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len_int);
 			bbCCEnc::sptr cc = bbCCEnc::Create(N_cc, K_cc, poly, len_cc, data_rate);
 			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(d_mode, len_man);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_data.dat");
@@ -112,7 +114,8 @@ class Test_PHY_I_modulator : public CppUnit::TestFixture
 												
 			gr_top_block_sptr gt = gr_make_top_block("PSDU_VPPM_mod_2");
 			bbRSEnc::sptr rs = bbRSEnc::Create(&GF, &N, &K, &phy, &phr_len);
-			bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len_int);
+			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len_int);
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_data.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_4b6b.dat");

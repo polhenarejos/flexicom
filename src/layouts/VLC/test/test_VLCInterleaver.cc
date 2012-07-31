@@ -1,6 +1,6 @@
 // $Id$
 #include <cppunit/extensions/HelperMacros.h>
-#include "bbVLCInterleaver.h"
+#include "InterPunct.h"
 #include "bbVLCDeInterleaver.h"
 #include <gr_file_source.h>
 #include <gr_top_block.h>
@@ -27,7 +27,8 @@ class TestVLCInterleaver : public CppUnit::TestFixture
 		{
 			unsigned int GF = 4, N = 15, K = 7, phr_len = 54, len = 30;
 			gr_top_block_sptr gt = gr_make_top_block("Interleave_PHR");
-			bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len);
+			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len);
+			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_out_rs_15_7.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PHR_in_cc_1_4.dat");
 			MSE::sptr mse = MSE::Create();
@@ -54,7 +55,8 @@ class TestVLCInterleaver : public CppUnit::TestFixture
 		{
 			unsigned int GF = 4, N = 15, K = 7, phr_len = 10*8, len = 45;
 			gr_top_block_sptr gt = gr_make_top_block("Interleave_PSDU");
-			bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len);
+			//bbVLCInterleaver::sptr intlv = bbVLCInterleaver::Create(GF, N, K , phr_len, len);
+			InterPunct::sptr intlv = InterPunct::Create(GF, N, K , phr_len, len);
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_rs_15_7.dat");
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_cc_1_4.dat");
 			MSE::sptr mse = MSE::Create();
