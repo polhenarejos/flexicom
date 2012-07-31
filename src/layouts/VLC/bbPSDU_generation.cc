@@ -23,7 +23,7 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	data_payload = new int[length_payload];
 	sequence_number = 0;
 	//FILE READING
-	fp = fopen(_f.c_str(), "r");
+	FILE *fp = fopen(_f.c_str(), "r");
 	if (fp ==NULL)
   	{
   		printf("The file is not available\n");

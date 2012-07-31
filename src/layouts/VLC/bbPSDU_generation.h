@@ -33,7 +33,6 @@ class bbPSDU_generation : public gr_block
 		int *data_payload;
 		int length_payload;
 		int sequence_number;
-		FILE *fp;
 		vlc_crc *crc;
 		unsigned int ic;
 		int *payload_crc;
