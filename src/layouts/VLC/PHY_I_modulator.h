@@ -33,8 +33,6 @@ class PHY_I_modulator : public gr_hier_block2
        * @param _data_rate: specifies the data rate used for the selected phy type and modulation. Remember for PHR has to be set always to 0
        */
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-		~PHY_I_modulator();
-		void stop();
 		int out_PHY_I_mod; /**< [out] indicates the length in bits of the encoded block of data*/
 		
 	private:
