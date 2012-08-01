@@ -2,7 +2,7 @@
 #ifndef _INC_BBMANCHESTERDEC_H_
 #define _INC_BBMANCHESTERDEC_H_
 
-#include <gr_block.h>
+#include <gr_sync_decimator.h>
 
 /*! \brief bbManchesterDec performs the Manchester decoding of the operation specified in section 10.5.2 of IEEE 802.15.7
 
@@ -10,7 +10,7 @@
 Used with the OOK modulation in PHY I operating mode.
 */
 
-class bbManchesterDec : public gr_block
+class bbManchesterDec : public gr_sync_decimator
 {
 	public:
 		typedef boost::shared_ptr<bbManchesterDec> sptr;
@@ -20,8 +20,7 @@ class bbManchesterDec : public gr_block
        * @param flag_cc: indicates whether the next block in the chain will be a CC decoder. In the case of CC decoding, the signal at the input of this block must be adapted.
        */
 		static sptr Create(int,int);
-		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
-		void forecast(int, gr_vector_int &);
+		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 		~bbManchesterDec();
 	
 	private:
