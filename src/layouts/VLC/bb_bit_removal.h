@@ -2,14 +2,14 @@
 #ifndef _INC_BB_BIT_REMOVAL_H
 #define _INC_BB_BIT_REMOVAL_H
 
-#include <gr_block.h>
+#include <gr_sync_block.h>
 #include "vlc_reed_solomon.h"
 
 /*! \brief bb_bit_removal is the block in remove some extra bits after the reed solomon operation 
 
 */
 
-class bb_bit_removal : public gr_block
+class bb_bit_removal : public gr_sync_block
 {
 	public:
 		typedef boost::shared_ptr<bb_bit_removal> sptr;
@@ -19,9 +19,7 @@ class bb_bit_removal : public gr_block
        * @param _output_length: the raw number of bits before the reed solomon encoder in transmission
        */
 		static sptr Create(int, int);
-		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
-		void forecast(int, gr_vector_int &);
-		~bb_bit_removal();
+		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 	
 	private:
 		bb_bit_removal(int, int);
