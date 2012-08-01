@@ -34,7 +34,6 @@ class bb_Header_cp : public gr_block
 		gr_msg_queue_sptr d_queue;
 		vlc_crc *crc_cp;
 		int length;
-		int *tmp;
 };
 
 #endif //_INC_BB_HEADER_CP_H_
