@@ -17,8 +17,9 @@
 #include <gr_sig_source_f.h>
 #include <gr_float_to_complex.h>
 #include <gr_file_source.h>
+#include <gr_file_sink.h>
 #include "bbMatlab.h"
-#include "Tcp.h"
+#include "../src/modules/SHM.cc"
 #include "../src/modules/Oversampler.cc"
 
 const char *LayoutVLC::name = "VLC";
@@ -75,7 +76,8 @@ void LayoutVLC::Run()
 		rx = RxVLC::Create(this);
 		//gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
 		//TcpSource::sptr source = TcpSource::Create(sizeof(float), "127.0.0.1", 55344);
-		gr_file_source_sptr source = gr_make_file_source(sizeof(float), "frame.txt.dat", true);
+		SHMSource<float>::sptr source = SHMSource<float>::Create("FlexiCom");
+		//gr_file_source_sptr source = gr_make_file_source(sizeof(float), "frame.txt.dat", false);
 		grTop->connect(source, 0, rx, 0);
 		grTop->start();
 	}
@@ -112,11 +114,15 @@ void LayoutVLC::Run()
 			}
 		}
 		*/
-		gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		Oversampler<float>::sptr ov = Oversampler<float>::Create(4);
+		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
+		//Oversampler<float>::sptr ov = Oversampler<float>::Create(4);
 		//TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
-		grTop->connect(tx, 0, ov, 0);
-		grTop->connect(ov, 0, sink, 0);
+		SHMSink<float>::sptr sink = SHMSink<float>::Create("FlexiCom");
+		//gr_file_sink_sptr sink = gr_make_file_sink(sizeof(float), "frame.txt.dat");
+		//bbMatlab::sptr sink = bbMatlab::Create("frame.txt", sizeof(float));	
+		//grTop->connect(tx, 0, ov, 0);
+		//grTop->connect(ov, 0, sink, 0);
+		grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		
 	}
