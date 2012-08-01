@@ -104,9 +104,8 @@ int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_v
 	{
 		if (ic == 0)
 		{
-			sequence_number = (sequence_number+1)%256;
 			memset(payload_crc, 0, sizeof(int)*PSDU_length);
-			LayoutVLC::dec2bi(sequence_number,8,&MHR[16]);
+			LayoutVLC::dec2bi(sequence_number++,8,&MHR[16]);
 			memcpy(payload_crc, MHR, sizeof(int)*40);
 			memcpy(&payload_crc[40],data_payload, sizeof(int)*length_payload);
 			crc->generate_crc(payload_crc, payload_crc, PSDU_length);
