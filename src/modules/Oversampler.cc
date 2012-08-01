@@ -5,7 +5,7 @@
 
 template <class T>
 Oversampler<T>::Oversampler(unsigned int pol) :
-	gr_sync_interpolator("Oversampler", gr_make_io_signature(1, gr_io_signature::IO_INFINITE, sizeof(T)), gr_make_io_signature(1,  gr_io_signature::IO_INFINITE, sizeof(T)), pol)
+	gr_sync_interpolator("Oversampler", gr_make_io_signature(1, gr_io_signature::IO_INFINITE, sizeof(T)), gr_make_io_signature(1, gr_io_signature::IO_INFINITE, sizeof(T)), pol)
 {
 }
 template <class T>

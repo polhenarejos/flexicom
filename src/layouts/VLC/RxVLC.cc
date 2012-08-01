@@ -6,7 +6,7 @@
 #include <gr_file_source.h>
 #include <gr_float_to_int.h>
 //#include <digital_clock_recovery_mm_ff.h>
-
+#include "bbManchesterDec.h"
 #include "bbVLC_Frame_Extractor.h"
 #include "PHY_I_demodulator.h"
 #include "PHY_II_demodulator.h"
@@ -67,7 +67,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 {
 	msgq = gr_make_msg_queue();
 	rxth = new RxVLCThread(msgq);
-	rxth->start();
+	//rxth->start();
 	
 	init_var();
 	gr_float_to_int_sptr f2i = gr_make_float_to_int();

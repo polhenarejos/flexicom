@@ -15,7 +15,6 @@
 #include "bbVLC_info_assembler.h"
 #include "bbVLC_Frame_Generator.h"
 #include "TxTagger.h"
-
 #include "bbMatlab.h"
 
 
@@ -40,7 +39,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	
-	TxTagger::sptr tagger = TxTagger::Create(this);
+	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);
 	//connect(tagger, 1, PSDU_gen, 0);
 	
@@ -74,14 +73,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(FRAME_gen,0,i2f,0);
 		connect(i2f,0,self(),0);
 	}
-	
-	if (0)
-	{
-		bbMatlab::sptr gm = bbMatlab::Create("m.txt", sizeof(float));
-		connect(i2f, 0, gm, 0);
-		//connect(uc2f,0,gm,0);
-	}
-	
 }
 
 TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)
