@@ -55,7 +55,7 @@ bbVLC_info_assembler::bbVLC_info_assembler(int _d_mode, int _topology, int _PSDU
 			length_frame = 2* 60 + length_PHR + PSDU_units * length_data_payload;
 		break;
 	}
-	set_output_multiple(length_frame); //worst case scenario in the burst mode so at least we always have 
+	set_output_multiple(length_frame); 
 }
 
 bbVLC_info_assembler::~bbVLC_info_assembler()
@@ -70,9 +70,7 @@ bbVLC_info_assembler::sptr bbVLC_info_assembler::Create(int _d_mode, int _topolo
  void bbVLC_info_assembler::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
 		ninput_items_required[0]= (noutput_items/length_frame)*length_PHR;
-		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;
-		//printf("Hola\n");
-	
+		ninput_items_required[1]= (noutput_items/length_frame)*length_data_payload;	
 }
 
 int bbVLC_info_assembler::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
@@ -114,8 +112,8 @@ int bbVLC_info_assembler::general_work(int noutput_items, gr_vector_int &ninput_
 				{
 					optr[2*i]= TDP_pattern[i];
 					optr[2*i+1]= TDP_pattern[i];
-					optr = optr +2;
 				}
+				optr = optr + 2*60;
 				memcpy(optr,iptr1, sizeof(int)*length_PHR);
 				iptr1 = iptr1+ length_PHR;
 				optr = optr + length_PHR;

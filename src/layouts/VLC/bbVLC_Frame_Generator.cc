@@ -29,48 +29,49 @@ bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _d_mode, int _FLP, int _tx_mode
 	
 	IFS=0; //IFS stands for Interframe Spacing
 	
-	switch(tx_mode)
-	{
-		case 0:
-			IFS= 240; //twice the value of table 77
-			length_frame = FLP_length + 60 + length_PHR + length_data_payload + IFS;
-			break;
-		case 1:
-			IFS= 240; //twice the value of table 77
-			length_frame = FLP_length + 60 + length_PHR + PSDU_units * length_data_payload+ IFS;
-			break;
-		case 2:
-			IFS = 90;
-			length_frame = FLP_length + (60 + length_PHR + PSDU_units * length_data_payload+ IFS)*length_burst;
-			break;
-	}
-	
 	switch (d_mode)
 	{
-		case 0: // OOK
-			length_frame_bis = length_frame;
-		break;
-		case 1: //VPPM
+		case 0:
 			switch(tx_mode)
 			{
 				case 0:
-					length_frame_bis = 2* FLP_length + 2* 60 + length_PHR + length_data_payload + 2*IFS;
+					IFS= 240; //twice the value of table 77
+					length_frame = FLP_length + 60 + length_PHR + length_data_payload + IFS;
 				break;
 				case 1:
-					length_frame_bis = 2*FLP_length + 2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS;
+					IFS= 240; //twice the value of table 77
+					length_frame = FLP_length + 60 + length_PHR + PSDU_units * length_data_payload+ IFS;
 				break;
 				case 2:
-					length_frame_bis = 2*FLP_length + (2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS)*length_burst;
+					IFS = 90;
+					length_frame = FLP_length + (60 + length_PHR + PSDU_units * length_data_payload+ IFS)*length_burst;
+				break;
+			}
+		break;
+		case 1:
+			switch(tx_mode)
+			{
+				case 0:
+					IFS= 240; //twice the value of table 77
+					length_frame = 2*FLP_length + 2*60 + length_PHR + length_data_payload + 2*IFS;
+				break;
+				case 1:
+					IFS= 240; //twice the value of table 77
+					length_frame = 2*FLP_length + 2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS;
+				break;
+				case 2:
+					IFS = 90;
+					length_frame = 2*FLP_length + (2*60 + length_PHR + PSDU_units * length_data_payload+ 2*IFS)*length_burst;
 				break;
 			}
 		break;
 	}
-		
+	
 	idle_pattern = new int[IFS];
 	idle_pattern_generation(idle_pattern, IFS, 50);//last value takes into account dimming effect. In the future, it will be taken into account
 	FLP_counter=0;
 	if (tx_mode != 2) //no burst
-		set_output_multiple(length_frame_bis); //worst case scenario in the burst mode so at least we always have 
+		set_output_multiple(length_frame); 
 }
 
 bbVLC_Frame_Generator::~bbVLC_Frame_Generator()
@@ -185,7 +186,6 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 					*optr++ = FLP_pattern[FLP_counter];
 				else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
 					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
-					//*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)];       
 				else
 				{
 					*optr++ = *iptr1++;
@@ -198,24 +198,18 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 			packet_len = 2* 60 + length_PHR + PSDU_units * length_data_payload;
 			for (int n = 0; n < noutput_items; n++)
 			{
-				if (FLP_counter < FLP_length)
-				{
-					//we copy twice the same sample due to VPPM
-					*optr++ = FLP_pattern[FLP_counter]; 
-					*optr++ = FLP_pattern[FLP_counter];
-				}
-				else if ((FLP_counter-FLP_length)%(packet_len+IFS) >= packet_len)
-				{
-					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
-					*optr++ = idle_pattern[((FLP_counter-FLP_length)-packet_len)%(packet_len+IFS)];      
-				}
+				if (FLP_counter < FLP_length*2)
+					*optr++ = FLP_pattern[FLP_counter/2]; 
+				else if ((FLP_counter-2*FLP_length)%(packet_len+2*IFS) >= packet_len)
+					*optr++ = idle_pattern[(((FLP_counter-2*FLP_length)-packet_len)%(packet_len+2*IFS))/2];      
 				else
 				{
 					//these samples, do not have to be copied twice as they enter duplicated to the block
 					*optr++ = *iptr1++;
-					ci++;
+					ci++;					
 				}
-			FLP_counter = (FLP_counter+1)%length_frame;
+				
+			FLP_counter = (FLP_counter+1)%length_frame;	
 			}
 		break;
 	}

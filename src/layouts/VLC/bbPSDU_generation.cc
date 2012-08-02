@@ -21,7 +21,7 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
 	length_payload= PSDU_length-40-crc_length;
 	data_payload = new int[length_payload];
-	sequence_number = 0;
+	sequence_number = 1;
 	//FILE READING
 	FILE *fp = fopen(_f.c_str(), "r");
 	if (fp ==NULL)
