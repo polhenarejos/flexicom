@@ -77,7 +77,7 @@ void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 
 int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0];
+	const int *iptr= (const int *)input_items[0];
 	//unsigned char *optr= (unsigned char *)output_items[0];
 	int *optr= (int *)output_items[0];
 	unsigned int blocks_to_process, i, GF_words, RS_words;
@@ -94,18 +94,26 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		//First, adapt the samples to process
 		memcpy(samples_block, iptr, sizeof(int)*length);
 		std::fill_n(samples_block+length, length%GF, *(iptr+length-1));
+			printf("IN:  ");
+			for (int ii = 0; ii < length; ii++)
+			printf("%d ",iptr[ii]);
+		printf("\n");
 		iptr += length;
 		for (unsigned int idx = 0; idx < RS_words; idx++)
 		{
 			for (i=0; i<K; i++)
 			{
 				tmp[i]=LayoutVLC::bi2dec(&samples_block[(idx*K*GF)+i*GF],GF);
-				//printf("El valor de tmp[%d]=%u\n",i, tmp[i]);
+				//printf("%d",tmp[i]);
 				//iptr=iptr+GF;
 			}
-			//memset(tmp3, 0, sizeof(unsigned char)*N);
+			memset(tmp3, 0, sizeof(unsigned char)*N);
 			vlc_rs->encode(tmp3, tmp);
 			std::copy(tmp3, tmp3+N, optr);
+				printf("OUT: ");
+				for (int ii = 0; ii < length; ii++)
+			printf("%d ",optr[ii]);
+		printf("\n");
 			optr += N;
 		}
 		if ((GF_words%K) !=0)

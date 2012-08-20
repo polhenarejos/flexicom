@@ -55,7 +55,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		{
 			if (flag==0)
 			{
-				//printf("PHR OK!\n");
+				printf("PHR OK!\n");
 				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(32+1));
 				memcpy(msg->msg(), &flag, sizeof(int)*1);
 				memcpy(msg->msg() + sizeof(int), tmp, sizeof(int)*32);
@@ -65,7 +65,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			else
 			{
 				//printf("* OK\n");
-				//printf("PSDU OK!\n");
+				printf("PSDU OK!\n");
 				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(40+1));
 				memcpy(msg->msg(), &flag, sizeof(int)*1);
 				memcpy(msg->msg() + sizeof(int), tmp, sizeof(int)*40);
