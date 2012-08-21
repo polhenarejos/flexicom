@@ -27,9 +27,9 @@ void bbRSEnc::ctor(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 	if (vlc_rs)
 		delete vlc_rs;
 	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
-	out_rs=rs_out_elements();
+	out_rs=rs_out_elements()/GF;
 	set_output_multiple(out_rs);
-	set_relative_rate((double)out_rs/length);
+	//set_relative_rate((double)out_rs/length);
 }
 
 bbRSEnc::~bbRSEnc()
@@ -74,55 +74,47 @@ void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 		ninput_items_required[i]= (noutput_items/out_rs)*length;
 	
 }
-
 int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	const int *iptr= (const int *)input_items[0];
 	//unsigned char *optr= (unsigned char *)output_items[0];
 	int *optr= (int *)output_items[0];
-	unsigned int blocks_to_process, i, GF_words, RS_words;
-	int remaining_bits;
+	unsigned int blocks_to_process = (noutput_items/out_rs), GF_words = (int) ceil(((double)length/GF)), RS_words = GF_words/K;
 	int *samples_block = new int[length+length%GF];
 	unsigned char *tmp = new unsigned char[K];
 	int *tmp2 = new int[GF*K];
 	unsigned char *tmp3 = new unsigned char[N];
-	blocks_to_process = (noutput_items/out_rs);
-	GF_words = (int) ceil(((double)length/GF));
-	RS_words = GF_words/K;
+	//printf("DIR RS %X\n",optr);
+	int ci = 0;
 	while (blocks_to_process>0)
 	{
 		//First, adapt the samples to process
 		memcpy(samples_block, iptr, sizeof(int)*length);
 		std::fill_n(samples_block+length, length%GF, *(iptr+length-1));
-			printf("IN:  ");
-			for (int ii = 0; ii < length; ii++)
-			printf("%d ",iptr[ii]);
-		printf("\n");
 		iptr += length;
+	//	printf("OUT RS: ");
 		for (unsigned int idx = 0; idx < RS_words; idx++)
 		{
-			for (i=0; i<K; i++)
+			for (unsigned int i=0; i<K; i++)
 			{
 				tmp[i]=LayoutVLC::bi2dec(&samples_block[(idx*K*GF)+i*GF],GF);
 				//printf("%d",tmp[i]);
 				//iptr=iptr+GF;
 			}
-			memset(tmp3, 0, sizeof(unsigned char)*N);
 			vlc_rs->encode(tmp3, tmp);
 			std::copy(tmp3, tmp3+N, optr);
-				printf("OUT: ");
-				for (int ii = 0; ii < length; ii++)
-			printf("%d ",optr[ii]);
-		printf("\n");
+	//		for (int ii = 0; ii < N; ii++)
+	//			printf("%d ",optr[ii]);
 			optr += N;
+			ci += N;
 		}
+	//	printf("\n");
 		if ((GF_words%K) !=0)
 		{
 			//we need to process the last word of the block
-			remaining_bits = (GF_words%K)*GF;
 			memset(tmp2, 0, sizeof(int)*GF*K);
-			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*remaining_bits);
-			for (i=0; i<K; i++)
+			memcpy(tmp2,&samples_block[RS_words*K*GF],sizeof(int)*((GF_words%K)*GF));
+			for (unsigned int i=0; i<K; i++)
 			{
 				tmp[i]=LayoutVLC::bi2dec(&tmp2[i*GF],GF);
 			//	printf("El clandemor tmp[%d]=%d\n",i,tmp[i]);
@@ -130,22 +122,26 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3
 			std::copy(tmp3, tmp3+(GF_words%K), optr);
 			optr += GF_words%K;
+			ci += GF_words%K;
 			std::copy(tmp3+K, tmp3+N, optr);
 			optr += N-K;
+			ci += N-K;
 			if (phy_type==0)
 			{
 				//move the zeros to the end, which are the punctured positions
 				memset(optr, 0, sizeof(int)*(K-GF_words%K));
 				optr += (K-GF_words%K);				
+				ci += (K-GF_words%K);
 			}
 		}
 		blocks_to_process--;
 	}
+	//printf("* %d %d %d\n",ci,noutput_items,out_rs);
 	delete [] tmp;
 	delete [] tmp2;
 	delete [] tmp3;
 	delete [] samples_block;
 	consume_each((noutput_items/out_rs)*length);
-	return noutput_items;
+	return ci;
 	
 }
