@@ -7,6 +7,7 @@
 #include "bbManchesterDec.h"
 #include "bb8b10bDec.h"
 #include "bb_bit_removal.h"
+#include "Bi2De.h"
 
 #include <gr_io_signature.h>
 
@@ -23,10 +24,12 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 		bb8b10bDec::sptr RLL = bb8b10bDec::Create();	
 		if (rs_in!=0)
 		{
-			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length/10*8);
+			Bi2De::sptr bi2de = Bi2De::Create(GF);
+			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length*8/(10*GF));
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
-			connect(RLL, 0, rs_dec,0);
+			connect(RLL,0, bi2de, 0);
+			connect(bi2de, 0, rs_dec,0);
 			connect(rs_dec, 0, bbr, 0);
 			connect(bbr, 0, self(),0);	
 		}
@@ -42,11 +45,13 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 		bb4b6bDec::sptr RLL2 = bb4b6bDec::Create();				
 		if (rs_in!=0)
 		{
-			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length/6*4);
+			Bi2De::sptr bi2de = Bi2De::Create(GF);
+			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length*4/(GF*6*2));
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
 			connect(RLL, 0, RLL2,0);
-			connect(RLL2, 0, rs_dec,0);
+			connect(RLL2,0, bi2de,0);
+			connect(bi2de, 0, rs_dec,0);
 			connect(rs_dec, 0, bbr, 0);
 			connect(bbr, 0, self(),0);	
 		}
