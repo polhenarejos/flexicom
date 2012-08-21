@@ -13,6 +13,7 @@ class Puncture : public gr_block
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		unsigned int out;
+		void forecast(int, gr_vector_int &);
 		
 	private:
 		Puncture(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
