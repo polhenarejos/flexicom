@@ -172,7 +172,7 @@ int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput
 */
 int bbVLC_Frame_Generator::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr1= (int *)input_items[0]; //TDP+PHR+PSDU
+	const int *iptr1= (const int *)input_items[0]; //TDP+PHR+PSDU
 	int *optr = (int *)output_items[0];
 	int ci = 0;
 	static int packet_len;

@@ -6,6 +6,7 @@
 #include "bb8b10bEnc.h"
 #include "bb4b6bEnc.h"
 #include "bbManchesterEnc.h"
+#include "De2Bi.h"
 #include <gr_io_signature.h>
 
 PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _raw_length) :
@@ -17,20 +18,22 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 	if (rs_in !=0)
 	{	
 		bbRSEnc::sptr rs_enc = bbRSEnc::Create(&GF, &rs_out, &rs_in, &phy_type, &raw_length);
+		De2Bi::sptr de2bi = De2Bi::Create(GF);
 		connect(self(),0, rs_enc, 0);
+		connect(rs_enc, 0, de2bi, 0);
 		if (phy_modulation==0) //OOK
 		{
 			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create();
-			out_PHY_II_mod = rs_enc->out_rs/8*10;
-			connect(rs_enc,0, RLL,0);
+			out_PHY_II_mod = rs_enc->out_rs*GF*10/8;
+			connect(de2bi,0, RLL,0);
 			connect(RLL,0, self(),0);
 		}
 		else //VPPM
 		{
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
 			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
-			out_PHY_II_mod= (rs_enc->out_rs/4*6)*2;
-			connect(rs_enc,0,RLL,0);
+			out_PHY_II_mod= (rs_enc->out_rs*GF*2*6/4);
+			connect(de2bi,0,RLL,0);
 			connect(RLL,0,RLL2,0);
 			connect(RLL2,0,self(),0);
 		}

@@ -75,8 +75,8 @@ bbVLC_info_assembler::sptr bbVLC_info_assembler::Create(int _d_mode, int _topolo
 
 int bbVLC_info_assembler::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr1= (int *)input_items[0]; //PHR
-	int *iptr2= (int *)input_items[1]; //PSDU
+	const int *iptr1= (const int *)input_items[0]; //PHR
+	const int *iptr2= (const int *)input_items[1]; //PSDU
 	int *optr=  (int *)output_items[0];
 	//printf("Hola\n");
 	int frames_to_process = noutput_items/length_frame;

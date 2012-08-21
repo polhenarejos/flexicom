@@ -4,6 +4,26 @@
 #include <gr_top_block.h>
 #include <gr_uhd_usrp_source.h>
 #include <gr_null_sink.h>
+#include <QtGui>
+
+class App : public QApplication
+{
+	public:
+		App(int argc, char **argv, QApplication::Type t) : QApplication(argc, argv, t) {}
+		virtual ~App() {}
+		virtual bool notify(QObject * receiver, QEvent * event) 
+		{
+    		try 
+    		{
+    	  		return QApplication::notify(receiver, event);
+    		} 
+    		catch(std::exception &e) 
+    		{
+      			qCritical() << "Exception thrown:" << e.what();
+    		}
+    		return false;
+		}
+};
 
 /*! \mainpage Flexicom: Rapid Prototyping communications systems using Software Defined Radio
 
@@ -33,7 +53,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 int main(int argc, char **argv)
 {
 #endif
-	QApplication app(argc, argv, QApplication::GuiClient);
+	App app(argc, argv, QApplication::GuiClient);
 	app.setOrganizationName(QString("FlexiCom"));
     app.setOrganizationDomain(QString("flexicom.com"));
     app.setApplicationName(QString("FlexiCom"));

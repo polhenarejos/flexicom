@@ -6,6 +6,7 @@
 #include "vlc_convolutional_coding.h"
 #include "bbCCDec.h"
 #include "bbVLCDeInterleaver.h"
+#include "DeInterPunct.h"
 #include "bbManchesterDec.h"
 #include "bb4b6bDec.h"
 #include "bb_bit_removal.h"
@@ -25,7 +26,8 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		{ //there will always have reed solomon decoding
 			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,1);	
 			bbCCDec::sptr cc_dec = bbCCDec::Create(3, 7, poly, mod_length/2, data_rate);
-			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);
+			//DeInterPunct::sptr deintlv = DeInterPunct::Create(GF, rs_out, rs_in, raw_length, cc_dec->out_cc_dec);
+			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);			
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out_deint);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);

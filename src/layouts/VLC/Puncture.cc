@@ -4,7 +4,7 @@
 #include <gr_io_signature.h>
 
 Puncture::Puncture(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length) :
-	gr_sync_block("Interleaver", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("Interleaver", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
 	rs_length(_rs_length), ic(0)
 {
 	unsigned int S_frame = ceil((double)_raw_length/_GF);
@@ -25,7 +25,7 @@ Puncture::sptr Puncture::Create(unsigned int _GF, unsigned int _N, unsigned int 
 {
 	return sptr(new Puncture(_GF, _N, _K, _raw_length, _rs_length));
 }
-int Puncture::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+int Puncture::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
 {
 	const int *iptr = (const int *)_i[0];
 	int *optr = (int *)_o[0];
