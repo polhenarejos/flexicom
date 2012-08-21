@@ -18,9 +18,11 @@
 #include <gr_float_to_complex.h>
 #include <gr_file_source.h>
 #include <gr_file_sink.h>
+#include <gr_null_sink.h>
 #include "bbMatlab.h"
 #include "../src/modules/SHM.cc"
 #include "../src/modules/Oversampler.cc"
+#include "Tcp.h"
 
 const char *LayoutVLC::name = "VLC";
 
@@ -120,6 +122,7 @@ void LayoutVLC::Run()
 		SHMSink<float>::sptr sink = SHMSink<float>::Create("FlexiCom");
 		//gr_file_sink_sptr sink = gr_make_file_sink(sizeof(float), "frame.txt.dat");
 		//bbMatlab::sptr sink = bbMatlab::Create("frame.txt", sizeof(float));	
+		//gr_null_sink_sptr sink = gr_make_null_sink(sizeof(int));
 		//grTop->connect(tx, 0, ov, 0);
 		//grTop->connect(ov, 0, sink, 0);
 		grTop->connect(tx, 0, sink, 0);
