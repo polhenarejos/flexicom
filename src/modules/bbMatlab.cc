@@ -98,5 +98,5 @@ int bbMatlab::work(int no, gr_vector_const_void_star &i, gr_vector_void_star &o)
 		}
 	}
 	fflush(fp);
-	return 0;
+	return no;
 }
