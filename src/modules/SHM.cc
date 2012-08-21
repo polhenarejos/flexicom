@@ -80,5 +80,6 @@ int SHMSink<T>::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star 
 		mem->mtx.post();
 		mem->Stored.post();
 	}
+	consume_each(no); //even though it is a sync_block, since returns 0, it also needs to consume
 	return 0;
 }

@@ -15,7 +15,6 @@ Puncture::Puncture(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 	{
 		for (unsigned int i = 0; i < p; i++)
 			pvector.push_back((_N-p+1)*D + (i*D)-1);
-		set_history(p);
 		out = rs_length-p;
 	}
 	else
@@ -24,6 +23,11 @@ Puncture::Puncture(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 Puncture::sptr Puncture::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length)
 {
 	return sptr(new Puncture(_GF, _N, _K, _raw_length, _rs_length));
+}
+void Puncture::forecast(int no, gr_vector_int &ni)
+{
+	for (int n = 0; n < ni.size(); n++)
+		ni[n] = no+pvector.size();
 }
 int Puncture::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
 {
