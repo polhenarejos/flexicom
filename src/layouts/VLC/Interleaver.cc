@@ -24,12 +24,11 @@ int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star
 {
 	const int *iptr = (const int *)_i[0];
 	int *optr = (int *)_o[0];
-	for (int n = 0; n < no; n++)
+	for (int n = 0; n < no/rs_length; n++)
 	{
-		*optr++ = *(iptr+ivector[n%rs_length]);
-		if ((n+1)%rs_length == 0)
-			iptr += rs_length;
+		for (int i = 0; i < rs_length; i++)
+			*optr++ = *(iptr+ivector[i]);
+		iptr += rs_length;
 	}
-	consume_each(no);
 	return no;
 }
