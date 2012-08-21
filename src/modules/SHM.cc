@@ -80,6 +80,5 @@ int SHMSink<T>::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star 
 		mem->mtx.post();
 		mem->Stored.post();
 	}
-	consume_each(no);
 	return 0;
 }

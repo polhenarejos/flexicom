@@ -11,7 +11,7 @@
 template <class _T>
 struct SHMMemory
 {
-	enum { Size = 8192 };
+	enum { Size = 4096 };
 	SHMMemory() : mtx(1), Empty(Size), Stored(0), rp(0), wp(0) {}
 	boost::interprocess::interprocess_semaphore mtx, Empty, Stored;
 	unsigned int rp, wp;
@@ -21,7 +21,7 @@ template <class _T>
 class SHMSource : public gr_sync_block
 {
 	public:
-		typedef boost::shared_ptr<SHMSource<_T>> sptr;
+		typedef boost::shared_ptr<SHMSource<_T> > sptr;
 		static sptr Create(const char *);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 		~SHMSource();
@@ -38,7 +38,7 @@ template <class _T>
 class SHMSink : public gr_sync_block
 {
 	public:
-		typedef boost::shared_ptr<SHMSink<_T>> sptr;
+		typedef boost::shared_ptr<SHMSink<_T> > sptr;
 		static sptr Create(const char *);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 		~SHMSink();
