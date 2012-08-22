@@ -10,10 +10,10 @@
 InterPunct::InterPunct(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length, Mode _mode) :
 	gr_hier_block2("InterPunct", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int)))
 {
-	Puncture::sptr pct = Puncture::Create(_GF, _N, _K, _raw_length, _rs_length, (_mode == INTERPUNCT ? Puncture::PUNCTURING : Puncture::DEPUNCTURING));
-	Interleaver::sptr ilv = Interleaver::Create(_GF, _N, _K, _raw_length, _rs_length, (_mode == INTERPUNCT ? Interleaver::INTERLEAVING : Interleaver::DEINTERLEAVING), pct->punct);
+	Interleaver::sptr ilv = Interleaver::Create(_GF, _N, _K, _raw_length, _rs_length, (_mode == INTERPUNCT ? Interleaver::INTERLEAVING : Interleaver::DEINTERLEAVING));
 	if (_mode == INTERPUNCT)
 	{
+		Puncture::sptr pct = Puncture::Create(_GF, _N, _K, _raw_length, _rs_length);
 		De2Bi::sptr de2bi = De2Bi::Create(_GF);
 		connect(self(), 0, ilv, 0);
 		connect(ilv, 0, pct, 0);
@@ -25,10 +25,9 @@ InterPunct::InterPunct(unsigned int _GF, unsigned int _N, unsigned int _K, unsig
 	{
 		Bi2De::sptr bi2de = Bi2De::Create(_GF);
 		connect(self(), 0, bi2de, 0);
-		connect(bi2de, 0, pct, 0);
-		connect(pct, 0, ilv, 0);
+		connect(bi2de, 0, ilv, 0);
 		connect(ilv, 0, self(), 0);
-		out = pct->out;
+		out = _rs_length;
 	}
 }
 InterPunct::sptr InterPunct::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length, Mode _mode)

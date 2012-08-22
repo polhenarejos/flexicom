@@ -26,9 +26,9 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		{ //there will always have reed solomon decoding
 			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,1);	
 			bbCCDec::sptr cc_dec = bbCCDec::Create(3, 7, poly, mod_length/2, data_rate);
-			//InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, cc_dec->out_cc_dec/GF, InterPunct::DEINTERPUNCT);
-			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);
-			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out_deint);
+			InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, cc_dec->out_cc_dec/GF, InterPunct::DEINTERPUNCT);
+			//bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);
+			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
 			connect(RLL, 0, cc_dec, 0);
