@@ -8,7 +8,7 @@
 #include "bbManchesterEnc.h"
 #include "bb4b6bEnc.h"
 #include "InterPunct.h"
-#include "bbVLCInterleaver.h"
+//#include "bbVLCInterleaver.h"
 #include <gr_io_signature.h>
 #include <gr_kludge_copy.h>
 
