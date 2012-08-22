@@ -15,14 +15,16 @@ class bb8b10bEnc : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<bb8b10bEnc> sptr;
-		static sptr Create();
+		static sptr Create(int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
 		~bb8b10bEnc();
 	
 	private:
-		bb8b10bEnc();
+		bb8b10bEnc(int);
 		int RD; //disparity indicator
+		int words_processed;
+		int words_in_frame;
 };
 
 #endif //_INC_BB8B10BENC_H_

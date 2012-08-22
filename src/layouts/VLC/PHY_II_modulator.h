@@ -26,8 +26,8 @@ class PHY_II_modulator : public gr_hier_block2
        * @param _raw_length: is the total length in bits of the block of data to be encoded
        */
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-		~PHY_II_modulator();
-		void stop();
+		//~PHY_II_modulator();
+		//void stop();
 		int out_PHY_II_mod; /**< [out] indicates the length in bits of the encoded block of data*/
 				
 	private:

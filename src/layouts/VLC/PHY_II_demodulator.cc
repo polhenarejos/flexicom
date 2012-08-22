@@ -21,7 +21,7 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 	//to the minimum data_rate of the current negotiated clock
 	if (phy_modulation==0) //OOK
 	{
-		bb8b10bDec::sptr RLL = bb8b10bDec::Create();	
+		bb8b10bDec::sptr RLL = bb8b10bDec::Create(mod_length);	
 		if (rs_in!=0)
 		{
 			Bi2De::sptr bi2de = Bi2De::Create(GF);

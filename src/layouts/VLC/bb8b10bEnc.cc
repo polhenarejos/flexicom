@@ -34,17 +34,19 @@ bb8b10bEnc::~bb8b10bEnc()
 	
 }
 
-bb8b10bEnc::bb8b10bEnc():
+bb8b10bEnc::bb8b10bEnc(int _mod_length):
 	gr_block("bb8b10bEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
 {
 	RD = 0;
+	words_processed=0;
+	words_in_frame= _mod_length/8;
 	set_output_multiple(10); //the number of outputs has to be a multiple of 6
 }
 
 
-bb8b10bEnc::sptr bb8b10bEnc::Create()
+bb8b10bEnc::sptr bb8b10bEnc::Create(int _mod_length)
 {
-	return sptr(new bb8b10bEnc());
+	return sptr(new bb8b10bEnc(_mod_length));
 }
 
 void bb8b10bEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
@@ -125,6 +127,9 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 			RD = (RD +1) % 2;
 			
 		samples_to_process=samples_to_process-8;
+		words_processed = (words_processed+1)%words_in_frame;
+		if (words_processed == 0)
+			RD=0;
 	}
 	consume_each(noutput_items/10*8);
 	return noutput_items;

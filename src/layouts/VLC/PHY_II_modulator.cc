@@ -23,7 +23,7 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 		connect(rs_enc, 0, de2bi, 0);
 		if (phy_modulation==0) //OOK
 		{
-			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create();
+			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create(rs_enc->out_rs*GF);
 			out_PHY_II_mod = rs_enc->out_rs*GF*10/8;
 			connect(de2bi,0, RLL,0);
 			connect(RLL,0, self(),0);
@@ -42,7 +42,7 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 	{
 		if (phy_modulation==0) //OOK
 		{
-			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create();
+			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create(raw_length);
 			out_PHY_II_mod = raw_length/8*10;
 			connect(self(),0, RLL,0);
 			connect(RLL,0, self(),0);
@@ -65,7 +65,7 @@ PHY_II_modulator::sptr PHY_II_modulator::Create(unsigned int _phy_type, unsigned
 	return gnuradio::get_initial_sptr(new PHY_II_modulator(_phy_type, _phy_modulation, _rs_in, _rs_out, _gf,_raw_length));
 }
 
-PHY_II_modulator::~PHY_II_modulator()
+/*PHY_II_modulator::~PHY_II_modulator()
 {
 	stop();
 }
@@ -73,4 +73,4 @@ PHY_II_modulator::~PHY_II_modulator()
 void PHY_II_modulator::stop()
 {
 	this->disconnect_all();
-}
+}*/
