@@ -19,7 +19,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 	if (rs_in !=0)
 	{
 		bbRSEnc::sptr rs_enc = bbRSEnc::Create(&GF, &rs_out, &rs_in, &phy_type, &raw_length);
-		InterPunct::sptr intlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, rs_enc->out_rs);
+		InterPunct::sptr intlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, rs_enc->out_rs, InterPunct::INTERPUNCT);
 		connect(self(), 0, rs_enc, 0);
 		connect(rs_enc, 0, intlv,0);
 		if (cc_in!=0)

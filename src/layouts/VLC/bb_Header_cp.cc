@@ -32,7 +32,8 @@ void bb_Header_cp::forecast(int noutput_items, gr_vector_int &ninput_items_requi
 	for (uint i=0; i < ninputs; i++)
 		ninput_items_required[i] = (noutput_items/raw_length)*raw_length; //16 = length of the crc
 }
-
+#include <QMutex>
+QMutex mtx;
 int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	int *iptr= (int *)input_items[0];
@@ -51,10 +52,11 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			memcpy(tmp,iptr, sizeof(int)*raw_length);
 		iptr += raw_length;
 		check = crc_cp->check_crc(tmp, NULL, length);
+		mtx.lock();
 		if (check == true) //crc ok!!
 		{
 			if (flag==0)
-			{
+			{				
 				printf("PHR OK!\n");
 				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(32+1));
 				memcpy(msg->msg(), &flag, sizeof(int)*1);
@@ -76,6 +78,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		}
 		else
 			printf("! %s NOK (%d)\n", (flag ? "PSDU" : "PHR"),ii);
+		mtx.unlock();
 		if (flag)
 			ii++;
 		//blocks_to_process--;

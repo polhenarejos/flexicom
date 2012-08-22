@@ -5,11 +5,11 @@
 #include "bbRSDec.h"
 #include "vlc_convolutional_coding.h"
 #include "bbCCDec.h"
-#include "bbVLCDeInterleaver.h"
-#include "DeInterPunct.h"
+#include "InterPunct.h"
 #include "bbManchesterDec.h"
 #include "bb4b6bDec.h"
 #include "bb_bit_removal.h"
+#include "bbVLCDeInterleaver.h"
 #include <gr_io_signature.h>
 
 PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _cc_in, unsigned int _cc_out, unsigned int _mod_length, unsigned int _raw_length, unsigned int _data_rate) :
@@ -26,8 +26,8 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		{ //there will always have reed solomon decoding
 			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,1);	
 			bbCCDec::sptr cc_dec = bbCCDec::Create(3, 7, poly, mod_length/2, data_rate);
-			//DeInterPunct::sptr deintlv = DeInterPunct::Create(GF, rs_out, rs_in, raw_length, cc_dec->out_cc_dec);
-			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);			
+			//InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, cc_dec->out_cc_dec/GF, InterPunct::DEINTERPUNCT);
+			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, cc_dec->out_cc_dec);
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out_deint);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
@@ -42,8 +42,8 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,0);				
 			if (rs_in!=0)
 			{
-				bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, mod_length/2);
-				bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out_deint);
+				InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, mod_length/(2*GF), InterPunct::DEINTERPUNCT);
+				bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out);
 				bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 				connect(self(), 0, RLL, 0);
 				connect(RLL, 0, deintlv,0);
@@ -64,8 +64,8 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		bb4b6bDec::sptr RLL2 = bb4b6bDec::Create();				
 		if (rs_in!=0)
 		{
-			bbVLCDeInterleaver::sptr deintlv = bbVLCDeInterleaver::Create(GF, rs_out, rs_in , raw_length, mod_length/6*4);
-			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out_deint);
+			InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length,mod_length/(6*GF)*4, InterPunct::DEINTERPUNCT);
+			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
 			connect(RLL,0, RLL2,0);

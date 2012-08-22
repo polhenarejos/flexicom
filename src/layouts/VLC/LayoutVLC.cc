@@ -96,11 +96,6 @@ void LayoutVLC::Run()
 		grTop->connect(f2c, 0, usrp_tx, 0);
 		grTop->start();
 		*/tx = TxVLC::Create(this);
-		if (tx->vlc_var.phy_type)
-		{
-			printf("PHY II mode is not still available\n");
-			exit(-1);
-		}
 		/*else
 		{
 			switch (tx->vlc_var.mod_type)
