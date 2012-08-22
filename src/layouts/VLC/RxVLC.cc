@@ -67,7 +67,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 {
 	msgq = gr_make_msg_queue();
 	rxth = new RxVLCThread(msgq);
-	//rxth->start();
+	rxth->start();
 	
 	init_var();
 	gr_float_to_int_sptr f2i = gr_make_float_to_int();
