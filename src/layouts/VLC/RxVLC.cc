@@ -11,7 +11,7 @@
 #include "PHY_I_demodulator.h"
 #include "PHY_II_demodulator.h"
 #include "bb_Header_cp.h"
-#include "PHRParser.h"
+#include "Parser.h"
 #include <vector>
 #include <QtGlobal>
 #include <iostream>

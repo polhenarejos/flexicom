@@ -1,6 +1,6 @@
 // $Id$
 
-#include "PHRParser.h"
+#include "Parser.h"
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
 
