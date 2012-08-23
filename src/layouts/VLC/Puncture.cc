@@ -18,7 +18,7 @@ Puncture::Puncture(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 			pvector.push_back((_N-p+1)*D + (i*D)-1);
 		out -= p;
 	}
-	set_output_multiple(out);
+	//set_output_multiple(out);
 }
 Puncture::sptr Puncture::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length)
 {

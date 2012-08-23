@@ -12,8 +12,14 @@ Interleaver::Interleaver(unsigned int _GF, unsigned int _N, unsigned int _K, uns
 	unsigned int D = ceil(((double)S/N));
 	unsigned int S_block = N * D;
 	unsigned int p = N - (S%N);
+	ivector.resize(S_block);
 	for (unsigned int i = 0; i < S_block; i++)
-		ivector.push_back((i%D)*N + i/D);
+	{
+		if (mode == INTERLEAVING)
+			ivector.push_back((i%D)*N + i/D);
+		else
+			ivector[(i%D)*N + i/D] = i;
+	}
 	set_output_multiple(rs_length);
 }
 Interleaver::sptr Interleaver::Create(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length, Mode _mode)
@@ -29,14 +35,8 @@ int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star
 	for (int n = 0; n < no/rs_length; n++)
 	{
 		for (int i = 0; i < rs_length; i++)
-		{
-			if (mode == INTERLEAVING)
-				*(optr+i) = *(iptr+ivector[i]);
-			else if (mode == DEINTERLEAVING && ivector[i] < rs_length)
-				*(optr+ivector[i]) = *(iptr+i);
-		}
+			*optr++ = *(iptr+ivector[i]);
 		iptr += rs_length;
-		optr += rs_length;
 	}
 	return no;
 }
