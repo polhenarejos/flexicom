@@ -280,7 +280,7 @@ void RxVLC::init_var()
 							break;
 						case 7:
 							vlc_var_rx._rs_code.rs_in = 128;
-							vlc_var_rx._rs_code.rs_out = 164;
+							vlc_var_rx._rs_code.rs_out = 160;
 							vlc_var_rx.clock_rate=120e6;
 							vlc_var_rx.MCSID[1] = vlc_var_rx.MCSID[2] = vlc_var_rx.MCSID[3]=1;
 							break;
@@ -304,7 +304,7 @@ void RxVLC::init_var()
 							break;
 						case 1:
 							vlc_var_rx._rs_code.rs_in = 128;
-							vlc_var_rx._rs_code.rs_out = 164;
+							vlc_var_rx._rs_code.rs_out = 160;
 							vlc_var_rx.clock_rate=3.75e6;
 							vlc_var_rx.MCSID[1] = vlc_var_rx.MCSID[5]=1;
 							break;
@@ -316,7 +316,7 @@ void RxVLC::init_var()
 							break;
 						case 3:
 							vlc_var_rx._rs_code.rs_in = 128;
-							vlc_var_rx._rs_code.rs_out = 164;
+							vlc_var_rx._rs_code.rs_out = 160;
 							vlc_var_rx.clock_rate=7.5e6;
 							vlc_var_rx.MCSID[1] = vlc_var_rx.MCSID[4] = vlc_var_rx.MCSID[5]=1;
 							break;
