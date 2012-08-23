@@ -85,7 +85,7 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	//the 11th bit is equal to zero because we do not request ACK
 	int dest_mode[] = {1,0}; // equal for source_mode
 	memcpy(&MHR[12],dest_mode, sizeof(dest_mode)/sizeof(int));
-	memcpy(&MHR[14],dest_mode, sizeof(dest_mode)/sizeof(int));
+	//memcpy(&MHR[14],dest_mode, sizeof(dest_mode)/sizeof(int));
 	
 	//The next 8 bits are the frame_sequence number that will have to be modified every
 	//frame and in the beginning is equal to 0;

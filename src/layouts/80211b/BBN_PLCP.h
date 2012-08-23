@@ -13,13 +13,13 @@
 #define MAX_PDU_LENGTH (2500)
 
 PACK(
-typedef struct oob_hdr_struct 
+struct oob_hdr_struct 
 {
 	long long timestamp; /* Relative time in microseconds */
 	ushort length;
 	signed char rssi; /* dB Scale */
 	char rate; /* Receive rate in units of 100 kBps */
-} __attribute__((__packed__)) oob_hdr_t);
+} , oob_hdr_t);
 
 #define REVERSE_BITS(c) ( bit_reverse_table[(c) & 0xff])
 

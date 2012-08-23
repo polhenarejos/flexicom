@@ -11,11 +11,11 @@
 #include "PHY_I_demodulator.h"
 #include "PHY_II_demodulator.h"
 #include "bb_Header_cp.h"
-
+#include "PHRParser.h"
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
-
+#include <gr_null_sink.h>
 #include "bbMatlab.h"
 
 RxVLCThread::RxVLCThread(gr_msg_queue_sptr _queue) :
@@ -65,27 +65,22 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(0, 0, 0)),
 	ly(_ly)
 {
-	msgq = gr_make_msg_queue();
-	rxth = new RxVLCThread(msgq);
-	rxth->start();
-	
 	init_var();
 	gr_float_to_int_sptr f2i = gr_make_float_to_int();
 	connect(self(), 0, f2i, 0);
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
-	
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
-	
+	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length);
+	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length);
+	PHRParser::sptr phr_parser = PHRParser::Create();
+	gr_null_sink_sptr psdu_parser = gr_make_null_sink(sizeof(int));
 	connect(f2i,0,phr,0);
 	connect(f2i,0,psdu,0);
-	
 	if (vlc_var_rx.phy_type ==0) // PHY I
 	{
 		PHY_I_demodulator::sptr phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, 0);
 		PHY_I_demodulator::sptr psdu_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length, vlc_var_rx.operating_mode);
-		bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(0,vlc_var_rx.PHR_raw_length, msgq);
-		bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(1,vlc_var_rx.PSDU_raw_length, msgq);
 		connect(phr, 0, phr_dem, 0);
 		connect(psdu, 0, psdu_dem, 0);
 		connect(phr_dem, 0, phr_header_dem,0);
@@ -95,16 +90,13 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	{
 		PHY_II_demodulator::sptr phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length);
 		PHY_II_demodulator::sptr psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length);
-		bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(0,vlc_var_rx.PHR_raw_length, msgq);
-		bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(1,vlc_var_rx.PSDU_raw_length, msgq);
 		connect(phr, 0, phr_dem, 0);
 		connect(psdu, 0, psdu_dem, 0);
 		connect(phr_dem, 0, phr_header_dem,0);
 		connect(psdu_dem,0, psdu_header_dem,0);
 	}	
-	
-	
-	
+	connect(phr_header_dem, 0, phr_parser, 0);
+	connect(psdu_header_dem, 0, psdu_parser, 0);	
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

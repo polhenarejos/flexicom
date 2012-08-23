@@ -22,7 +22,7 @@ Rx80211bThread::Rx80211bThread(gr_msg_queue_sptr _queue) :
 {
 }
 PACK(
-typedef struct mac_header
+struct 
 {
 	unsigned short fc;
 	unsigned short id;
@@ -30,9 +30,9 @@ typedef struct mac_header
 	unsigned char add2[6];
 	unsigned char add3[6];
 	unsigned short sc;
-} __attribute__((__packed__)) mac_header);
+}, mac_header);
 PACK(
-typedef struct frame_control
+struct 
 {
 	unsigned protocol:2;
 	unsigned type:2;
@@ -45,14 +45,14 @@ typedef struct frame_control
 	unsigned more_data:1;
 	unsigned wep:1;
 	unsigned order:1;
-} __attribute__((__packed__)) frame_control);
+} , frame_control);
 PACK(
-typedef struct beacon_header
+struct 
 {
 	unsigned char timestamp[8];
 	unsigned char beacon_interval[2];
 	unsigned char cap_info[2];
-} __attribute__((__packed__)) beacon_header);
+} , beacon_header);
 void Rx80211bThread::run()
 {
 	while (1)
@@ -64,11 +64,11 @@ void Rx80211bThread::run()
 			const char *packet = (const char *)mesg->msg(), *packet_data = packet+size;
 			oob_hdr_t *oob = (oob_hdr_t *)packet;
 			char addr1[18], addr2[18], addr3[18];
-			struct mac_header *p = (struct mac_header *)(packet_data);
+			mac_header *p = (mac_header *)(packet_data);
 			sprintf(addr1, "%02x:%02x:%02x:%02x:%02x:%02x", p->add1[0], p->add1[1], p->add1[2], p->add1[3], p->add1[4], p->add1[5]);
 			char ssid[64];
 			ssid[0] = 0;	
-    		struct frame_control *control = (struct frame_control *) &p->fc;
+    		frame_control *control = (frame_control *) &p->fc;
     		std::cout << "PKT Header" << std::endl;
 			std::cout	<< "\tlen=" << (unsigned short)oob->length << std::endl
 						<< "\tRSSI=" << (signed short)oob->rssi << std::endl
@@ -83,7 +83,7 @@ void Rx80211bThread::run()
 						<< "\tBSSID=" << addr3 << std::endl;
 				//		<< "\tSeqControl=" << p->sc << std::endl
 				//		<< "\tCRC Payload=0x" << std::hex << *((unsigned long *)&packet_data[size_d-4])<< std::dec << std::endl;
-				char *temp = (char *) (packet + sizeof(struct mac_header) +sizeof (struct beacon_header));
+				char *temp = (char *) (packet + sizeof(mac_header) +sizeof (beacon_header));
 				memset(ssid, 0, sizeof(ssid));
 				memcpy (ssid, &temp[2], temp[1]);
 				if (ssid[0])

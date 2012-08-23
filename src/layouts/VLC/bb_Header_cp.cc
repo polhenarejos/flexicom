@@ -12,18 +12,21 @@ bb_Header_cp::~bb_Header_cp()
 	delete crc_cp;
 }
 
-bb_Header_cp::bb_Header_cp(int _flag, int _raw_length, gr_msg_queue_sptr _d_queue):
-	gr_block("bb_Header_cp", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (0,0, 0)),
-	flag(_flag), raw_length(_raw_length), d_queue(_d_queue)
+bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
+	gr_block("bb_Header_cp", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
+	type(_type), raw_length(_raw_length)
 {
-
-		crc_cp= new vlc_crc();
+	crc_cp= new vlc_crc();
+	if (type == PHR)
+		length = 48;
+	else if (type == PSDU)
+		length = raw_length;
 }
 
 
-bb_Header_cp::sptr bb_Header_cp::Create(int _flag, int _raw_length, gr_msg_queue_sptr _d_queue)
+bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length)
 {
-	return sptr(new bb_Header_cp(_flag, _raw_length, _d_queue));
+	return sptr(new bb_Header_cp(_type, _raw_length));
 }
 
 void bb_Header_cp::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
@@ -36,54 +39,42 @@ void bb_Header_cp::forecast(int noutput_items, gr_vector_int &ninput_items_requi
 QMutex mtx;
 int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	int *iptr= (int *)input_items[0];
-	int blocks_to_process,i,j;
-	bool check;
-	blocks_to_process= (noutput_items/raw_length);
-	length = (flag ? raw_length+16 : 48+16);
-	int *tmp = new int[length];
+	const int *iptr= (const int *)input_items[0];
+	int *optr = (int *)output_items[0];
+	int *tmp = new int[length+16];
 	memset(tmp,0,sizeof(int)*length);
-	static int ii = 0;
-	for (i=0; i<blocks_to_process; i++)
+	int rtd = 0;
+	mtx.lock();
+	optr = (int *)output_items[0];
+	printf("IN: ");
+	for (int n = 0; n < length; n++)
+		printf("%d ", iptr[n]);
+	printf("\n");
+	mtx.unlock();
+	for (int i = 0; i < noutput_items/raw_length; i++)
 	{
-		if (flag==0) //PHR
-			memcpy(tmp,iptr, sizeof(int)*48);
-		else //PSDU
-			memcpy(tmp,iptr, sizeof(int)*raw_length);
-		iptr += raw_length;
-		check = crc_cp->check_crc(tmp, NULL, length);
+		memcpy(tmp, iptr, sizeof(int)*length);
 		mtx.lock();
-		if (check == true) //crc ok!!
+		if (crc_cp->check_crc(tmp, NULL, length)) //crc ok!!
 		{
-			if (flag==0)
-			{				
-				//printf("PHR OK!\n");
-				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(32+1));
-				memcpy(msg->msg(), &flag, sizeof(int)*1);
-				memcpy(msg->msg() + sizeof(int), tmp, sizeof(int)*32);
-				d_queue->insert_tail(msg);
-				msg.reset();
-			}
-			else
-			{
-				//printf("* OK\n");
-				//printf("PSDU OK!\n");
-				gr_message_sptr msg = gr_make_message(0, 0, 0, sizeof(int)*(40+1));
-				memcpy(msg->msg(), &flag, sizeof(int)*1);
-				memcpy(msg->msg() + sizeof(int), tmp, sizeof(int)*40);
-				d_queue->insert_tail(msg);  //send it
-				msg.reset(); //free it up
-			}
-			
+			printf("%s OK\n", (type == PSDU ? "PSDU" : "PHR"));
+			memcpy(optr, iptr, sizeof(int)*(length-16));
+			optr += length-16;
+			rtd += length-16;
 		}
-		//else
-		//	printf("! %s NOK (%d)\n", (flag ? "PSDU" : "PHR"),ii);
+		else
+			printf("! %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));
 		mtx.unlock();
-		if (flag)
-			ii++;
-		//blocks_to_process--;
+		iptr += raw_length;
 	}
+	mtx.lock();
+	optr = (int *)output_items[0];
+	printf("OUT: ");
+	for (int n = 0; n < rtd; n++)
+		printf("%d ", optr[n]);
+	printf("\n");
+	mtx.unlock();
 	delete [] tmp;
-	consume_each(raw_length*blocks_to_process);
-	return 0;
+	consume_each(raw_length*(noutput_items/raw_length));
+	return rtd;
 }
