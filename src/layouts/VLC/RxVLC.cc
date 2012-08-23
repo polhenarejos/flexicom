@@ -95,8 +95,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		connect(phr_dem, 0, phr_header_dem,0);
 		connect(psdu_dem,0, psdu_header_dem,0);
 	}	
-	//connect(phr_header_dem, 0, phr_parser, 0);
-	//connect(psdu_header_dem, 0, psdu_parser, 0);	
+	connect(phr_header_dem, 0, phr_parser, 0);
+	connect(psdu_header_dem, 0, psdu_parser, 0);	
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

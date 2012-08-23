@@ -13,7 +13,7 @@ bb_Header_cp::~bb_Header_cp()
 }
 
 bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
-	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(0, 0, 0)),
+	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
 	raw_length(_raw_length), type(_type)
 {
 	crc_cp= new vlc_crc();
@@ -39,7 +39,7 @@ QMutex mtx;
 int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	const int *iptr = (const int *)input_items[0];
-	//int *optr = (int *)output_items[0];
+	int *optr = (int *)output_items[0];
 	int blocks_to_process = (noutput_items/raw_length);
 	int *tmp = new int[length+16];
 	memset(tmp,0,sizeof(int)*length+16);
@@ -50,9 +50,9 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		mtx.lock();
 		if (crc_cp->check_crc(tmp, NULL, length+16)) //crc ok!!
 		{
-			//memcpy(optr, iptr, sizeof(int)*(length-16));
+			memcpy(optr, iptr, sizeof(int)*(length-16));
 			rtd += length-16;
-			//optr += length-16;
+			optr += length-16;
 			printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
 		}
 		else
@@ -62,5 +62,5 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	}
 	delete [] tmp;
 	consume_each(raw_length*blocks_to_process);
-	return 0;
+	return rtd;
 }
