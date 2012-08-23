@@ -193,7 +193,7 @@ void RxVLC::init_var()
 					vlc_var_rx._cc_code.pre_cc_out = 0;
 					vlc_var_rx._cc_code.cc_in=0;
 					vlc_var_rx._cc_code.cc_out=0;
-					vlc_var_rx.clock_rate = 800e3; //trick to use the manchester encoder
+					vlc_var_rx.clock_rate = 400e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
 					vlc_var_rx.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[1]->currentIndex())
 					{
@@ -249,8 +249,8 @@ void RxVLC::init_var()
 							vlc_var_rx.MCSID[1] = vlc_var_rx.MCSID[3] = vlc_var_rx.MCSID[4]=1;
 							break;
 						case 2:
-							vlc_var_rx._rs_code.rs_in = 64;
-							vlc_var_rx._rs_code.rs_out = 128;
+							vlc_var_rx._rs_code.rs_in = 32;
+							vlc_var_rx._rs_code.rs_out = 64;
 							vlc_var_rx.clock_rate=30e6;
 							vlc_var_rx.MCSID[1] = vlc_var_rx.MCSID[3] = vlc_var_rx.MCSID[4] = vlc_var_rx.MCSID[5]=1;
 							break;

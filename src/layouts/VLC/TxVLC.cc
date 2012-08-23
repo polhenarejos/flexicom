@@ -161,7 +161,7 @@ void TxVLC::init_var()
 					vlc_var._cc_code.pre_cc_out = 0;
 					vlc_var._cc_code.cc_in=0;
 					vlc_var._cc_code.cc_out=0;
-					vlc_var.clock_rate = 800e3; //trick to use the manchester encoder
+					vlc_var.clock_rate = 400e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
 					switch (ly->varVLC->cb_phy_op_mode[1]->currentIndex())
 					{
@@ -217,8 +217,8 @@ void TxVLC::init_var()
 							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
-							vlc_var._rs_code.rs_in = 64;
-							vlc_var._rs_code.rs_out = 128;
+							vlc_var._rs_code.rs_in = 32;
+							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=30e6;
 							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;

@@ -300,13 +300,13 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	
 	
 	varVLC->sp_frame_size[0] = new QSpinBox(p);
-	varVLC->sp_frame_size[0]->setRange(0,1023);
+	varVLC->sp_frame_size[0]->setRange(7,1023);
 	varVLC->sp_frame_size[0]->setSingleStep(100);
 	varVLC->sp_frame_size[0]->setHidden(false);
 	QObject::connect(varVLC->sp_frame_size[0], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
 	
 	varVLC->sp_frame_size[1] = new QSpinBox(p);
-	varVLC->sp_frame_size[1]->setRange(0,65535);
+	varVLC->sp_frame_size[1]->setRange(7,65535);
 	varVLC->sp_frame_size[1]->setSingleStep(500);
 	varVLC->sp_frame_size[1]->setHidden(true);
 	QObject::connect(varVLC->sp_frame_size[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
@@ -415,6 +415,8 @@ void LayoutVLC::setDatarate(bool a)
 	switch (checked1)
 	{
 		case 0:
+			varVLC->sp_frame_size[0]->setHidden(false);
+			varVLC->sp_frame_size[1]->setHidden(true);
 			switch (checked2)
 			{
 				case 0:
@@ -433,6 +435,8 @@ void LayoutVLC::setDatarate(bool a)
 			
 		break;
 		case 1:
+			varVLC->sp_frame_size[0]->setHidden(true);
+			varVLC->sp_frame_size[1]->setHidden(false);
 			switch (checked2)
 			{
 				case 0:
