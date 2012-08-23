@@ -20,38 +20,47 @@ int PHRParser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star
 	const int *iptr = (const int *)_i[0];
 	int csmd = 0;
 
-	for (int n = 0; n < no; n++)
+	for (int n = 0; n < no;)
 	{
-		int mv = 0;
+		int mv = 1;
 		if (ic == 0)
+			printf("---------------------\nPHR HEADER\n| Burst_mode: %d\n", *iptr);
+		else if (ic == 1)
 		{
-			printf("---------------------\nEXTRACTING INFORMATION FROM PHR HEADER\n");
-			printf("| Burst_mode: %d\n", *iptr);
-			mv = 1;
+			if (n+3 < no)
+			{
+				printf("| Channel_number: %d\n", LayoutVLC::bi2dec((int *)iptr, 3));
+				mv = 3;
+			}
+			else
+				break;
 		}
-		else if (ic == 1 && n+3 < no)
+		else if (ic == 4)
 		{
-			printf("| Channel_number: %d\n", LayoutVLC::bi2dec((int *)iptr, 3));
-			mv = 3;
+			if (n+6 < no)
+			{
+				printf("| MCSID: %d\n", LayoutVLC::bi2dec((int *)iptr, 6));
+				mv = 6;
+			}
+			else
+				break;
 		}
-		else if (ic == 4 && n+6 < no)
+		else if (ic == 10)
 		{
-			printf("| MCSID: %d\n", LayoutVLC::bi2dec((int *)iptr, 6));
-			mv = 6;
-		}
-		else if (ic == 10 && n+16 < no)
-		{
-			printf("| PSDU_length: %d bytes\n", LayoutVLC::bi2dec((int *)iptr, 16));
-			mv = 16;
+			if (n+16 < no)
+			{
+				printf("| PSDU_length: %d bytes\n", LayoutVLC::bi2dec((int *)iptr, 16));
+				mv = 16;
+			}
+			else
+				break;
 		}
 		else if (ic == 26)
-		{
 			printf("| Dimmed_OOK_extension: %d\n", *iptr);
-			mv = 1;
-		}
 		csmd += mv;
 		iptr += mv;
-		ic = (ic+1)%32;
+		ic = (ic+mv)%32;
+		n += mv;
 	}
 	consume_each(csmd);
 	return 0;
