@@ -23,6 +23,7 @@ int PHRParser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star
 	for (int n = 0; n < no;)
 	{
 		int mv = 1;
+		mtx.lock();
 		if (ic == 0)
 			printf("---------------------\nPHR HEADER\n| Burst_mode: %d\n", *iptr);
 		else if (ic == 1)
@@ -57,6 +58,7 @@ int PHRParser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star
 		}
 		else if (ic == 26)
 			printf("| Dimmed_OOK_extension: %d\n", *iptr);
+		mtx.unlock();
 		csmd += mv;
 		iptr += mv;
 		ic = (ic+mv)%32;
