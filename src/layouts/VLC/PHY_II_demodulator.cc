@@ -46,7 +46,7 @@ PHY_II_demodulator::PHY_II_demodulator(unsigned int _phy_type, unsigned int _phy
 		if (rs_in!=0)
 		{
 			Bi2De::sptr bi2de = Bi2De::Create(GF);
-			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length*4/(GF*6*2));
+			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, mod_length*4/(GF*6));
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
 			connect(RLL, 0, RLL2,0);

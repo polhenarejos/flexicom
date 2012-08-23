@@ -12,16 +12,8 @@ bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 {
 	unsigned int poly = 0x0;
 	//printf("GF:%d, N:%d, K:%d, phy_type:%d, length:%d\n", GF,N,K, phy_type, length);
-	switch (phy_type)
-	{
-		case 0: //PHY I
-			poly = 0x13;
-			break;
-		case 1: //PHY II
-			poly = 0x11D; 
-			break;
-	}
-	vlc_rs=new vlc_reed_solomon(GF, poly, 1, 1,(N-K));
+	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
+		//for PHY II coincides the fact that the possible rates (n,k) -> 160-128=64-32=255-223
 	out_rs_dec=rs_out_elements();
 	//printf("\n\n\nEl valor de out_rs_dec es:%d\n", out_rs_dec);
 	set_output_multiple(out_rs_dec);
@@ -69,51 +61,110 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	uint RS_words= pre_length/N;
 	uint blocks_to_process = (noutput_items/out_rs_dec);
 	uint i,j;
-	unsigned char *tmp = new unsigned char[N];
-	unsigned char *tmp2 = new unsigned char[K];
-	while (blocks_to_process>0)
+	unsigned char *tmp = new unsigned char[powf(2,GF)-1];
+	unsigned char *tmp2;
+	if (phy_type==0)
+		tmp2 = new unsigned char[K];
+	else
+		tmp2 = new unsigned char[223];
+	if (phy_type == 0)
+	{	
+		while (blocks_to_process>0)
+		{
+			for (i=0; i<RS_words; i++)
+			{
+				//memcpy(tmp,iptr,sizeof(unsigned char)*N);
+				for(j=0;j<N;j++)
+				{
+					tmp[j]= (unsigned char)iptr[0];
+					iptr ++;
+				}
+				vlc_rs->decode(tmp2,tmp);
+				for (j=0; j< K; j++)
+				{
+					LayoutVLC::dec2bi(tmp2[j], GF,optr);
+					optr = optr + GF;
+				}
+				//iptr = iptr + N;
+			}
+			if (pre_length%N!=0)
+			{
+				uint remaining_words = pre_length%N - (N-K);
+				//we will have to insert zeros in the middle of the frame to perform the rs-decoding
+				memset(tmp,0,sizeof(unsigned char)*N);
+				memset(tmp2,0,sizeof(unsigned char)*K);
+				for (j=0;j<remaining_words;j++)
+				{
+					tmp[j]=(unsigned char)iptr[0];
+					iptr++;
+				}
+				for (j=K;j<N;j++)
+				{
+					tmp[j]=(unsigned char)iptr[0];
+					iptr ++;
+				}
+				vlc_rs->decode(tmp2,tmp);
+				for (i=0; i< remaining_words; i++)
+				{
+					LayoutVLC::dec2bi(tmp2[i],GF,optr);
+					optr = optr + GF;
+				}
+				//iptr = iptr + (pre_length%N);
+			}
+			blocks_to_process--;
+		}
+	}
+	else // PHY_ II
 	{
-		for (i=0; i<RS_words; i++)
+		while (blocks_to_process >0)
 		{
-			//memcpy(tmp,iptr,sizeof(unsigned char)*N);
-			for(j=0;j<N;j++)
+			for (i=0; i<RS_words; i++)
 			{
-				tmp[j]= (unsigned char)iptr[0];
-				iptr ++;
+				memset(tmp,0,sizeof(unsigned char)*255);
+				for(j=0;j<K;j++)
+				{
+					tmp[j]= (unsigned char)iptr[0];
+					iptr ++;
+				}
+				for (j=223; j<255; j++)
+				{
+					tmp[j] = (unsigned char)iptr[0];
+					iptr ++;
+				}
+				vlc_rs->decode(tmp2,tmp);
+				for (j=0; j< K; j++)
+				{
+					LayoutVLC::dec2bi(tmp2[j], GF,optr);
+					optr = optr + GF;
+				}
+				//iptr = iptr + N;
 			}
-			vlc_rs->decode(tmp2,tmp);
-			for (j=0; j< K; j++)
+			if (pre_length%N!=0)
 			{
-				LayoutVLC::dec2bi(tmp2[j], GF,optr);
-				optr = optr + GF;
+				uint remaining_words = pre_length%N - (N-K);
+				//we will have to insert zeros in the middle of the frame to perform the rs-decoding
+				memset(tmp,0,sizeof(unsigned char)*255);
+				memset(tmp2,0,sizeof(unsigned char)*223);
+				for (j=0;j<remaining_words;j++)
+				{
+					tmp[j]=(unsigned char)iptr[0];
+					iptr++;
+				}
+				for (j=223;j<255;j++)
+				{
+					tmp[j]=(unsigned char)iptr[0];
+					iptr ++;
+				}
+				vlc_rs->decode(tmp2,tmp);
+				for (i=0; i< remaining_words; i++)
+				{
+					LayoutVLC::dec2bi(tmp2[i],GF,optr);
+					optr = optr + GF;
+				}
+				//iptr = iptr + (pre_length%N);
 			}
-			//iptr = iptr + N;
+			blocks_to_process--;
 		}
-		if (pre_length%N!=0)
-		{
-			uint remaining_words = pre_length%N - (N-K);
-			//we will have to insert zeros in the middle of the frame to perform the rs-decoding
-			memset(tmp,0,sizeof(unsigned char)*N);
-			memset(tmp2,0,sizeof(unsigned char)*K);
-			for (j=0;j<remaining_words;j++)
-			{
-				tmp[j]=(unsigned char)iptr[0];
-				iptr++;
-			}
-			for (j=K;j<N;j++)
-			{
-				tmp[j]=(unsigned char)iptr[0];
-				iptr ++;
-			}
-			vlc_rs->decode(tmp2,tmp);
-			for (i=0; i< remaining_words; i++)
-			{
-				LayoutVLC::dec2bi(tmp2[i],GF,optr);
-				optr = optr + GF;
-			}
-			//iptr = iptr + (pre_length%N);
-		}
-		blocks_to_process--;
 	}
 	delete [] tmp;
 	delete [] tmp2;
