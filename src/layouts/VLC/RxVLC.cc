@@ -34,25 +34,25 @@ void RxVLCThread::run()
 			if (packet[0] == 0) //phr
 			{
 				
-				printf("EXTRACTING INFORMATION FROM PHR HEADER\n");
-				printf("Burst_mode: %d\n", packet[1]);
-				printf("Channel_number: %d\n", LayoutVLC::bi2dec(&packet[2],3));
-				printf("MCSID(table 83):%d\n", LayoutVLC::bi2dec(&packet[5],6));
+				//printf("EXTRACTING INFORMATION FROM PHR HEADER\n");
+				//printf("Burst_mode: %d\n", packet[1]);
+				//printf("Channel_number: %d\n", LayoutVLC::bi2dec(&packet[2],3));
+				//printf("MCSID(table 83):%d\n", LayoutVLC::bi2dec(&packet[5],6));
 				printf("PSDU_length (in octets): %d\n", LayoutVLC::bi2dec(&packet[11],16));
-				printf("Dimmed_OOK_extenstion : %d\n", packet[27]);
+				//printf("Dimmed_OOK_extenstion : %d\n", packet[27]);
 				
 			}
 			else //reading mhr
 			{
-				printf("EXTRACTING INFORMATION FROM MAC HEADER\n");
-				printf("Frame_version: %d, (0 means that is compatible with IEEE 802.15.7)\n", LayoutVLC::bi2dec(&packet[1],2));
-				printf("Frame_type: %d\n", LayoutVLC::bi2dec(&packet[7],3));
-				printf("Security Enabled: %d\n", packet[10]);
-				printf("Frame pending: %d\n", packet[11]);
-				printf("Ack Request: %d\n", packet[12]);
-				printf("Destination address_mode: %d\n", LayoutVLC::bi2dec(&packet[13],2));
-				printf("Source address_mode: %d\n", LayoutVLC::bi2dec(&packet[15],2));
-				printf("Frame_sequence_number: %d\n", (int)LayoutVLC::bi2dec(&packet[17],8));
+				//printf("EXTRACTING INFORMATION FROM MAC HEADER\n");
+				//printf("Frame_version: %d, (0 means that is compatible with IEEE 802.15.7)\n", LayoutVLC::bi2dec(&packet[1],2));
+				//printf("Frame_type: %d\n", LayoutVLC::bi2dec(&packet[7],3));
+				//printf("Security Enabled: %d\n", packet[10]);
+				//printf("Frame pending: %d\n", packet[11]);
+				//printf("Ack Request: %d\n", packet[12]);
+				//printf("Destination address_mode: %d\n", LayoutVLC::bi2dec(&packet[13],2));
+				//printf("Source address_mode: %d\n", LayoutVLC::bi2dec(&packet[15],2));
+				//printf("Frame_sequence_number: %d\n", (int)LayoutVLC::bi2dec(&packet[17],8));
 				printf("Destination_address: %X:%X:%X:%X\n", packet[25],packet[29],packet[33],packet[37]);
 			}
 		}
@@ -95,8 +95,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		connect(phr_dem, 0, phr_header_dem,0);
 		connect(psdu_dem,0, psdu_header_dem,0);
 	}	
-	connect(phr_header_dem, 0, phr_parser, 0);
-	connect(psdu_header_dem, 0, psdu_parser, 0);	
+	//connect(phr_header_dem, 0, phr_parser, 0);
+	//connect(psdu_header_dem, 0, psdu_parser, 0);	
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {
