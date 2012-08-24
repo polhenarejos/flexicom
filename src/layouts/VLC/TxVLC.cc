@@ -116,7 +116,8 @@ void TxVLC::init_var()
 					vlc_var._cc_code.pre_cc_out = 4;
 					vlc_var.clock_rate = 200e3;
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[0]->currentIndex();
-					switch (ly->varVLC->cb_phy_op_mode[0]->currentIndex())
+					LayoutVLC::dec2bi(vlc_var.operating_mode, 6, vlc_var.MCSID);
+					switch (vlc_var.operating_mode)
 					{
 					    case 0:
 							vlc_var._rs_code.rs_in = 7;
@@ -129,28 +130,24 @@ void TxVLC::init_var()
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 1;
 							vlc_var._cc_code.cc_out = 3;
-							vlc_var.MCSID[5]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 11;
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 2;
 							vlc_var._cc_code.cc_out = 3;
-							vlc_var.MCSID[4]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 11;
 							vlc_var._rs_code.rs_out = 15;
 							vlc_var._cc_code.cc_in = 0;
 							vlc_var._cc_code.cc_out = 0;
-							vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
 							vlc_var._cc_code.cc_in = 0;
 							vlc_var._cc_code.cc_out = 0;
-							vlc_var.MCSID[3]=1;
 							break;
 					}
 					break;
@@ -163,27 +160,24 @@ void TxVLC::init_var()
 					vlc_var._cc_code.cc_out=0;
 					vlc_var.clock_rate = 400e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
-					switch (ly->varVLC->cb_phy_op_mode[1]->currentIndex())
+					LayoutVLC::dec2bi(vlc_var.operating_mode+5, 6, vlc_var.MCSID);
+					switch (vlc_var.operating_mode)
 					{
 						case 0:
 							vlc_var._rs_code.rs_in = 2;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.rs_in = 4;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 7;
 							vlc_var._rs_code.rs_out = 15;
-							vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
-							vlc_var.MCSID[2]=1;
 							break;
 					}
 					break;
@@ -202,97 +196,85 @@ void TxVLC::init_var()
 			{
 				case 0: //OOK
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[2]->currentIndex();
-					switch (ly->varVLC->cb_phy_op_mode[2]->currentIndex())
+					LayoutVLC::dec2bi(vlc_var.operating_mode+21, 6, vlc_var.MCSID);
+					switch (vlc_var.operating_mode)
 					{
 						case 0:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=15e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=15e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=30e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[3] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=30e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out =64;
 							vlc_var.clock_rate=60e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[5]=1;
 							break;
 						case 5:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=60e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4]=1;
 							break;
 						case 6:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 7:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3]=1;
 							break;
 						case 8:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
 							vlc_var.clock_rate=120e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[2] = vlc_var.MCSID[3] = vlc_var.MCSID[5]=1;
 							break;
 					}
 					break;
 				case 1: //VPPM
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[3]->currentIndex();
-					switch (ly->varVLC->cb_phy_op_mode[3]->currentIndex())
+					LayoutVLC::dec2bi(vlc_var.operating_mode+16, 6, vlc_var.MCSID);
+					switch (vlc_var.operating_mode)
 					{
 						case 0:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=3.75e6;
-							vlc_var.MCSID[1]=1;
 							break;
 						case 1:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=3.75e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[5]=1;
 							break;
 						case 2:
 							vlc_var._rs_code.rs_in = 32;
 							vlc_var._rs_code.rs_out = 64;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[4]=1;
 							break;
 						case 3:
 							vlc_var._rs_code.rs_in = 128;
 							vlc_var._rs_code.rs_out = 160;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[4] = vlc_var.MCSID[5]=1;
 							break;
 						case 4:
 							vlc_var._rs_code.rs_in = 0;
 							vlc_var._rs_code.rs_out = 0;
 							vlc_var.clock_rate=7.5e6;
-							vlc_var.MCSID[1] = vlc_var.MCSID[3]=1; 
 							break;
 
 					}

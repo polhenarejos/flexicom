@@ -78,7 +78,7 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 	// the first 6 bits are 0: frame_version and reserved.
 	// the 8th version is equal to 1, according to Table 7 (Page 76), data frame.
 	//memset(&MHR[8],1,sizeof(int)*1);
-	MHR[8] =1;
+	MHR[6] =1;
 	//the 9th bit is equal to zero because security is not enabled.
 	//memset(&MHR[10],1,sizeof(int)*1); //means that there is a frame_pending
 	MHR[10]=1;
