@@ -1,8 +1,8 @@
 // $Id$
 #include "bb_Header_cp.h"
 #include "vlc_crc.h"
+#include "LayoutVLC.h"
 #include <gr_io_signature.h>
-#include <gr_msg_queue.h>
 #include <math.h>
 
 typedef unsigned int uint;
@@ -13,7 +13,7 @@ bb_Header_cp::~bb_Header_cp()
 }
 
 bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
-	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
 	raw_length(_raw_length), type(_type)
 {
 	crc_cp= new vlc_crc();
@@ -39,7 +39,7 @@ QMutex mtx;
 int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
 	const int *iptr = (const int *)input_items[0];
-	int *optr = (int *)output_items[0];
+	unsigned char *optr = (unsigned char *)output_items[0];
 	int blocks_to_process = (noutput_items/raw_length);
 	int *tmp = new int[length+16];
 	memset(tmp,0,sizeof(int)*length+16);
@@ -50,9 +50,11 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		mtx.lock();
 		if (crc_cp->check_crc(tmp, NULL, length+16)) //crc ok!!
 		{
-			memcpy(optr, iptr, sizeof(int)*(length-16));
-			rtd += length-16;
-			optr += length-16;
+			for (int n = 0; n < length-16; n += sizeof(unsigned char)*8)
+			{
+				*optr++ = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, sizeof(unsigned char)*8);
+				rtd++;
+			}
 			printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
 		}
 		else

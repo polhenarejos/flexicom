@@ -73,8 +73,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length);
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length);
-	PHRParser::sptr phr_parser = PHRParser::Create();
-	gr_null_sink_sptr psdu_parser = gr_make_null_sink(sizeof(int));
+	Parser::sptr phr_parser = Parser::Create(Parser::PHR);
+	Parser::sptr psdu_parser = Parser::Create(Parser::PSDU, vlc_var_rx.PSDU_raw_length-16);
 	connect(f2i,0,phr,0);
 	connect(f2i,0,psdu,0);
 	if (vlc_var_rx.phy_type ==0) // PHY I

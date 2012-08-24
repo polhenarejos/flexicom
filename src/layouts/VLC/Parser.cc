@@ -4,66 +4,68 @@
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
 
-PHRParser::PHRParser() :
-	gr_block("PHRParser", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(0, 0, 0)),
-	ic(0)
+Parser::Parser(Type _type, int _psdu_len) :
+	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 0, 0)),
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8))
 {
 }
-PHRParser::sptr PHRParser::Create()
+Parser::sptr Parser::Create(Type _type, int _psdu_len)
 {
-	return sptr(new PHRParser());
+	return sptr(new Parser(_type, _psdu_len));
+}
+void Parser::PHRParser(unsigned int PHRData)
+{
+	PhyHdr *ph = (PhyHdr *)&PHRData;
+	printf("---------------------\nPHR HEADER (%X)\n| Burst_mode: %d\n", PHRData, ph->B);
+	printf("| Channel_number: %d\n", ph->CN);
+	printf("| MCSID: %d\n", ph->MCS);
+	printf("| PSDU_length: %d bytes\n", ph->PL);
+	printf("| Dimmed_OOK_extension: %d\n", ph->DO);
+}
+void Parser::PSDUParser(unsigned char *MHR)
+{
+	FrameControl *fc = (FrameControl *)MHR;
+	printf("+++++++++++++++++++++\n+ PSDU HEADER(%X-%X-%X-%X-%X)\n+ Frame version: %d\n", MHR[0], MHR[1], MHR[2], MHR[3], MHR[4], fc->FV);
+	printf("+ Frame type: %d\n", fc->FT);
+	printf("+ Security enabled: %d\n", fc->SE);
+	printf("+ Frame pending: %d\n", fc->FP);
+	printf("+ Ack request: %d\n", fc->AR);
+	printf("+ Dest. addr. mode: %d\n", fc->DAM);
+	printf("+ Source addr. mode: %d\n", fc->SAM);
+	printf("+ Sequence number: %d\n", MHR[2]);
+	printf("+ Dest. Address: %X.%X\n", MHR[3], MHR[4]);
 }
 #include <QMutex>
 extern QMutex mtx;
-int PHRParser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
+int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
-	const int *iptr = (const int *)_i[0];
-	int csmd = 0;
-
-	for (int n = 0; n < no;)
+	const unsigned char *iptr = (const unsigned char *)_i[0];
+	if (type == PHR)
 	{
-		int mv = 1;
-		mtx.lock();
-		if (ic == 0)
-			printf("---------------------\nPHR HEADER\n| Burst_mode: %d\n", *iptr);
-		else if (ic == 1)
+		for (int n = 0; n < no; n++)
 		{
-			if (n+3 < no)
+			PHRData |= ((unsigned int )*iptr++ << (0x8)*ic);
+			if ((ic = (ic+1)%4) == 0)
 			{
-				printf("| Channel_number: %d\n", LayoutVLC::bi2dec((int *)iptr, 3));
-				mv = 3;
+				PHRParser(PHRData);
+				PHRData = 0x0;
 			}
-			else
-				break;
 		}
-		else if (ic == 4)
-		{
-			if (n+6 < no)
-			{
-				printf("| MCSID: %d\n", LayoutVLC::bi2dec((int *)iptr, 6));
-				mv = 6;
-			}
-			else
-				break;
-		}
-		else if (ic == 10)
-		{
-			if (n+16 < no)
-			{
-				printf("| PSDU_length: %d bytes\n", LayoutVLC::bi2dec((int *)iptr, 16));
-				mv = 16;
-			}
-			else
-				break;
-		}
-		else if (ic == 26)
-			printf("| Dimmed_OOK_extension: %d\n", *iptr);
-		mtx.unlock();
-		csmd += mv;
-		iptr += mv;
-		ic = (ic+mv)%32;
-		n += mv;
 	}
-	consume_each(csmd);
+	else if (type == PSDU)
+	{
+		for (int n = 0; n < no; n++)
+		{
+			if (ic < 5)
+			{
+				MHR[ic] = *iptr;
+				if (ic == 4)
+					PSDUParser(MHR);
+			}
+			ic = (ic+1)%psdu_len;
+			iptr++;
+		}
+	}
+	consume_each(no);
 	return 0;
 }
