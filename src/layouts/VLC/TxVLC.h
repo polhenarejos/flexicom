@@ -4,6 +4,8 @@
 
 #include <gr_hier_block2.h>
 #include <boost/thread.hpp>
+#include "DataSource.h"
+
 //#include <gr_msg_queue.h>
 //#include <QThread>
 
@@ -79,6 +81,7 @@ class TxVLC : public gr_hier_block2
 		void UIChanged();
 		uint64_t GetConfigVer();
 		void UpdateConfigVer();
+		int SendPacket(unsigned char *, unsigned int);
 		
 	private:
 		int poly[3];
@@ -86,6 +89,7 @@ class TxVLC : public gr_hier_block2
 		LayoutVLC *ly;
 		void init_var();
 		boost::mutex mutex;
+		DataSource::sptr data_source;
 };
 
 #endif //_INC_TXVLC_H_

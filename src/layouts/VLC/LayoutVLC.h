@@ -15,6 +15,41 @@
 class uhd_usrp_source;
 class uhd_usrp_sink;
 class MainWindow;
+class QRadioButton;
+class QPushButton;
+class QLineEdit;
+class QSpinBox;
+class QComboBox;
+class QLabel;
+class QTextEdit;
+
+typedef struct
+{
+	QLabel *l_tx_mode;
+	QComboBox *cb_tx_mode;
+	
+	QLabel *l_psdu_units;
+	QSpinBox *sp_psdu_units[2];
+	
+	QLabel *l_phy_type;
+	QRadioButton *rb_phy_type[2];
+	
+	QLabel *l_flp_length;
+	QSpinBox *sp_flp_length;
+	
+	QLabel *l_phy_modulation;
+	QRadioButton *rb_phy_modulation	[2];
+			
+	QLabel *l_phy_op_mode;
+	QComboBox *cb_phy_op_mode[4];
+	
+	QLabel *l_frame_size; //bytes
+	QSpinBox *sp_frame_size[2];
+	
+	QTextEdit *tx_chat;
+	QLineEdit *le_chat;
+	QPushButton *pb_chat;
+}VarVLC;
 
 /*! \brief The class where the layout of the VLC communication system is defined
 
@@ -37,6 +72,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		MainWindow *mw;
 		int radioID;
 		QWidget *CreateTabOpts();
+		QWidget *CreateTabChat();
 		void init_v_VLC (VarVLC *, QWidget *);
 		void ReadSettings(QSettings *);
 			
@@ -58,6 +94,12 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void setDatarate(bool);
 		void TrackChanges();
 		void StateLayout(MainWindow::StatesLayout);
+		void ChatClicked();
+		void ChatText(QString &);
+		void ChatAppend(QString &);
+		
+	signals:
+		void ChatSigText(QString &);
 };
 
 #endif //_INC_LAYOUTVLC_H_

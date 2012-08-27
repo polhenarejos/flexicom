@@ -113,6 +113,7 @@ class Panel : public QTabWidget
 		QSpinBox *sp_gain;
 		QLineEdit *le_freq;
 		QRadioButton *rb_chain[2];
+		QButtonGroup *bg_chain;
 	
 	public slots:
 		void SetDevs(int);

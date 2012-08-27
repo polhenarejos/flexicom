@@ -8,9 +8,9 @@
 #endif
 #include "LayoutVLC.h"
 
-bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) : 
-	gr_block("bbPSDU_generation", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(int))),
-	PSDU_length(_PSDU_length*8), ic(0)
+bbPSDU_generation::bbPSDU_generation(int _PSDU_length) : 
+	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	PSDU_length(_PSDU_length), ic(0), bits(0)
 {
 	//crc=new vlc_crc(PSDU_length);
 	crc=new vlc_crc();
@@ -20,53 +20,23 @@ bbPSDU_generation::bbPSDU_generation(std::string _f,int _PSDU_length) :
 	int i;
 	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
 	length_payload= PSDU_length-40-crc_length;
-	data_payload = new int[length_payload];
 	sequence_number = 1;
-	//FILE READING
-	FILE *fp = fopen(_f.c_str(), "r");
-	if (fp ==NULL)
-  	{
-  		printf("The file is not available\n");
-    	exit(-1);
-  	}
-  	else
-  	{
-  		// 2 assumptions done here: 
-  		//a)I do not check the length of the file , there is enough elements
-  		//b)In the first approximation, the data_payload will be the same for all the frames
-  		for (i=0; i<length_payload; )
-  		{
-  			char c = fgetc(fp);
-  			if (c != 0xd && c != 0xa) //\r\n
-  				data_payload[i++]=c-48;  //it returns the ascii code
-  			//the file could be prepared to do a fread call
-  		}
-  	}
-  	fclose(fp);
   	payload_crc = new int[PSDU_length];
-	//this would be to be modified in the future with the addition of dimming capabilities
-	//set_output_multiple(PSDU_length);
-
+  	bytes_payload = length_payload/8;
+  	data = new int[length_payload];
 }
 bbPSDU_generation::~bbPSDU_generation()
 {
-	if (data_payload && crc)
+	if (crc)
 	{
-		delete [] data_payload; data_payload = 0;
 		delete crc; crc=0;
 	}
 	delete [] payload_crc;
 }
-bbPSDU_generation::sptr bbPSDU_generation::Create(std::string _f, int _PSDU_length)
+bbPSDU_generation::sptr bbPSDU_generation::Create(int _PSDU_length)
 {
-	return sptr(new bbPSDU_generation(_f, _PSDU_length));
+	return sptr(new bbPSDU_generation(_PSDU_length));
 }
-/*
-void bbPSDU_generation::forecast(int no, gr_vector_int &in)
-{
-	in[0] = no/PSDU_length;
-}
-*/
 void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 {
 	// This is a particular codification for the MHR, taking into account simplicity
@@ -97,23 +67,60 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 		MHR[24+i]= 1;
 	
 }
+void bbPSDU_generation::forecast(int no, gr_vector_int &ni)
+{
+	ni[0] = (no/PSDU_length)*length_payload;
+}
 int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
+	const int *iptr = (const int *)input_items[0];
 	int *optr = (int *) output_items[0];
+	//printf("addr %X\n",iptr);
+	int csmd = 0;
 	for (int n = 0; n < no; n++)
 	{
+		if (ic < length_payload)
+		{
+			//if (*iptr)
+			//	printf("%d en byte %d\n", *iptr, bits);
+			data[bits++] = *iptr++;
+			csmd++;
+			if (bits == length_payload)
+			{
+				buffer.push_back(data);
+				data = new int[length_payload];
+				bits = 0;
+			}
+		}
+		//printf("%d %d\n",buffer.size(), ic);
 		if (ic == 0)
 		{
 			int *pld = new int[PSDU_length];
 			memset(pld, 0, sizeof(int)*PSDU_length);
-			LayoutVLC::dec2bi(sequence_number++,8,&MHR[16]);
+			LayoutVLC::dec2bi(sequence_number++, 8, MHR+16);
 			memcpy(pld, MHR, sizeof(int)*40);
-			memcpy(&pld[40],data_payload, sizeof(int)*length_payload);
+			if (buffer.size())
+			{
+				/*if (buffer[0][10])
+				{
+					for (int i = 8; i < 16; i++)
+					printf("%d",*(buffer[0]+i));
+					printf("\n");
+				}*/
+				memcpy(pld+40, buffer[0], sizeof(int)*length_payload);
+				delete [] buffer[0];
+				buffer.erase(buffer.begin());
+			}
 			crc->generate_crc(pld, payload_crc, PSDU_length);
 			delete [] pld;
 		}
 		*optr++ = payload_crc[ic];
 		ic = (ic+1)%PSDU_length;
 	}
+	consume_each(csmd);
 	return no;
+}
+int bbPSDU_generation::DataLength()
+{
+	return bytes_payload; //in bytes
 }

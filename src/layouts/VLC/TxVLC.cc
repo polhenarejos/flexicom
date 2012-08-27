@@ -16,7 +16,7 @@
 #include "bbVLC_Frame_Generator.h"
 #include "TxTagger.h"
 #include "bbMatlab.h"
-
+#include "DataSource.h"
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(float))),
@@ -33,12 +33,14 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	connect(phr_RLL,0,i2f,0);
 	connect(i2f,0,self(),0);*/
 	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
-	
+
 	//GENERATION OF PHR, DATA
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
-	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create("src/layouts/VLC/input_data.txt", vlc_var.PSDU_raw_length/8);
+	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create(vlc_var.PSDU_raw_length);
+	data_source = DataSource::Create(PSDU_gen->DataLength());
+	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-4);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
-	
+	connect(data_source, 0, PSDU_gen, 0);
 	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);
 	//connect(tagger, 1, PSDU_gen, 0);
@@ -313,4 +315,8 @@ uint64_t TxVLC::GetConfigVer()
 	boost::lock_guard<boost::mutex> lock(mutex);
 	uint64_t v = vlc_var.count;
 	return v;
+}
+int TxVLC::SendPacket(unsigned char *data, unsigned int size)
+{
+	return data_source->PushData(data, size, 2);
 }

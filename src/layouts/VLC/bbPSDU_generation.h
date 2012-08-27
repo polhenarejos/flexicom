@@ -20,22 +20,26 @@ class bbPSDU_generation : public gr_block
        * @param _f: name of the file where the input bits are extracted from. 
        * @param _PSDU_length: specifies the total number of bits containted in the PSDU.
        */
-		static sptr Create(std::string, int);
-		int general_work(int, gr_vector_int &, gr_vector_const_void_star&, gr_vector_void_star&);
+		static sptr Create(int);
+		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		~bbPSDU_generation();
-		//void forecast(int, gr_vector_int &);
+		int DataLength();
+		void forecast(int, gr_vector_int &);
 	
 	private:
-		bbPSDU_generation(std::string, int);
+		bbPSDU_generation(int);
 		void generate_MHR_preamble (int *);
 		int PSDU_length; //length of the PSDU in bytes
 		int MHR[40];
-		int *data_payload;
+		std::vector<int *> buffer;
+		int *data;
 		int length_payload;
 		unsigned char sequence_number;
 		vlc_crc *crc;
 		unsigned int ic;
 		int *payload_crc;
+		unsigned int bits;
+		unsigned int bytes_payload;
 };
 
 #endif //_INC_BBPSDU_GENERATION_H

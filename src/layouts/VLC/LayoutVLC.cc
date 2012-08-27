@@ -10,6 +10,11 @@
 #include <QGridLayout>
 #include <QComboBox>
 #include <QRadioButton>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QLabel>
+#include <QTextEdit>
 #include <iostream>
 
 #include <gr_udp_sink.h>
@@ -44,10 +49,12 @@ double rate_phy2_o [] = {
 	
 
 LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
-	LayoutFactory(),mw(_mw), radioID(_radioID)
+	LayoutFactory(), mw(_mw), radioID(_radioID)
 {
 	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 	QObject::connect(mw, SIGNAL(StateLayoutChanged(MainWindow::StatesLayout)), this, SLOT(StateLayout(MainWindow::StatesLayout)));
+	QObject::connect(this, SIGNAL(ChatSigText(QString &)), this, SLOT(ChatText(QString &)));
+	qRegisterMetaType<QString>("QString &");
 }
 const char *LayoutVLC::Name()
 {
@@ -85,6 +92,8 @@ void LayoutVLC::Run()
 	}
 	else //transmitter
 	{
+		varVLC->le_chat->setEnabled(true);
+		varVLC->pb_chat->setEnabled(true);
 		/*usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 		usrp_tx->set_samp_rate(800e3);
 		usrp_tx->set_center_freq(0);
@@ -140,11 +149,12 @@ void LayoutVLC::RadioPressed(bool checked)
 	if (checked)
 	{
 		mw->AddCustomTab(CreateTabOpts(), QString("Options"));
+		mw->AddCustomTab(CreateTabChat(), QString("Chat"));
 		mw->panel->rb_chain[RB_TX]->setHidden(false);
 		mw->panel->rb_chain[RB_RX]->setHidden(false);
 		mw->panel->rb_chain[RB_TX]->setChecked(true);
 		ReadSettings(mw->s);
-		QObject::connect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));
+		QObject::connect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));		
 	}
 	else
 	{
@@ -206,7 +216,23 @@ QWidget *LayoutVLC::CreateTabOpts()
 	return p;
 	
 }
-
+QWidget *LayoutVLC::CreateTabChat()
+{
+	QWidget *p = new QWidget(mw);
+	QGridLayout *grid = new QGridLayout(p);
+	varVLC->tx_chat = new QTextEdit(p);
+	varVLC->le_chat = new QLineEdit(p);
+	varVLC->pb_chat = new QPushButton(tr("Send"));
+	grid->addWidget(varVLC->tx_chat, 0, 0, 1, 2);
+	grid->addWidget(varVLC->le_chat, 1, 0);
+	grid->addWidget(varVLC->pb_chat, 1, 1);
+	QObject::connect(varVLC->pb_chat, SIGNAL(clicked()), this, SLOT(ChatClicked()));
+	QObject::connect(varVLC->le_chat, SIGNAL(returnPressed()), this, SLOT(ChatClicked()));
+	varVLC->le_chat->setEnabled(false);
+	varVLC->pb_chat->setEnabled(false);
+	varVLC->tx_chat->setReadOnly(true);
+	return p;
+}
 void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 {
 	uint i;
@@ -480,4 +506,31 @@ void LayoutVLC::StateLayout(MainWindow::StatesLayout s)
 {
 	if (s == MainWindow::STOPPING)
 		Stop();
+}
+void LayoutVLC::ChatClicked()
+{
+	int size = varVLC->le_chat->text().size();
+	if (tx && size)
+	{
+		unsigned char *t = new unsigned char[size+1];
+		memcpy(t, (unsigned char *)varVLC->le_chat->text().toAscii().data(), sizeof(unsigned char)*(size+1));
+		t[size] = '\0';
+		tx->SendPacket(t, size+1);
+		varVLC->tx_chat->setPlainText(varVLC->tx_chat->toPlainText().append(varVLC->le_chat->text().append('\n')));
+		varVLC->le_chat->setText('\0');
+		QTextCursor c = varVLC->tx_chat->textCursor();
+		c.movePosition(QTextCursor::End);
+		varVLC->tx_chat->setTextCursor(c);
+	}
+}
+void LayoutVLC::ChatAppend(QString &s)
+{
+	emit ChatSigText(s);
+}
+void LayoutVLC::ChatText(QString &s)
+{
+	varVLC->tx_chat->setPlainText(varVLC->tx_chat->toPlainText().append(s));
+	QTextCursor c = varVLC->tx_chat->textCursor();
+	c.movePosition(QTextCursor::End);
+	varVLC->tx_chat->setTextCursor(c);
 }

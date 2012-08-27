@@ -2,16 +2,17 @@
 
 #include "Parser.h"
 #include "LayoutVLC.h"
+#include <QTextEdit>
 #include <gr_io_signature.h>
 
-Parser::Parser(Type _type, int _psdu_len) :
+Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 0, 0)),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8))
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly)
 {
 }
-Parser::sptr Parser::Create(Type _type, int _psdu_len)
+Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
 {
-	return sptr(new Parser(_type, _psdu_len));
+	return sptr(new Parser(_type, _ly, _psdu_len));
 }
 void Parser::PHRParser(unsigned int PHRData)
 {
@@ -47,7 +48,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 			PHRData |= ((unsigned int )*iptr++ << (0x8)*ic);
 			if ((ic = (ic+1)%4) == 0)
 			{
-				PHRParser(PHRData);
+				//PHRParser(PHRData);
 				PHRData = 0x0;
 			}
 		}
@@ -59,8 +60,34 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 			if (ic < 5)
 			{
 				MHR[ic] = *iptr;
-				if (ic == 4)
-					PSDUParser(MHR);
+				//if (ic == 4)
+				//	PSDUParser(MHR);
+			}
+			else if (ic == 5)
+			{
+				payload_len = 0x0;
+				payload_ver = *iptr & 0x3;
+			}
+			else
+			{
+				if (payload_ver == 0)
+				{
+					if (ic == 6)
+						payload_len |= *iptr;
+					else if (ic == 7)
+						payload_len |= (unsigned short)*iptr << 0x8;
+					else if (payload_len > 0)
+					{
+						if (ic-7 < payload_len)
+							payload.append(*iptr);
+						else if (ic-7 == payload_len)
+						{
+							payload.append('\n');
+							ly->ChatAppend(payload);
+							payload.clear();
+						}
+					}
+				}
 			}
 			ic = (ic+1)%psdu_len;
 			iptr++;

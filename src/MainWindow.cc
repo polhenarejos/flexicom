@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QButtonGroup>
 
 typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
 CreateFunc layouts[] = {
@@ -118,6 +119,7 @@ void MainWindow::readSettings(QSettings *st)
 	else
 		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->setChecked(true);
+	panel->rb_chain[st->value("layout/chain", 0).toInt()]->click();
 	panel->sp_devs->setValue(st->value("uhd/devs", 1).toInt());
 	int siz = st->beginReadArray("uhd/ip");
 	for (int i = 0; i < siz; i++)
@@ -382,9 +384,12 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	QHBoxLayout *cBox = new QHBoxLayout;
 	rb_chain[0] = new QRadioButton(tr("Transmitter"), this);
 	rb_chain[1] = new QRadioButton(tr("Receiver"), this);
-    cBox->addWidget(rb_chain[0]);
-    cBox->addWidget(rb_chain[1]);
-    gBoxchain->setLayout(cBox);
+	cBox->addWidget(rb_chain[0]);
+	cBox->addWidget(rb_chain[1]);
+	bg_chain = new QButtonGroup(gBoxchain);
+	bg_chain->addButton(rb_chain[RB_TX], RB_TX);
+	bg_chain->addButton(rb_chain[RB_RX], RB_RX);
+	gBoxchain->setLayout(cBox);
 	for (uint i = 0; layouts[i]; i++)
 	{
 		RadioLayout *r = new RadioLayout;

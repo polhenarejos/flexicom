@@ -5,13 +5,10 @@
 #include <gr_io_signature.h>
 #include <math.h>
 
-typedef unsigned int uint;
-
 bb_Header_cp::~bb_Header_cp()
 {
 	delete crc_cp;
 }
-
 bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
 	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
 	raw_length(_raw_length), type(_type)
@@ -21,7 +18,8 @@ bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
 		length = 48;
 	else if (type == PSDU)
 		length = raw_length;
-	set_output_multiple(length-16);
+	olen = length/8-2;
+	set_output_multiple(olen);
 }
 bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length)
 {
@@ -30,9 +28,9 @@ bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length)
 
 void bb_Header_cp::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
-	uint ninputs = ninput_items_required.size();
-	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i] = (noutput_items/raw_length)*raw_length; //16 = length of the crc
+	int ninputs = ninput_items_required.size();
+	for (int i=0; i < ninputs; i++)
+		ninput_items_required[i] = (noutput_items/olen)*raw_length; //16 = length of the crc
 }
 #include <QMutex>
 QMutex mtx;
@@ -40,7 +38,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 {
 	const int *iptr = (const int *)input_items[0];
 	unsigned char *optr = (unsigned char *)output_items[0];
-	int blocks_to_process = (noutput_items/raw_length);
+	int blocks_to_process = (noutput_items/olen);
 	int *tmp = new int[length+16];
 	memset(tmp,0,sizeof(int)*length+16);
 	int rtd = 0;
@@ -48,7 +46,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	{
 		memcpy(tmp, iptr, sizeof(int)*length);
 		mtx.lock();
-		if (crc_cp->check_crc(tmp, NULL, length+16)) //crc ok!!
+		if (crc_cp->check_crc(tmp, length)) //crc ok!!
 		{
 			for (int n = 0; n < length-16; n += sizeof(unsigned char)*8)
 			{

@@ -22,7 +22,7 @@ bbPHR_generation::bbPHR_generation(int _tx_mode, int _PSDU_length, int _PHR_leng
 	LayoutVLC::dec2bi(PSDU_length, 16,tmp3);
 	memcpy(&tmp[10],tmp3,sizeof(int)*16);
 	//this would be to be modified in the future with the addition of dimming capabilities
-	crc->generate_crc(tmp,phr_crc, 32+crc_length);
+	crc->generate_crc(tmp,phr_crc, 32);
 	//set_output_multiple(PHR_length);
 	//printf("PHR generation\n");
 
