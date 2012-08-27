@@ -534,3 +534,34 @@ void LayoutVLC::ChatText(QString &s)
 	c.movePosition(QTextCursor::End);
 	varVLC->tx_chat->setTextCursor(c);
 }
+//size is the size of in. out must have size+CRC_LENGTH space
+unsigned short LayoutVLC::GenerateCRC(int *in, int *out, int size)
+{
+	int crc = 0xffff, *dt = in;
+	for (int i = 0; i < size; i += 8, dt += 8)
+	{
+		unsigned char d = *dt | *(dt+1)<<1 | *(dt+2)<<2 | *(dt+3)<<3 | *(dt+4)<<4 | *(dt+5)<<5 | *(dt+6)<<6 | *(dt+7)<<7;
+		unsigned crc_new = ((unsigned char)(crc >> 8) | (crc << 8)) ^ d;
+		crc_new ^= (unsigned char)(crc_new & 0xff) >> 4;
+		crc_new ^= crc_new << 12;
+		crc_new ^= (crc_new & 0xff) << 5;
+		crc = crc_new;
+	}
+	if (out)
+	{
+		memcpy(out, in, sizeof(int)*size);
+		out += size;
+		for (int i = 0; i < CRC_LENGTH; i++)
+			*out++ = (crc>>i)&0x1;
+	}
+	return crc;
+}
+//CRC is appended at the end of in. Size is the size of in (including CRC)
+bool LayoutVLC::CheckCRC(int *in, int size)
+{
+	unsigned short crc = GenerateCRC(in, NULL, size-CRC_LENGTH), excrc = 0x0;
+	int *dt = in+size-CRC_LENGTH;
+	for (int i = 0; i < CRC_LENGTH; i++)
+		excrc |= dt[i]<<i;
+	return (excrc == crc);
+}

@@ -1,19 +1,16 @@
 // $Id$
 #include "bb_Header_cp.h"
-#include "vlc_crc.h"
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
 bb_Header_cp::~bb_Header_cp()
 {
-	delete crc_cp;
 }
 bb_Header_cp::bb_Header_cp(Type _type, int _raw_length):
 	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
 	raw_length(_raw_length), type(_type)
 {
-	crc_cp= new vlc_crc();
 	if (type == PHR)
 		length = 48;
 	else if (type == PSDU)
@@ -46,17 +43,17 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	{
 		memcpy(tmp, iptr, sizeof(int)*length);
 		mtx.lock();
-		if (crc_cp->check_crc(tmp, length)) //crc ok!!
+		if (LayoutVLC::CheckCRC(tmp, length)) //crc ok!!
 		{
 			for (int n = 0; n < length-16; n += sizeof(unsigned char)*8)
 			{
 				*optr++ = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, sizeof(unsigned char)*8);
 				rtd++;
 			}
-			printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
+			//printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
 		}
-		else
-			printf("**************** %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));
+		//else
+		//	printf("**************** %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));
 		mtx.unlock();
 		iptr += raw_length;
 	}

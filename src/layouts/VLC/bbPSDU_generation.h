@@ -3,7 +3,6 @@
 #define _INC_BBPSDU_GENERATION_H
 
 #include <gr_block.h>
-#include "vlc_crc.h"
 
 /*! \brief bbPSDU_generation generates the PSDU field of an IEEE 802.15.7 frame as specified in section 8.6.5 according to the input parameters
 
@@ -35,7 +34,6 @@ class bbPSDU_generation : public gr_block
 		int *data;
 		int length_payload;
 		unsigned char sequence_number;
-		vlc_crc *crc;
 		unsigned int ic;
 		int *payload_crc;
 		unsigned int bits;

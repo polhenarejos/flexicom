@@ -4,7 +4,6 @@
 
 #include <gr_block.h>
 #include <gr_msg_queue.h>
-#include "vlc_crc.h"
 
 /*! \brief bb_Header_cp checks the CRC present in the PHR and the MHR and if it is correct, then is printed the information in the screen
 
@@ -29,8 +28,8 @@ class bb_Header_cp : public gr_block
 	private:
 		bb_Header_cp(Type, int);
 		int raw_length;
-		vlc_crc *crc_cp;
 		int length;
+		int olen;
 		Type type;
 };
 

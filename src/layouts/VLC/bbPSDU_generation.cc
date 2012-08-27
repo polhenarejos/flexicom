@@ -12,14 +12,11 @@ bbPSDU_generation::bbPSDU_generation(int _PSDU_length) :
 	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
 	PSDU_length(_PSDU_length), ic(0), bits(0)
 {
-	//crc=new vlc_crc(PSDU_length);
-	crc=new vlc_crc();
 	//we assume we are transmitting in broadcast mode
-	int crc_length=16;
 	generate_MHR_preamble(MHR);
 	int i;
 	//int length_payload= PSDU_length*8-(sizeof(MHR)/sizeof(int))-crc_length;
-	length_payload= PSDU_length-40-crc_length;
+	length_payload= PSDU_length-40-LayoutVLC::CRC_LENGTH;
 	sequence_number = 1;
   	payload_crc = new int[PSDU_length];
   	bytes_payload = length_payload/8;
@@ -27,10 +24,6 @@ bbPSDU_generation::bbPSDU_generation(int _PSDU_length) :
 }
 bbPSDU_generation::~bbPSDU_generation()
 {
-	if (crc)
-	{
-		delete crc; crc=0;
-	}
 	delete [] payload_crc;
 }
 bbPSDU_generation::sptr bbPSDU_generation::Create(int _PSDU_length)
@@ -95,8 +88,8 @@ int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_v
 		//printf("%d %d\n",buffer.size(), ic);
 		if (ic == 0)
 		{
-			int *pld = new int[PSDU_length];
-			memset(pld, 0, sizeof(int)*PSDU_length);
+			int *pld = new int[PSDU_length-LayoutVLC::CRC_LENGTH];
+			memset(pld, 0, sizeof(int)*(PSDU_length-LayoutVLC::CRC_LENGTH));
 			LayoutVLC::dec2bi(sequence_number++, 8, MHR+16);
 			memcpy(pld, MHR, sizeof(int)*40);
 			if (buffer.size())
@@ -111,7 +104,7 @@ int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_v
 				delete [] buffer[0];
 				buffer.erase(buffer.begin());
 			}
-			crc->generate_crc(pld, payload_crc, PSDU_length);
+			LayoutVLC::GenerateCRC(pld, payload_crc, PSDU_length-LayoutVLC::CRC_LENGTH);
 			delete [] pld;
 		}
 		*optr++ = payload_crc[ic];

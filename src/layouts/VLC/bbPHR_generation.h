@@ -1,9 +1,10 @@
 // $Id$
+
 #ifndef _INC_BBPHR_GENERATION_H
 #define _INC_BBPHR_GENERATION_H
 
 #include <gr_block.h>
-#include "vlc_crc.h"
+#include "LayoutVLC.h"
 
 /*! \brief bbPHR_generation generates the PHY Header of an IEEE 802.15.7 frame as specified in section 8.6.2 according to the input parameters
 
@@ -33,9 +34,7 @@ class bbPHR_generation : public gr_block
 		int PSDU_length; //length of the PSDU, raw, without any modulation, in octects
 		int PHR_length; //length of the PHR, raw, without any modulation, in bits
 		int *MCSID; //field of the preamble, precomputed at beginning. See Table 83
-		static const int crc_length = 16;
-		int phr_crc[32+crc_length];
-		vlc_crc *crc;
+		int phr_crc[32+LayoutVLC::CRC_LENGTH];
 		unsigned int ic;
 };
 

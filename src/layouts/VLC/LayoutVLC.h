@@ -5,7 +5,6 @@
 #include "LayoutFactory.h"
 #include "RxVLC.h"
 #include "TxVLC.h"
-#include "VarVLC.h"
 #include "MainWindow.h"
 #include <gr_top_block.h>
 #include <QObject>
@@ -85,6 +84,9 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void Stop();
 		static unsigned char bi2dec(int *, unsigned int);
 		static void dec2bi(int, unsigned int, int *);
+		static unsigned short GenerateCRC(int *, int *, int);
+		static bool CheckCRC(int *, int);
+		static const int CRC_LENGTH = 16;
 		
 	public slots:
 		void RadioPressed(bool);
