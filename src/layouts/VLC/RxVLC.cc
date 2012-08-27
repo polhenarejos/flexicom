@@ -272,7 +272,7 @@ void RxVLC::init_var()
 					break;
 				case 1: //VPPM
 					vlc_var_rx.operating_mode = ly->varVLC->cb_phy_op_mode[3]->currentIndex();
-					LayoutVLC::dec2bi(vlc_var.operating_mode+16, 6, vlc_var.MCSID); 
+					LayoutVLC::dec2bi(vlc_var_rx.operating_mode+16, 6, vlc_var_rx.MCSID); 
 					switch (vlc_var_rx.operating_mode)
 					{
 						case 0:

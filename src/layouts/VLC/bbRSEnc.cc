@@ -83,12 +83,19 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	unsigned int blocks_to_process = (noutput_items/out_rs), GF_words = (int) ceil(((double)length/GF)), RS_words = GF_words/K;
 	int *samples_block = new int[length+length%GF];
 	unsigned char *tmp;
+	unsigned char *tmp3;
 	if (phy_type==0)
+	{
 		tmp = new unsigned char[K];
+		tmp3 = new unsigned char[15];
+	}
 	else
+	{
 		tmp = new unsigned char[223];
+		tmp3 = new unsigned char[255];
+	}
 	int *tmp2 = new int[GF*K];
-	unsigned char *tmp3 = new unsigned char[powf(2,GF)-1];
+	//unsigned char *tmp3 = new unsigned char[powf(2,GF)-1];
 	//printf("DIR RS %X\n",optr);
 	int ci = 0;
 	while (blocks_to_process>0)

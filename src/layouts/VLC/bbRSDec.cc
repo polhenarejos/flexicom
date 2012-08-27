@@ -61,12 +61,18 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	uint RS_words= pre_length/N;
 	uint blocks_to_process = (noutput_items/out_rs_dec);
 	uint i,j;
-	unsigned char *tmp = new unsigned char[powf(2,GF)-1];
+	unsigned char *tmp;
 	unsigned char *tmp2;
 	if (phy_type==0)
+	{
+		tmp = new unsigned char[15];
 		tmp2 = new unsigned char[K];
+	}
 	else
+	{
+		tmp = new unsigned char[255];
 		tmp2 = new unsigned char[223];
+	}
 	if (phy_type == 0)
 	{	
 		while (blocks_to_process>0)
