@@ -20,7 +20,8 @@ bbPSDU_generation::bbPSDU_generation(int _PSDU_length) :
 	sequence_number = 1;
   	payload_crc = new int[PSDU_length];
   	bytes_payload = length_payload/8;
-  	data = new int[length_payload];
+  	//data = new int[length_payload];
+	//set_output_multiple(PSDU_length);
 }
 bbPSDU_generation::~bbPSDU_generation()
 {
@@ -28,7 +29,7 @@ bbPSDU_generation::~bbPSDU_generation()
 }
 bbPSDU_generation::sptr bbPSDU_generation::Create(int _PSDU_length)
 {
-	return sptr(new bbPSDU_generation(_PSDU_length));
+	return gnuradio::get_initial_sptr(new bbPSDU_generation(_PSDU_length));
 }
 void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 {
@@ -60,30 +61,32 @@ void bbPSDU_generation::generate_MHR_preamble(int * MHR)
 		MHR[24+i]= 1;
 	
 }
+/*
 void bbPSDU_generation::forecast(int no, gr_vector_int &ni)
 {
 	ni[0] = (no/PSDU_length)*length_payload;
 }
-int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
+*/
+int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
-	const int *iptr = (const int *)input_items[0];
-	int *optr = (int *) output_items[0];
-	//printf("addr %X\n",iptr);
+	const int *iptr = (const int *)_i[0];
+	int *optr = (int *)_o[0];
 	int csmd = 0;
 	for (int n = 0; n < no; n++)
 	{
 		if (ic < length_payload)
 		{
-			//if (*iptr)
-			//	printf("%d en byte %d\n", *iptr, bits);
-			data[bits++] = *iptr++;
-			csmd++;
-			if (bits == length_payload)
+			if (bits == 0)
 			{
-				buffer.push_back(data);
+				if (data)
+					buffer.push_back(data);
 				data = new int[length_payload];
-				bits = 0;
 			}
+			//if (*iptr)
+			//	printf("%d en bit %d (%d) %d\n", *iptr, bits, iptr, _i[0]);
+			data[bits] = *iptr++;
+			bits = (bits+1)%length_payload;
+			csmd++;
 		}
 		//printf("%d %d\n",buffer.size(), ic);
 		if (ic == 0)
@@ -94,12 +97,14 @@ int bbPSDU_generation::general_work(int no, gr_vector_int &ni, gr_vector_const_v
 			memcpy(pld, MHR, sizeof(int)*40);
 			if (buffer.size())
 			{
-				/*if (buffer[0][10])
+				/*
+				if (buffer[0][10])
 				{
 					for (int i = 8; i < 16; i++)
 					printf("%d",*(buffer[0]+i));
 					printf("\n");
-				}*/
+				}
+				*/
 				memcpy(pld+40, buffer[0], sizeof(int)*length_payload);
 				delete [] buffer[0];
 				buffer.erase(buffer.begin());

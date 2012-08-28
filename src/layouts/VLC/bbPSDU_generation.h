@@ -23,7 +23,7 @@ class bbPSDU_generation : public gr_block
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		~bbPSDU_generation();
 		int DataLength();
-		void forecast(int, gr_vector_int &);
+		//void forecast(int, gr_vector_int &);
 	
 	private:
 		bbPSDU_generation(int);
