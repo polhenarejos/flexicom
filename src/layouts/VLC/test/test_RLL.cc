@@ -137,7 +137,7 @@ class TestRLL : public CppUnit::TestFixture
 		void test_Encode_8b10b_PSDU()                                                                                         
 		{                                                                                                               
 			gr_top_block_sptr gt = gr_make_top_block("Encode_8b10b");                                                    
-			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create();                                                                  
+			bb8b10bEnc::sptr RLL = bb8b10bEnc::Create(1456/8*10);                                                                  
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_8b10b.dat");  
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_8b10b.dat"); 
 			MSE::sptr mse = MSE::Create();                                                                              
@@ -163,7 +163,7 @@ class TestRLL : public CppUnit::TestFixture
 		void test_Decode_8b10b_PSDU()                                                                                         
 		{                                                                                                               
 			gr_top_block_sptr gt = gr_make_top_block("Decode_8b10b");                                                    
-			bb8b10bDec::sptr RLL = bb8b10bDec::Create();                                                                  
+			bb8b10bDec::sptr RLL = bb8b10bDec::Create(1456/10*8);                                                                  
 			gr_file_source_sptr fi = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_out_8b10b.dat");  
 			gr_file_source_sptr fo = gr_make_file_source(sizeof(float), "src/layouts/VLC/test/vecs/PSDU_in_8b10b.dat"); 
 			MSE::sptr mse = MSE::Create();                                                                              
