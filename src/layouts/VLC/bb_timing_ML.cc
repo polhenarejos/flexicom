@@ -3,13 +3,12 @@
 #include <gr_io_signature.h>
 #include <math.h>
 
-typedef unsigned int uint;
 
 bb_timing_ML::~bb_timing_ML()
 {
 }
 
-bb_timing_ML::bb_timing_ML(uint _symbols, uint _decimation):
+bb_timing_ML::bb_timing_ML(unsigned int _symbols, unsigned int _decimation):
 	gr_block("bb_timing_ML", gr_make_io_signature (1,1, sizeof(float)), gr_make_io_signature (1,1, sizeof(float))),
 	symbols(_symbols), decimation(_decimation)
 {
@@ -17,15 +16,15 @@ bb_timing_ML::bb_timing_ML(uint _symbols, uint _decimation):
 }
 
 
-bb_timing_ML::sptr bb_timing_ML::Create(uint _symbols, uint _decimation)
+bb_timing_ML::sptr bb_timing_ML::Create(unsigned int _symbols, unsigned int _decimation)
 {
 	return sptr(new bb_timing_ML(_symbols, _decimation));
 }
 
 void bb_timing_ML::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
-	uint ninputs = ninput_items_required.size();
-	for (uint i=0; i < ninputs; i++)
+	unsigned int ninputs = ninput_items_required.size();
+	for (unsigned int i=0; i < ninputs; i++)
 		ninput_items_required[i] = noutput_items*decimation; 
 }
 
@@ -40,7 +39,8 @@ float bb_timing_ML::energy( float *input, unsigned int position)
 
 static inline float slice(float x)
 {
-  return x < 0 ? 0.0F : 1.0F;
+	//the negative samples delivered by the USRP correspond to a '1' symbol
+  return x > 0 ? -1.0F : 1.0F;
 }
 
 

@@ -16,9 +16,8 @@ class bb_Header_cp : public gr_block
 		typedef boost::shared_ptr<bb_Header_cp> sptr;
 		/**
        * The creation of the bb_Header_cp requires 3 parameters: 
-       * @param _flag: will be used to determine the amount of samples to be pushed in the queue.
+       * @param _type: enumeration to indicate if we are analyzing a PHR or a PSDU unit. 
        * @param _raw_length: length in bits of the block of data whose the CRC has to be checked.
-       * @param _d_queue: message queue where the proper information will be placed to decode its information.
        */
 		static sptr Create(Type, int);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);

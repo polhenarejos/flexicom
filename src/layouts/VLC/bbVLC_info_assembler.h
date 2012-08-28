@@ -16,7 +16,7 @@ class bbVLC_info_assembler : public gr_block
 		typedef boost::shared_ptr<bbVLC_info_assembler> sptr;
 	   /**
        * The creation of the bbVLC_info_assembler block requires 5 parameters:
-       * @param _mod_type: to indicate whether OOK or VPPM is being used 
+       * @param _d_mode: to indicate whether OOK or VPPM is being used 
        * @param _topology: indicates the transmission topology as specified in section 8.6.1 of IEEE 802.15.7. This information is used to generate the TDP pattern.
        * @param _PSDU_units: the number of PSDU_units in the frame. Example, in the single transmission mode this value is always one. 
        * @param _length_PHR : length of the encoded PHR block of data 
