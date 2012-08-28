@@ -72,16 +72,20 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 			{
 				if (payload_ver == 0)
 				{
+					//if (*iptr)
+					//	printf("* %d (%d)\n",*iptr,ic);
 					if (ic == 6)
 						payload_len |= *iptr;
 					else if (ic == 7)
 						payload_len |= (unsigned short)*iptr << 0x8;
 					else if (payload_len > 0)
 					{
+						//printf("%c", *iptr);
 						if (ic-7 < payload_len)
 							payload.append(*iptr);
 						else if (ic-7 == payload_len)
 						{
+							//printf("\n");
 							payload.append('\n');
 							ly->ChatAppend(payload);
 							payload.clear();

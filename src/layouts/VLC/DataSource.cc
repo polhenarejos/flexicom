@@ -35,7 +35,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			{
 				if (pic == 1) //Lower len byte
 				{
-					printf("Writing %d at %X (%X) [%d]\n",data[0].size & 0xff,optr,_o[0],(optr-_o[0])/4);
+					//printf("Writing %d at %X (%X) [%d]\n",data[0].size & 0xff,optr,_o[0],(optr-_o[0])/4);
 					LayoutVLC::dec2bi((int)(data[0].size & 0xff), 8, databyte);
 				}
 				else if (pic == 2) //Upper len byte
