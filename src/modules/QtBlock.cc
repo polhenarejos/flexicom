@@ -1,7 +1,6 @@
 // $Id$
 #include "QtBlock.h"
-#include <volk/volk_32f_convert_64f_a.h>
-#include <volk/volk_32f_convert_64f_u.h>
+#include <volk/volk.h>
 #ifdef _WIN
 #include <windows.h>
 #else
@@ -48,13 +47,15 @@ Qt1D::Qt1D(QwtPlot *_qp, int _acc) :
 	//xval = (double *)malloc(sizeof(double)*maxXval);
 	for (int i = 0; i < maxXval; i++)
 		xval[i] = (double)i;
-	//volk_32f_convert_64f_a_sse2(xval, xfval, maxXval);
+	//volk_32f_convert_64f_a(xval, xfval, maxXval);
 	qc = new QwtPlotCurve *[maxCurves];
 	for (int i = 0; i < maxCurves; i++)
 	{
 		qc[i] = new QwtPlotCurve("C");
 		qc[i]->attach(qp);
+		yval[i] = (double *)_aligned_malloc(sizeof(double)*8192*2, 16);
 	}
+	
 }
 int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, gr_vector_void_star &o)
 {
@@ -63,9 +64,9 @@ int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, 
 	for (uint n = 0; n < i.size(); n++)
 	{
 		if (is_unaligned())
-			volk_32f_convert_64f_u_generic(yval[n], in[n], no);
+			volk_32f_convert_64f_u(yval[n], in[n], no);
 		else
-			volk_32f_convert_64f_a_generic(yval[n], in[n], no);
+			volk_32f_convert_64f_a(yval[n], in[n], no);
 		//printf("fsamp in %lf (ds = %d)\n", yval[0][0], no);
 		qc[n]->setRawSamples(xval, yval[n], no);
 	}

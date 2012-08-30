@@ -23,7 +23,7 @@ class QtBlock : public QObject, public gr_block
 		QwtPlotCurve **qc;
 		QMutex mutex;
 		static const int maxCurves = 4;
-		double yval[4][8192*2];
+		double *yval[maxCurves];
 		QwtPlotDirectPainter *dp;
 		
 	public slots:
