@@ -25,12 +25,12 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 {
 	init_var();
 	gr_float_to_int_sptr f2i = gr_make_float_to_int();
-	Correlator::sptr corr = Correlator::Create();
-	connect(self(), 0, f2i, 0);
-	connect(self(), 0, corr, 0);
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
+	Correlator::sptr corr = Correlator::Create(phr->length_sequence);
+	connect(self(), 0, corr, 0);
+	connect(corr, 0, f2i, 0);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length);
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length);
 	Parser::sptr phr_parser = Parser::Create(Parser::PHR);

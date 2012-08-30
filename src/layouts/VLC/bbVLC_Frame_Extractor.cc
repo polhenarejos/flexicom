@@ -14,26 +14,26 @@ bbVLC_Frame_Extractor::bbVLC_Frame_Extractor(int _flag, int _tx_mode, int _d_mod
 	{
 		case 0:
 			IFS= 240; //twice the value of table 77
-			length_sequence = 256 + 60 + _PHR_mod_length + _PSDU_mod_length + IFS;
+			length_sequence = 60 + _PHR_mod_length + _PSDU_mod_length + IFS;
 			break;
 		case 1:
 			IFS= 240; //twice the value of table 77
-			length_sequence = 256+ 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
+			length_sequence = 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length + IFS;
 			break;
 		case 2:
 			IFS = 90;
-			length_sequence = 256+60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length+ IFS;
+			length_sequence = 60 + _PHR_mod_length + _PSDU_units * _PSDU_mod_length+ IFS;
 			break;
 	}
 	
 	if (flag==0) //PHR
 	{
-		begin = 256+60;
+		begin = 60;
 		end = begin + _PHR_mod_length;
 	}
 	else //PSDU
 	{	
-		begin = 256+60 + _PHR_mod_length;
+		begin = 60 + _PHR_mod_length;
 		end = begin + _PSDU_units * _PSDU_mod_length;
 	}
 	

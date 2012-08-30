@@ -25,14 +25,13 @@ class bbVLC_Frame_Extractor : public gr_block
 		static sptr Create(int, int, int, int, int, int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		~bbVLC_Frame_Extractor();
-		
+		int length_sequence;  //length of the frame 
 	
 	private:
 		bbVLC_Frame_Extractor(int, int, int, int, int, int);
 		int flag;
 		int begin; //point to start to extract the samples corresponding to the desired part of the frame
 		int end; // point to end to extract the samples corresponding to the desired part of the frame
-		int length_sequence;  //length of the frame 
 		int IFS; //constraint length
 		int sample_counter;
 		int d_mode;

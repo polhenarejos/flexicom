@@ -19,15 +19,18 @@ class Correlator : public gr_block
        * @param _topology: to indicate which is the sequence to do the correlation with the incoming samples.  
        * @param _d_mode: to indicate whether OOK or VPPM is being used
        */
-		static sptr Create();
+		static sptr Create(int, float = .75);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		void forecast(int, gr_vector_int &);
 		float TDP[4][60];
 		int pattern;
 							  	
 	private:
-		Correlator();
+		Correlator(int, float = .75);
 		void Correlate(const float *, float *, float *, int);
+		unsigned int copy;
+		unsigned int cpd;
+		float th;
 };
 
 #endif //_INC_CORRELATOR_H
