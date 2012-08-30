@@ -66,7 +66,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			Correlate(iptr, TDP[pattern], C, no);
 		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? no*4 : no));
-		if (C[idx] > 0.7)
+		if (C[idx] > th)
 		{
 			if (pattern == -1)
 				pattern = idx/no;
