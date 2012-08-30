@@ -4,22 +4,7 @@
 
 #include <gr_hier_block2.h>
 #include <gr_msg_queue.h>
-#include <QThread>
 #include "TxVLC.h"
-
-/*! \brief The class where we process the received PHR information, after demodulation
-*/
-class RxVLCThread : public QThread
-{
-	public:
-		RxVLCThread(gr_msg_queue_sptr);
-	protected:
-		void run();
-	private:
-		gr_msg_queue_sptr queue;
-		//this is the class where we process the received information, after demodulation
-};
-
 
 class LayoutVLC;
 
@@ -47,8 +32,6 @@ class RxVLC : public gr_hier_block2
 		int get_modulated_resources(int,int,int,int,int,int,int,int); //returns the number of bits after modulation
 		unsigned int PHR_modulated_length; //length of the PHR after all the modulating chain
 		unsigned int PSDU_modulated_length; //length of the PSDU after all the modulating chain
-		gr_msg_queue_sptr msgq;
-		RxVLCThread *rxth;
 };
 
 #endif //_INC_RXVLC_H_

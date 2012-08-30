@@ -87,8 +87,8 @@ CMDLINE_CFLAG=/D CMDLINE
 !endif
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
-GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk /D LV_HAVE_SSE2 /D LV_HAVE_GENERIC
-GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-digital.lib
+GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk
+GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-digital.lib volk.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
@@ -130,7 +130,7 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj  $(OBJ_DIR)/PHY_II_modulator.obj $(OBJ_DIR)/PHY_I_demodulator.obj $(OBJ_DIR)/PHY_II_demodulator.obj \
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \
         $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj $(OBJ_DIR)/bb_Header_cp.obj $(OBJ_DIR)/Interleaver.obj $(OBJ_DIR)/Puncture.obj $(OBJ_DIR)/bb_timing_ML.obj $(OBJ_DIR)/Parser.obj \
-		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/bbCorrelator.obj
+		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/Correlator.obj
 
 
 TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/test_CC.obj $(OBJ_DIR)/test_RS.obj  $(OBJ_DIR)/test_VLCInterleaver.obj

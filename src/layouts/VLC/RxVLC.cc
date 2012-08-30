@@ -12,54 +12,12 @@
 #include "PHY_II_demodulator.h"
 #include "bb_Header_cp.h"
 #include "Parser.h"
+#include "Correlator.h"
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
 #include <gr_null_sink.h>
 #include "bbMatlab.h"
-
-RxVLCThread::RxVLCThread(gr_msg_queue_sptr _queue) :
-	queue(_queue)
-{
-}
-
-void RxVLCThread::run()
-{
-	while (1)
-	{
-		gr_message_sptr mesg = queue->delete_head();
-		if (mesg)
-		{
-			int *packet = (int *)mesg->msg();
-			if (packet[0] == 0) //phr
-			{
-				
-				//printf("EXTRACTING INFORMATION FROM PHR HEADER\n");
-				//printf("Burst_mode: %d\n", packet[1]);
-				//printf("Channel_number: %d\n", LayoutVLC::bi2dec(&packet[2],3));
-				//printf("MCSID(table 83):%d\n", LayoutVLC::bi2dec(&packet[5],6));
-				printf("PSDU_length (in octets): %d\n", LayoutVLC::bi2dec(&packet[11],16));
-				//printf("Dimmed_OOK_extenstion : %d\n", packet[27]);
-				
-			}
-			else //reading mhr
-			{
-				//printf("EXTRACTING INFORMATION FROM MAC HEADER\n");
-				//printf("Frame_version: %d, (0 means that is compatible with IEEE 802.15.7)\n", LayoutVLC::bi2dec(&packet[1],2));
-				//printf("Frame_type: %d\n", LayoutVLC::bi2dec(&packet[7],3));
-				//printf("Security Enabled: %d\n", packet[10]);
-				//printf("Frame pending: %d\n", packet[11]);
-				//printf("Ack Request: %d\n", packet[12]);
-				//printf("Destination address_mode: %d\n", LayoutVLC::bi2dec(&packet[13],2));
-				//printf("Source address_mode: %d\n", LayoutVLC::bi2dec(&packet[15],2));
-				//printf("Frame_sequence_number: %d\n", (int)LayoutVLC::bi2dec(&packet[17],8));
-				printf("Destination_address: %X:%X:%X:%X\n", packet[25],packet[29],packet[33],packet[37]);
-			}
-		}
-		//else
-			//sleep(1);
-	}
-}
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(0, 0, 0)),
@@ -67,7 +25,9 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 {
 	init_var();
 	gr_float_to_int_sptr f2i = gr_make_float_to_int();
+	Correlator::sptr corr = Correlator::Create();
 	connect(self(), 0, f2i, 0);
+	connect(self(), 0, corr, 0);
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
@@ -372,12 +332,5 @@ RxVLC::~RxVLC()
 }
 void RxVLC::stop()
 {
-	if (rxth)
-	{
-		rxth->terminate();
-		rxth->wait();
-		delete rxth;
-		rxth = NULL;
-	}
 }
 
