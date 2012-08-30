@@ -30,7 +30,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			connect(intlv, 0, cc_enc, 0);
 			if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(bbManchesterEnc::OOK);
 				out_PHY_I_mod = cc_enc->out_cc*2;
 				connect(cc_enc,0,RLL,0);
 				connect(RLL,0,self(), 0);
@@ -38,7 +38,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
 				out_PHY_I_mod= (cc_enc->out_cc/4*6)*2;
 				connect(cc_enc,0,RLL,0);
 				connect(RLL,0, RLL2,0);
@@ -50,7 +50,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 		{
 			if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(bbManchesterEnc::OOK);
 				out_PHY_I_mod = intlv->out*2;
 				connect(intlv,0,RLL,0);
 				connect(RLL,0,self(), 0);
@@ -58,7 +58,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
 				out_PHY_I_mod= (intlv->out/4*6)*2;
 				connect(intlv,0,RLL,0);
 				connect(RLL,0, RLL2,0);
@@ -70,7 +70,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 	{
 		if (phy_modulation == 0)
 			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(0);
+				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(bbManchesterEnc::OOK);
 				out_PHY_I_mod= raw_length*2;
 				connect(self(), 0, RLL, 0);
 				connect(RLL,0,self(), 0);
@@ -78,7 +78,7 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 			else
 			{
 				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
 				out_PHY_I_mod= (raw_length/4*6)*2;
 				connect(self(),0,RLL,0);
 				connect(RLL,0, RLL2,0);

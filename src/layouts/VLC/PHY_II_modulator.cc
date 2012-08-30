@@ -31,7 +31,7 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 		else //VPPM
 		{
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
 			out_PHY_II_mod= (rs_enc->out_rs*GF*2*6/4);
 			connect(de2bi,0,RLL,0);
 			connect(RLL,0,RLL2,0);
@@ -50,7 +50,7 @@ PHY_II_modulator::PHY_II_modulator(unsigned int _phy_type, unsigned int _phy_mod
 		else //VPPM
 		{
 			bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(1);
+			bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
 			out_PHY_II_mod= (raw_length/4*6)*2;
 			connect(self(),0,RLL,0);
 			connect(RLL, 0, RLL2,0);

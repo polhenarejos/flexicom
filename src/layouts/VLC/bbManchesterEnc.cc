@@ -2,12 +2,12 @@
 #include "bbManchesterEnc.h"
 #include <gr_io_signature.h>
 
-bbManchesterEnc::bbManchesterEnc(int mode):
+bbManchesterEnc::bbManchesterEnc(ModType mode):
 	gr_sync_interpolator("bbManchesterEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)), 2),
 	d_mode(mode)
 {
 }
-bbManchesterEnc::sptr bbManchesterEnc::Create(int mode)
+bbManchesterEnc::sptr bbManchesterEnc::Create(ModType mode)
 {
 	return sptr(new bbManchesterEnc(mode));
 }

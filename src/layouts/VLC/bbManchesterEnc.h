@@ -11,16 +11,17 @@
 class bbManchesterEnc : public gr_sync_interpolator
 {
 	public:
+		typedef enum { OOK = 0, VPPM = 1 } ModType;
 		typedef boost::shared_ptr<bbManchesterEnc> sptr;
 		/**
        * The creation of the bbManchesterEnc requires 1 parameters: 
        * @param mode: selects in which mode works the block. Two options: 0 and 1. 0 is for OOK and 1 is used with VPPM with 50% dimming (assuming double clock frequency than in OOK)
        */
-		static sptr Create(int);
+		static sptr Create(ModType);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 	
 	private:
-		bbManchesterEnc(int);
+		bbManchesterEnc(ModType);
 		int d_mode;
 		int d_length;
 };
