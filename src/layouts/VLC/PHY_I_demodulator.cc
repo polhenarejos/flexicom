@@ -39,7 +39,7 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		}		
 		else
 		{
-			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,0);				
+			bbManchesterDec::sptr RLL = bbManchesterDec::Create(0,0);
 			if (rs_in!=0)
 			{
 				InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length, mod_length/(2*GF), InterPunct::DEINTERPUNCT);
@@ -64,7 +64,7 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		bb4b6bDec::sptr RLL2 = bb4b6bDec::Create();				
 		if (rs_in!=0)
 		{
-			InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length,mod_length/(6*GF)*4, InterPunct::DEINTERPUNCT);
+			InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length,mod_length*4/(6*GF), InterPunct::DEINTERPUNCT);
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);

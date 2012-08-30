@@ -27,7 +27,6 @@ int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star
 {
 	const int *iptr = (const int *)_i[0];
 	int *optr = (int *)_o[0];
-	
 	for (int n = 0; n < no/rs_length; n++)
 	{
 		for (int i = 0; i < ivector.size(); i++)
