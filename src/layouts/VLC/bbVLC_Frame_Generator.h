@@ -30,12 +30,11 @@ class bbVLC_Frame_Generator : public gr_block
 	
 	private:
 		bbVLC_Frame_Generator(int, int,int,int,int,int,int);
-		void idle_pattern_generation(int *, int, int);
 		int FLP_length;
 		int tx_mode;
 		int PSDU_units;
-		int *FLP_pattern;
-		int *idle_pattern;
+		float *FLP_pattern;
+		float *idle_pattern;
 		int IFS;
 		int length_PHR; //length of modulated PHR
 		int length_data_payload; // length of modulated data

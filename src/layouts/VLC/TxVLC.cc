@@ -32,7 +32,6 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	connect(null,0,phr_RLL,0);
 	connect(phr_RLL,0,i2f,0);
 	connect(i2f,0,self(),0);*/
-	gr_int_to_float_sptr i2f = gr_make_int_to_float(1, 1.0);
 
 	//GENERATION OF PHR, DATA
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
@@ -57,8 +56,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
-		connect(FRAME_gen,0,i2f,0);
-		connect(i2f,0,self(),0);
+		connect(FRAME_gen,0,self(),0);
 	}
 	//PHY II
 	else // PHY II
@@ -72,8 +70,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
-		connect(FRAME_gen,0,i2f,0);
-		connect(i2f,0,self(),0);
+		connect(FRAME_gen,0,self(),0);
 	}
 }
 
