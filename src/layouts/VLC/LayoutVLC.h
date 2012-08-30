@@ -82,7 +82,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		VarVLC *varVLC;
 		void Run();
 		void Stop();
-		static unsigned char bi2dec(int *, unsigned int);
+		static unsigned int bi2dec(int *, unsigned int);
 		static void dec2bi(int, unsigned int, int *);
 		static unsigned short GenerateCRC(int *, int *, int);
 		static bool CheckCRC(int *, int);

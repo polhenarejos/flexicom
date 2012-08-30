@@ -489,9 +489,9 @@ void LayoutVLC::TrackChanges()
 		tx->UIChanged();	
 }
 //Binary functions must be encoded as left-lsb
-unsigned char LayoutVLC::bi2dec(int *in, unsigned int GF)
+unsigned int LayoutVLC::bi2dec(int *in, unsigned int GF)
 {
-	unsigned char o = 0;
+	unsigned int o = 0;
 	for (unsigned int i = 0; i < GF; i++)
 		o |= *in++<<i;
 	return o;
