@@ -13,6 +13,7 @@
 #include "bb_Header_cp.h"
 #include "Parser.h"
 #include "Correlator.h"
+#include "Timing.h"
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
@@ -29,14 +30,15 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence);
+	Timing::sptr tim = Timing::Create(4);
 	connect(self(), 0, corr, 0);
-	connect(corr, 0, f2i, 0);
+	connect(corr, 0, tim, 0);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length);
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length);
 	Parser::sptr phr_parser = Parser::Create(Parser::PHR);
 	Parser::sptr psdu_parser = Parser::Create(Parser::PSDU, ly, vlc_var_rx.PSDU_raw_length-16);
-	connect(f2i,0,phr,0);
-	connect(f2i,0,psdu,0);
+	connect(tim,0,phr,0);
+	connect(tim,0,psdu,0);
 	if (vlc_var_rx.phy_type ==0) // PHY I
 	{
 		PHY_I_demodulator::sptr phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, 0);

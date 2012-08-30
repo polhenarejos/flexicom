@@ -13,15 +13,28 @@ Correlator::Correlator(int _copy, float _th) :
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
 					  { 1,-1,-1,1,1,-1,-1,-1,-1,-1,1,-1,-1,1,1,-1,1,1,-1,-1,1,1,1,1,1,-1,1,1,-1,-1,1,-1,-1,1,1,-1,-1,-1,-1,-1,1,-1,-1,1,1,-1,1,1,-1,-1,1,1,1,1,1,-1,1,1,-1,-1 },
    					  { -1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1 } };
-	memcpy(TDP, _TDP, sizeof(TDP));
+	ov = 4; //oversampler factor
+	siz = 60*ov;
+	copy *= ov;
+	for (int i = 0; i < 4; i++)
+	{
+		TDP[i] = new float[60*ov];
+		for (int j = 0; j < 60; j++)
+			std::fill_n(TDP[i]+j*ov, ov, _TDP[i][j]);
+	}
 }
 Correlator::sptr Correlator::Create(int _copy, float _th)
 {
 	return sptr(new Correlator(_copy, _th));
 }
+Correlator::~Correlator()
+{
+	for (int i = 0; i < 4; i++)
+		delete [] TDP[i];
+}
 void Correlator::forecast(int no, gr_vector_int &ni)
 {
-	ni[0] = no+60;
+	ni[0] = no+siz;
 }
 void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no)
 {
@@ -30,17 +43,17 @@ void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no)
 	{
 		if (is_unaligned()) 
 		{
-			volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, 60);
-			volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr, 60);
+			volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz);
+			volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr, siz);
 		}
 		else
 		{
-			volk_32f_x2_dot_prod_32f_a(tC+n, iptr+n, tD, 60);
-			volk_32f_x2_dot_prod_32f_a(tN+n, iptr+n, iptr+n, 60);
+			volk_32f_x2_dot_prod_32f_a(tC+n, iptr+n, tD, siz);
+			volk_32f_x2_dot_prod_32f_a(tN+n, iptr+n, iptr+n, siz);
 		}
 	}
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
-	volk_32f_s32f_multiply_32f_a(tN, tN, 30, no);
+	volk_32f_s32f_multiply_32f_a(tN, tN, siz/2, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
 	_aligned_free(tN);
 }

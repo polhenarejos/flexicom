@@ -22,8 +22,9 @@ class Correlator : public gr_block
 		static sptr Create(int, float = .75);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		void forecast(int, gr_vector_int &);
-		float TDP[4][60];
+		float *TDP[4];
 		int pattern;
+		~Correlator();
 							  	
 	private:
 		Correlator(int, float = .75);
@@ -31,6 +32,8 @@ class Correlator : public gr_block
 		unsigned int copy;
 		unsigned int cpd;
 		float th;
+		unsigned int ov;
+		unsigned int siz;
 };
 
 #endif //_INC_CORRELATOR_H

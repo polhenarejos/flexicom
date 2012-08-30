@@ -121,15 +121,15 @@ void LayoutVLC::Run()
 		}
 		*/
 		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		//Oversampler<float>::sptr ov = Oversampler<float>::Create(4);
+		Oversampler<float>::sptr ov = Oversampler<float>::Create(4);
 		//TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
 		SHMSink<float>::sptr sink = SHMSink<float>::Create("FlexiCom");
 		//gr_file_sink_sptr sink = gr_make_file_sink(sizeof(float), "frame.txt.dat");
 		//bbMatlab::sptr sink = bbMatlab::Create("frame.txt", sizeof(float));	
 		//gr_null_sink_sptr sink = gr_make_null_sink(sizeof(int));
-		//grTop->connect(tx, 0, ov, 0);
-		//grTop->connect(ov, 0, sink, 0);
-		grTop->connect(tx, 0, sink, 0);
+		grTop->connect(tx, 0, ov, 0);
+		grTop->connect(ov, 0, sink, 0);
+		//grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		
 	}
