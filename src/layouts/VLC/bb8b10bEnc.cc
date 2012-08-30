@@ -1,5 +1,6 @@
 // $Id$
 #include "bb8b10bEnc.h"
+#include "LayoutVLC.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -73,8 +74,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 		switch(RD)
 		{
 			case 0:
-				for (i=0; i<3; i++)
-					index = index + iptr[i]*powf(2,2-i);
+				index = LayoutVLC::bi2dec(iptr, 3);
 				for (i=0; i<4;i++)
 				{
 					optr[i]= bits_3_RD_negative[index*4+i];
@@ -82,9 +82,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 				}
 				iptr = iptr +3;
 				optr = optr +4;
-				index = 0;
-				for (i=0; i<5; i++)
-					index = index + iptr[i]*powf(2,4-i);
+				index = LayoutVLC::bi2dec(iptr, 5);
 				for (i=0; i<6;i++)
 				{
 					optr[i]= bits_5_RD_negative[index*6+i];
@@ -94,8 +92,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 				optr = optr + 6;
 			break;
 			case 1:
-				for (i=0; i<3; i++)
-					index = index + iptr[i]*powf(2,2-i);
+				index = LayoutVLC::bi2dec(iptr, 3);
 				for (i=0; i<4;i++)
 				{
 					optr[i]= bits_3_RD_positive[index*4+i];
@@ -103,9 +100,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 				}
 				iptr = iptr +3;
 				optr = optr +4;
-				index = 0;
-				for (i=0; i<5; i++)
-					index = index + iptr[i]*powf(2,4-i);
+				index = LayoutVLC::bi2dec(iptr, 5);
 				for (i=0; i<6;i++)
 				{
 					optr[i]= bits_5_RD_positive[index*6+i];

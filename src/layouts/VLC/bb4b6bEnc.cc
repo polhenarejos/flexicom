@@ -1,5 +1,6 @@
 // $Id$
 #include "bb4b6bEnc.h"
+#include "LayoutVLC.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -42,12 +43,7 @@ int bb4b6bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_v
 	samples_to_process= noutput_items/6*4;
 	while (samples_to_process>0)
 	{
-		index = 0;
-		for (i=0; i<4; i++)
-		{
-			index=index + iptr[i]*powf(2,3-i);
-		}
-
+		index = LayoutVLC::bi2dec(iptr, 4);
 		for (i=0; i<6; i++)
 		{
 			optr[i]=outputTable6b[index*6+i];
