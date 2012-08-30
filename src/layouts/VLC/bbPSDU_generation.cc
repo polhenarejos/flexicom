@@ -10,7 +10,7 @@
 
 bbPSDU_generation::bbPSDU_generation(int _PSDU_length) : 
 	gr_block("bbPSDU_generation", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
-	PSDU_length(_PSDU_length), ic(0), bits(0)
+	PSDU_length(_PSDU_length), ic(0), bits(0), data(NULL)
 {
 	//we assume we are transmitting in broadcast mode
 	generate_MHR_preamble(MHR);
