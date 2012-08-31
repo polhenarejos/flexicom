@@ -27,6 +27,7 @@ Correlator::Correlator(int _copy, float _th) :
 				std::fill_n(TDP[i+t*4]+j*s, s, _TDP[i][j]);
 		}
 	}
+	set_alignment(volk_get_alignment()/sizeof(float));
 }
 Correlator::sptr Correlator::Create(int _copy, float _th)
 {
@@ -44,18 +45,20 @@ void Correlator::forecast(int no, gr_vector_int &ni)
 void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int v)
 {
 	float *tN = (float *)malloc16Align(sizeof(float)*no);
-	for (int n = 0; n < no; n++)
+	if (is_unaligned()) 
 	{
-		if (is_unaligned()) 
-		{
-			volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz*v);
-			volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr, siz*v);
-		}
-		else
-		{
-			volk_32f_x2_dot_prod_32f_a(tC+n, iptr+n, tD, siz*v);
-			volk_32f_x2_dot_prod_32f_a(tN+n, iptr+n, iptr+n, siz*v);
-		}
+		volk_32f_x2_dot_prod_32f_u(tC, iptr, tD, siz*v);
+		volk_32f_x2_dot_prod_32f_u(tN, iptr, iptr, siz*v);
+	}
+	else
+	{
+		volk_32f_x2_dot_prod_32f_a(tC, iptr, tD, siz*v);
+		volk_32f_x2_dot_prod_32f_a(tN, iptr, iptr, siz*v);
+	}
+	for (int n = 1; n < no; n++)
+	{
+		volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz*v);
+		volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr+n, siz*v);
 	}
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
 	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
