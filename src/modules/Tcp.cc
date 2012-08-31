@@ -2,8 +2,8 @@
 #include <gr_file_descriptor_source.h>
 #include <gr_file_descriptor_sink.h>
 #include <sys/types.h>
-//#include <io.h>
 #ifdef _WIN
+#include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #define dup(x) _dup(x)
