@@ -1,10 +1,11 @@
 // $Id$
 
 #include "Correlator.h"
+#include "compat.h"
 #include <volk/volk.h>
 #include <gr_io_signature.h>
 #include <malloc.h>
-                
+
 Correlator::Correlator(int _copy, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
 	pattern(-1), copy(_copy), cpd(0), th(_th)
@@ -40,24 +41,24 @@ void Correlator::forecast(int no, gr_vector_int &ni)
 {
 	ni[0] = no+siz*2;
 }
-void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int ov)
+void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int v)
 {
 	float *tN = (float *)_aligned_malloc(sizeof(float)*no, 16);
 	for (int n = 0; n < no; n++)
 	{
 		if (is_unaligned()) 
 		{
-			volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz*ov);
-			volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr, siz*ov);
+			volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz*v);
+			volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr, siz*v);
 		}
 		else
 		{
-			volk_32f_x2_dot_prod_32f_a(tC+n, iptr+n, tD, siz*ov);
-			volk_32f_x2_dot_prod_32f_a(tN+n, iptr+n, iptr+n, siz*ov);
+			volk_32f_x2_dot_prod_32f_a(tC+n, iptr+n, tD, siz*v);
+			volk_32f_x2_dot_prod_32f_a(tN+n, iptr+n, iptr+n, siz*v);
 		}
 	}
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
-	volk_32f_s32f_multiply_32f_a(tN, tN, siz*ov/2, no);
+	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
 	_aligned_free(tN);
 }

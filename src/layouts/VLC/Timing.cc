@@ -1,6 +1,7 @@
 // $Id$
 
 #include "Timing.h"
+#include "compat.h"
 #include <gr_io_signature.h>
 #include <volk/volk.h>
 
