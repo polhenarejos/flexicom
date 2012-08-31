@@ -1,8 +1,8 @@
 // $Id$
 
 #include "Correlator.h"
-#include "compat.h"
 #include <volk/volk.h>
+#include <gnuradio/malloc16.h>
 #include <gr_io_signature.h>
 #include <malloc.h>
 
@@ -43,7 +43,7 @@ void Correlator::forecast(int no, gr_vector_int &ni)
 }
 void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int v)
 {
-	float *tN = (float *)_aligned_malloc(sizeof(float)*no, 16);
+	float *tN = (float *)malloc16Align(sizeof(float)*no);
 	for (int n = 0; n < no; n++)
 	{
 		if (is_unaligned()) 
@@ -60,7 +60,7 @@ void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int 
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
 	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
-	_aligned_free(tN);
+	free16Align(tN);
 }
 int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
 {
@@ -70,17 +70,17 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	if (!cpd)
 	{
 		unsigned int idx = 0;
-		float *C = (float *)_aligned_malloc(sizeof(float)*no*(pattern == -1 ? 8 : 1), 16);
+		float *C = (float *)malloc16Align(sizeof(float)*no*(pattern == -1 ? 8 : 1));
 		if (pattern == -1)
 		{
 			for (int t = 0; t < 2; t++)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					float *tC = (float *)_aligned_malloc(sizeof(float)*no, 16);
+					float *tC = (float *)malloc16Align(sizeof(float)*no);
 					Correlate(iptr, TDP[t*4+i], tC, no, t+1);
 					memcpy(C+(t*4+i)*no, tC, sizeof(float)*no);
-					_aligned_free(tC);
+					free16Align(tC);
 				}
 			}
 		}
@@ -98,7 +98,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			cpd = copy;
 			o = idx%no;
 		}
-		_aligned_free(C);
+		free16Align(C);
 	}
 	if (cpd)
 	{

@@ -4,6 +4,7 @@
 #include "compat.h"
 #include <gr_io_signature.h>
 #include <volk/volk.h>
+#include <gnuradio/malloc16.h>
 
 Timing::Timing(unsigned int _decim, unsigned int _syms) :
 	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int)), _decim),
@@ -20,7 +21,7 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 	const float *iptr = (const float *)_i[0];
 	int *optr = (int *)_o[0];
 	unsigned int decim = decimation();
-	float *E = (float *)_aligned_malloc(sizeof(float)*no*decim, 16);
+	float *E = (float *)malloc16Align(sizeof(float)*no*decim);
 	if (is_unaligned())
 		volk_32f_x2_multiply_32f_u(E, iptr, iptr, no);
 	else
@@ -44,6 +45,6 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 			*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
 		iptr += syms*decim;
 	}
-	_aligned_free(E);
+	free16Align(E);
 	return no;
 }

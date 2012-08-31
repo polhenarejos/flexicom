@@ -1,6 +1,7 @@
 // $Id$
 #include "QtBlock.h"
 #include <volk/volk.h>
+#include <gnuradio/malloc16.h>
 #ifdef _WIN
 #include <windows.h>
 #else
@@ -53,7 +54,7 @@ Qt1D::Qt1D(QwtPlot *_qp, int _acc) :
 	{
 		qc[i] = new QwtPlotCurve("C");
 		qc[i]->attach(qp);
-		yval[i] = (double *)_aligned_malloc(sizeof(double)*8192*2, 16);
+		yval[i] = (double *)malloc16Align(sizeof(double)*8192*2);
 	}
 	
 }
