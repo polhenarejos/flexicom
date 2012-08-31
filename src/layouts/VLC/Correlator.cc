@@ -22,7 +22,7 @@ Correlator::Correlator(int _copy, float _th) :
 		for (int i = 0; i < 4; i++)
 		{
 			int s = ov*(t+1);
-			TDP[i+t*4] = new float[60*s];
+			TDP[i+t*4] = (float *)malloc16Align(sizeof(float)*60*s);
 			for (int j = 0; j < 60; j++)
 				std::fill_n(TDP[i+t*4]+j*s, s, _TDP[i][j]);
 		}
@@ -36,7 +36,7 @@ Correlator::sptr Correlator::Create(int _copy, float _th)
 Correlator::~Correlator()
 {
 	for (int i = 0; i < 8; i++)
-		delete [] TDP[i];
+		free16Align(TDP[i]);
 }
 void Correlator::forecast(int no, gr_vector_int &ni)
 {
@@ -45,16 +45,16 @@ void Correlator::forecast(int no, gr_vector_int &ni)
 void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int v)
 {
 	float *tN = (float *)malloc16Align(sizeof(float)*no);
-	if (is_unaligned()) 
+	//if (is_unaligned()) 
 	{
 		volk_32f_x2_dot_prod_32f_u(tC, iptr, tD, siz*v);
 		volk_32f_x2_dot_prod_32f_u(tN, iptr, iptr, siz*v);
 	}
-	else
+	/*else
 	{
 		volk_32f_x2_dot_prod_32f_a(tC, iptr, tD, siz*v);
 		volk_32f_x2_dot_prod_32f_a(tN, iptr, iptr, siz*v);
-	}
+	}*/
 	for (int n = 1; n < no; n++)
 	{
 		volk_32f_x2_dot_prod_32f_u(tC+n, iptr+n, tD, siz*v);
@@ -97,7 +97,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				vppm = idx/(4*no)+1;
 				pattern = idx/no;
 			}
-			//printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
+			printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
 			cpd = copy;
 			o = idx%no;
 		}
