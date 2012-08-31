@@ -43,5 +43,6 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 			*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
 		iptr += syms*decim;
 	}
+	_aligned_free(E);
 	return no;
 }
