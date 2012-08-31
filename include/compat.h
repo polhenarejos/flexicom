@@ -13,6 +13,7 @@ static inline void *_aligned_malloc(size_t s, size_t b)
 	posix_memalign(&p, b, s);
 	return p;
 }
+#define _aligned_free(p) free(p)
 #endif
 
 #endif //_INC_COMPAT_H_
