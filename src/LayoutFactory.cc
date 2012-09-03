@@ -71,7 +71,7 @@ void LayoutFactory::Setup()
 			usrp_source = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc16"));
 			usrp_source->set_gain(mw->panel->sp_gain->value());
 			usrp_source->set_center_freq(mw->panel->sp_freq->value()*1e6);
-			usrp_source->set_samp_rate(mw->panel->sp_sps->value());
+			usrp_source->set_samp_rate(mw->panel->sp_sps->value()*1e3);
 		}
 		else
 		{
@@ -97,7 +97,7 @@ void LayoutFactory::Setup()
 			usrp_sink = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 			usrp_sink->set_gain(mw->panel->sp_gain->value());
 			usrp_sink->set_center_freq(mw->panel->sp_freq->value()*1e6);
-			usrp_sink->set_samp_rate(mw->panel->sp_sps->value());
+			usrp_sink->set_samp_rate(mw->panel->sp_sps->value()*1e3);
 		}
 		else
 		{
