@@ -117,7 +117,7 @@ DBGCFLAG=/MD /Zi /Ox /W1
 DBGLFLAG=/debug
 !endif
 
-OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj
+OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/LayoutFactory.obj
 
 MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj $(OBJ_DIR)/MSE.obj $(OBJ_DIR)/Tcp.obj \
 		  $(OBJ_DIR)/Oversampler.obj $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj

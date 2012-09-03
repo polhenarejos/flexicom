@@ -1,4 +1,5 @@
 // $Id$
+
 #ifndef _INC_MAINWINDOW_H_
 #define _INC_MAINWINDOW_H_
 
@@ -89,13 +90,9 @@ class Panel : public QTabWidget
 		QWidget *CreateLayoutTab(QWidget * = NULL);
 		QWidget *CreateUHDTab(QWidget * = NULL);
 		MainWindow *parent;
+		int tab_ss;
 		
 	public:
-		typedef struct
-		{
-			QLineEdit *ip;
-			QLabel *label;
-		}IPField;
 		class RadioButton : public QRadioButton
 		{
 			public:
@@ -106,18 +103,30 @@ class Panel : public QTabWidget
 			RadioButton *bt;
 			LayoutFactory::sptr layout;
 		}RadioLayout;
-		Panel(MainWindow * = NULL);
-		std::vector<RadioLayout *> rb_layout;
-		IPField ipfield[8];
 		QSpinBox *sp_devs;
-		QSpinBox *sp_gain;
-		QLineEdit *le_freq;
+		Panel(MainWindow * = NULL);
 		QRadioButton *rb_chain[2];
 		QButtonGroup *bg_chain;
+		std::vector<RadioLayout *> rb_layout;
+		QGridLayout *grid_ss;
+		QRadioButton *rb_dev[7];
+		static const int MaxDevs = 8;
+		//File
+		QLineEdit *le_name[MaxDevs];
+		//UHD/TCP/UDP
+		QLineEdit *le_ip[MaxDevs];
+		//UHD
+		QSpinBox *sp_gain;
+		QSpinBox *sp_freq;
+		QSpinBox *sp_sps;
+		//TCP/UDP
+		QSpinBox *sp_port[MaxDevs];
 	
 	public slots:
 		void SetDevs(int);
 		void StateLayout(MainWindow::StatesLayout);
+		void ChangeChain(int);
+		void ChangeDev(int);
 };
 
 #endif //_INC_MAINWINDOW_H_

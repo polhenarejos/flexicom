@@ -11,7 +11,7 @@
 template <class _T>
 struct SHMMemory
 {
-	enum { Size = 4096 };
+	enum { Size = 4096*4 };
 	SHMMemory() : mtx(1), Empty(Size), Stored(0), rp(0), wp(0) {}
 	boost::interprocess::interprocess_semaphore mtx, Empty, Stored;
 	unsigned int rp, wp;

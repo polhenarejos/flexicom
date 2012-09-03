@@ -1,4 +1,5 @@
 // $Id$
+
 #include "LayoutVLC.h"
 #include <gr_uhd_usrp_source.h>
 #include <gr_uhd_usrp_sink.h>
@@ -17,15 +18,12 @@
 #include <QTextEdit>
 #include <iostream>
 
-#include <gr_udp_sink.h>
-#include <gr_udp_source.h>
 #include <gr_sig_source_f.h>
 #include <gr_float_to_complex.h>
 #include <gr_file_source.h>
 #include <gr_file_sink.h>
 #include <gr_null_sink.h>
 #include "bbMatlab.h"
-#include "../src/modules/SHM.cc"
 #include "../src/modules/Oversampler.cc"
 #include "Tcp.h"
 
@@ -49,7 +47,7 @@ double rate_phy2_o [] = {
 	
 
 LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
-	LayoutFactory(), mw(_mw), radioID(_radioID)
+	LayoutFactory(_mw, _radioID)
 {
 	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 	QObject::connect(mw, SIGNAL(StateLayoutChanged(MainWindow::StatesLayout)), this, SLOT(StateLayout(MainWindow::StatesLayout)));
@@ -68,26 +66,10 @@ LayoutFactory::sptr LayoutVLC::Create(MainWindow *_mw, int _radioID)
 void LayoutVLC::Run()
 {
 	grTop = gr_make_top_block(std::string(name));
-	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
-	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
-		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		/*
-		usrp_rx = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc16"));
-		usrp_rx->set_samp_rate(800e3);
-		usrp_rx->set_center_freq(0);
-		usrp_rx->set_gain(mw->panel->sp_gain->value());
-		//rx = RxVLC::Create();
-		bbMatlab::sptr bbm = bbMatlab::Create("rx.txt", sizeof(std::complex<float>));	
-		grTop->connect(usrp_rx, 0, bbm, 0);
-		*/
 		rx = RxVLC::Create(this);
-		//gr_udp_source_sptr source = gr_make_udp_source(sizeof(float), "127.0.0.1", 5544);
-		//TcpSource::sptr source = TcpSource::Create(sizeof(float), "127.0.0.1", 55344);
-		SHMSource<float>::sptr source = SHMSource<float>::Create("FlexiCom");
-		//gr_file_source_sptr source = gr_make_file_source(sizeof(float), "frame.txt.dat", false);
-		grTop->connect(source, 0, rx, 0);
+		grTop->connect(Source(0), 0, rx, 0);
 		grTop->start();
 	}
 	else //transmitter
@@ -121,14 +103,9 @@ void LayoutVLC::Run()
 		}
 		*/
 		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		Oversampler<float>::sptr ov = Oversampler<float>::Create(4);
-		//TcpSink::sptr sink = TcpSink::Create(sizeof(float), "127.0.0.1", 55344);
-		SHMSink<float>::sptr sink = SHMSink<float>::Create("FlexiCom");
-		//gr_file_sink_sptr sink = gr_make_file_sink(sizeof(float), "frame.txt.dat");
-		//bbMatlab::sptr sink = bbMatlab::Create("frame.txt", sizeof(float));	
-		//gr_null_sink_sptr sink = gr_make_null_sink(sizeof(int));
+		Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(4);
 		grTop->connect(tx, 0, ov, 0);
-		grTop->connect(ov, 0, sink, 0);
+		grTop->connect(ov, 0, Sink(0), 0);
 		//grTop->connect(tx, 0, sink, 0);
 		grTop->start();
 		

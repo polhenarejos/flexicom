@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <gr_int_to_float.h>
+#include <gr_float_to_complex.h>
 #include "bbPHR_generation.h"
 #include "bbPSDU_generation.h"
 #include "PHY_I_modulator.h"
@@ -19,7 +20,7 @@
 #include "DataSource.h"
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
-	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(float))),
+	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(gr_complex))),
 	ly(_ly)
 {
 	//variable initialization, to make easier the pass of parameters. 
@@ -43,7 +44,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);
 	//connect(tagger, 1, PSDU_gen, 0);
-	
+	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	//PHY I
 	if (vlc_var.phy_type==0) // PHY I
 	{
@@ -56,7 +57,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
-		connect(FRAME_gen,0,self(),0);
+		connect(FRAME_gen,0,f2c,0);
 	}
 	//PHY II
 	else // PHY II
@@ -70,8 +71,9 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		connect(phr,0,INFO_ass,0);
 		connect(psdu,0,INFO_ass,1);
 		connect(INFO_ass,0, FRAME_gen,0);
-		connect(FRAME_gen,0,self(),0);
+		connect(FRAME_gen,0,f2c,0);
 	}
+	connect(f2c, 0, self(), 0);
 }
 
 TxVLC::sptr TxVLC::Create(LayoutVLC * _ly)

@@ -66,15 +66,11 @@ class LayoutVLC : public QObject , public LayoutFactory
 		gr_top_block_sptr grTop;
 		RxVLC::sptr rx;
 		TxVLC::sptr tx;
-		boost::shared_ptr<uhd_usrp_source> usrp_rx;
-		boost::shared_ptr<uhd_usrp_sink> usrp_tx;
-		MainWindow *mw;
-		int radioID;
 		QWidget *CreateTabOpts();
 		QWidget *CreateTabChat();
 		void init_v_VLC (VarVLC *, QWidget *);
 		void ReadSettings(QSettings *);
-			
+
 	public:
 		LayoutVLC(MainWindow *, int);
 		const char *Name();

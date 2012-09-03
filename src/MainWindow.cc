@@ -1,6 +1,7 @@
 // $Id$
-#include "MainWindow.h"
+
 #include "LayoutFactory.h"
+#include "MainWindow.h"
 #include "layouts/VLC/LayoutVLC.h"
 #include "layouts/80211b/Layout80211b.h"
 #include <QGroupBox>
@@ -81,6 +82,7 @@ void MainWindow::RunLayout()
 	{
 		emit StateLayoutChanged(STARTING);
 		//printf("Running layout %s\n", layoutFactory->Name());
+		layoutFactory->Setup();
 		layoutFactory->Run();
 		emit StateLayoutChanged(STARTED);
 	}
@@ -121,15 +123,32 @@ void MainWindow::readSettings(QSettings *st)
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->setChecked(true);
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->click();
 	panel->sp_devs->setValue(st->value("uhd/devs", 1).toInt());
+	panel->rb_dev[st->value("uhd/dev", 0).toInt()]->setChecked(true);
 	int siz = st->beginReadArray("uhd/ip");
 	for (int i = 0; i < siz; i++)
 	{
 		st->setArrayIndex(i);
-		panel->ipfield[i].ip->setText(st->value("ip", "0.0.0.0").toString());
+		panel->le_ip[i]->setText(st->value("ip", "0.0.0.0").toString());
+	}
+	st->endArray();
+	siz = st->beginReadArray("uhd/name");
+	for (int i = 0; i < siz; i++)
+	{
+		st->setArrayIndex(i);
+		panel->le_name[i]->setText(st->value("name", "").toString());
+	}
+	st->endArray();
+	siz = st->beginReadArray("uhd/port");
+	for (int i = 0; i < siz; i++)
+	{
+		st->setArrayIndex(i);
+		panel->sp_port[i]->setValue(st->value("port", 5533).toInt());
 	}
 	st->endArray();
 	panel->sp_gain->setValue(st->value("uhd/gain", 40).toInt());
-	panel->le_freq->setText(st->value("uhd/freq", "0").toString());
+	panel->sp_freq->setValue(st->value("uhd/freq", 0).toInt());
+	panel->sp_sps->setValue(st->value("uhd/sps", 0).toInt());
+	panel->SetDevs(st->value("uhd/devs", 1).toInt());
 }
 void MainWindow::writeSettings(QSettings *st)
 {
@@ -153,15 +172,38 @@ void MainWindow::writeSettings(QSettings *st)
 		}
 	}
 	st->setValue("uhd/devs", panel->sp_devs->value());
+	for (uint i = 0; i < sizeof(panel->rb_dev)/sizeof(QRadioButton *); i++)
+	{
+		if (panel->rb_dev[i]->isChecked())
+		{
+			st->setValue("uhd/dev", i);
+			break;
+		}
+	}
 	st->beginWriteArray("uhd/ip");
-	for (uint i = 0; i < sizeof(panel->ipfield)/sizeof(Panel::IPField); i++)
+	for (uint i = 0; i < Panel::MaxDevs; i++)
 	{
 		st->setArrayIndex(i);
-		st->setValue("ip", panel->ipfield[i].ip->text().remove(' '));
+		st->setValue("ip", panel->le_ip[i]->text().remove(' '));
+	}
+	st->endArray();
+	st->beginWriteArray("uhd/name");
+	for (uint i = 0; i < Panel::MaxDevs; i++)
+	{
+		st->setArrayIndex(i);
+		st->setValue("name", panel->le_name[i]->text());
+	}
+	st->endArray();
+	st->beginWriteArray("uhd/port");
+	for (uint i = 0; i < Panel::MaxDevs; i++)
+	{
+		st->setArrayIndex(i);
+		st->setValue("port", panel->sp_port[i]->value());
 	}
 	st->endArray();
 	st->setValue("uhd/gain", panel->sp_gain->value());
-	st->setValue("uhd/freq", panel->le_freq->text());
+	st->setValue("uhd/freq", panel->sp_freq->value());
+	st->setValue("uhd/sps", panel->sp_sps->value());
 	emit SaveSettings(st);
 	setWindowModified(false);
 }
@@ -372,7 +414,7 @@ Panel::Panel(MainWindow *w) :
 	w->panel = this; //trick for being accessible from now
 	setTabPosition(QTabWidget::North);
 	addTab(CreateLayoutTab(this), "Layouts");
-	addTab(CreateUHDTab(this), "UHD");
+	tab_ss = addTab(CreateUHDTab(this), "Source");
 	QObject::connect(w, SIGNAL(StateLayoutChanged(MainWindow::StatesLayout)), this, SLOT(StateLayout(MainWindow::StatesLayout)));
 }
 QWidget *Panel::CreateLayoutTab(QWidget *w)
@@ -389,6 +431,7 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	bg_chain = new QButtonGroup(gBoxchain);
 	bg_chain->addButton(rb_chain[RB_TX], RB_TX);
 	bg_chain->addButton(rb_chain[RB_RX], RB_RX);
+	QObject::connect(bg_chain, SIGNAL(buttonClicked(int)), this, SLOT(ChangeChain(int)));
 	gBoxchain->setLayout(cBox);
 	for (uint i = 0; layouts[i]; i++)
 	{
@@ -411,46 +454,133 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	QWidget *p = new QWidget(w);
 	sp_devs = new QSpinBox(p);
 	sp_devs->setRange(1, 4);
-	QGridLayout *grid = new QGridLayout(p);
-	QRegExpValidator *v = new QRegExpValidator(QRegExp("^[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]$"), this);
-	grid->addWidget(new QLabel(tr("# USRPs")), 0, 0);
-	grid->addWidget(sp_devs, 0, 1);
-	uint i = 0;
-	for (; i < sizeof(ipfield)/sizeof(IPField); i++)
-	{
-		ipfield[i].ip = new QLineEdit("0.0.0.0", p);
-		//ipfield[i].ip->setInputMask(QString("000.000.000.000"));
-		ipfield[i].ip->setValidator(v);
-		ipfield[i].label = new QLabel(tr("IP Address %1").arg(i+1), p);
-		grid->addWidget(ipfield[i].label, i+1, 0);
-		grid->addWidget(ipfield[i].ip, i+1, 1);
-	}
+	grid_ss = new QGridLayout(p);
+	int i = 0;
+	grid_ss->addWidget(new QLabel(tr("# Devs")), i, 0);
+	grid_ss->addWidget(sp_devs, i, 1);
 	i++;
-	le_freq = new QLineEdit(p);
-	grid->addWidget(new QLabel(tr("Central Freq.")), i, 0);
-	grid->addWidget(le_freq, i, 1);
-	grid->addWidget(new QLabel(tr("MHz")), i++, 2);
+	rb_dev[0] = new QRadioButton(tr("Null"), p);
+	rb_dev[1] = new QRadioButton(tr("USRP"), p);
+	rb_dev[2] = new QRadioButton(tr("File"), p);
+	rb_dev[3] = new QRadioButton(tr("Shared Memory"), p);
+	rb_dev[4] = new QRadioButton(tr("TCP"), p);
+	rb_dev[5] = new QRadioButton(tr("UDP"), p);
+	rb_dev[6] = new QRadioButton(tr("Matlab file"), p);
+	QGroupBox *gb_dev = new QGroupBox(tr("Device type"));
+	QGridLayout *gl_dev = new QGridLayout;
+	gb_dev->setLayout(gl_dev);
+	QButtonGroup *bg_dev = new QButtonGroup(gb_dev);
+	for (int j = 0; j < sizeof(rb_dev)/sizeof(QRadioButton *); j++)
+	{
+		gl_dev->addWidget(rb_dev[j], j/2, j%2);
+		bg_dev->addButton(rb_dev[j]);
+	}
+	rb_dev[0]->setChecked(true);
+	QObject::connect(bg_dev, SIGNAL(buttonClicked(int)), this, SLOT(ChangeDev(int)));
+	grid_ss->addWidget(gb_dev, i, 0, 1, 3);
+	i++;
+	//File/SHM/Matlab (2)
+	for (int j = 0; j < MaxDevs; j++)
+	{
+		le_name[j] = new QLineEdit(p);
+		grid_ss->addWidget(new QLabel(tr("Name")), i, 0);
+		grid_ss->addWidget(le_name[j], i, 1);
+		i++;
+	}
+	//UHD/TCP/UDP (10)
+	QRegExpValidator *v = new QRegExpValidator(QRegExp("^[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]\\.[0-2 ]?[0-9 ]?[0-9 ]$"), this);
+	for (int j = 0; j < MaxDevs; j++)
+	{
+		le_ip[j] = new QLineEdit("0.0.0.0", p);
+		//ipfield[i].ip->setInputMask(QString("000.000.000.000"));
+		le_ip[j]->setValidator(v);
+		grid_ss->addWidget(new QLabel(tr("IP Address"), p), i, 0);
+		grid_ss->addWidget(le_ip[j], i, 1);
+		i++;
+	}
+	//ONLY UHD (18)
+	sp_freq = new QSpinBox(p);
+	grid_ss->addWidget(new QLabel(tr("Central Freq.")), i, 0);
+	grid_ss->addWidget(sp_freq, i, 1);
+	grid_ss->addWidget(new QLabel(tr("MHz")), i, 2);
+	i++;
 	sp_gain = new QSpinBox(p);
 	sp_gain->setRange(10, 70);
 	sp_gain->setSingleStep(5);
+	grid_ss->addWidget(new QLabel(tr("Gain")), i, 0);
+	grid_ss->addWidget(sp_gain, i, 1);
 	i++;
-	grid->addWidget(new QLabel(tr("Gain")), i, 0);
-	grid->addWidget(sp_gain, i++, 1);
+	sp_sps = new QSpinBox(p);
+	sp_sps->setSingleStep(100);
+	sp_sps->setRange(1, 100000);
+	grid_ss->addWidget(new QLabel(tr("Clock rate")), i, 0);
+	grid_ss->addWidget(sp_sps, i, 1);
+	grid_ss->addWidget(new QLabel(tr("Ksps")), i, 2);
+	i++;
+	//ONLY TCP/UDP (21)
+	for (int j = 0; j < MaxDevs; j++)
+	{
+		sp_port[j] = new QSpinBox(p);
+		sp_port[j]->setRange(1024, (1<<16)-1);
+		grid_ss->addWidget(new QLabel(tr("Port")), i, 0);
+		grid_ss->addWidget(sp_port[j], i, 1);
+		i++;
+	}
+	//
 	SetDevs(sp_devs->value());
 	QObject::connect(sp_devs, SIGNAL(valueChanged(int)), this, SLOT(SetDevs(int)));
 	return p;
 }
 void Panel::SetDevs(int devs)
 {
-	for (int i = 0; i < devs; i++)
+	int dev = 0;
+	for (int i = 0; i < sizeof(rb_dev)/sizeof(QRadioButton *); i++)
 	{
-		ipfield[i].ip->setHidden(false);
-		ipfield[i].label->setHidden(false);
+		if (rb_dev[i]->isChecked())
+		{
+			dev = i;
+			break;
+		}
 	}
-	for (uint i = devs; i < sizeof(ipfield)/sizeof(IPField); i++)
+	for (int r = 4; r < grid_ss->count(); r++)
+		grid_ss->itemAt(r)->widget()->setHidden(true);
+	if (rb_chain[RB_RX]->isChecked())
+		rb_dev[6]->setHidden(true);
+	else
+		rb_dev[6]->setHidden(false);
+	if (dev == 1)//USRP
 	{
-		ipfield[i].ip->setHidden(true);
-		ipfield[i].label->setHidden(true);
+		for (int j = 0; j < devs; j++)
+		{
+			grid_ss->itemAtPosition(10+j, 0)->widget()->setHidden(false);
+			grid_ss->itemAtPosition(10+j, 1)->widget()->setHidden(false);
+		}
+		grid_ss->itemAtPosition(18, 0)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(18, 1)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(18, 2)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(19, 0)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(19, 1)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(20, 0)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(20, 1)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(20, 2)->widget()->setHidden(false);
+	}
+	else if (dev == 4 || dev == 5)
+	{
+		grid_ss->itemAtPosition(10, 0)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(10, 1)->widget()->setHidden(false);
+		for (int j = 0; j < devs; j++)
+		{
+			grid_ss->itemAtPosition(21+j, 0)->widget()->setHidden(false);
+			grid_ss->itemAtPosition(21+j, 1)->widget()->setHidden(false);
+		}
+	}
+	else if (dev == 2 || dev == 3 || dev == 6)
+	{
+		for (int j = 0; j < devs; j++)
+		{
+			grid_ss->itemAtPosition(2+j, 0)->widget()->setHidden(false);
+			grid_ss->itemAtPosition(2+j, 1)->widget()->setHidden(false);
+		}
 	}
 }
 void Panel::StateLayout(MainWindow::StatesLayout s)
@@ -473,4 +603,16 @@ void Panel::StateLayout(MainWindow::StatesLayout s)
 		rb_chain[RB_TX]->setEnabled(true);
 		rb_chain[RB_RX]->setEnabled(true);
 	}
+}
+void Panel::ChangeChain(int id)
+{
+	if (id == RB_TX)
+		setTabText(tab_ss, "Sink");
+	else if (id == RB_RX)
+		setTabText(tab_ss, "Source");
+	SetDevs(sp_devs->value());
+}
+void Panel::ChangeDev(int id)
+{
+	SetDevs(sp_devs->value());
 }

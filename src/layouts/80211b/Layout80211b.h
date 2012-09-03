@@ -22,8 +22,6 @@ class Layout80211b : public QObject, public LayoutFactory
 		Rx80211b::sptr rx;
 		//Tx80211b::sptr tx;
 		boost::shared_ptr<uhd_usrp_source> usrp;
-		MainWindow *mw;
-		int radioID;
 		QWidget *CreateTabOpts();
 		QComboBox *cb_chans;
 		void ReadSettings(QSettings *);

@@ -16,7 +16,7 @@ int channels [] = {
 };
 
 Layout80211b::Layout80211b(MainWindow *_mw, int _radioID) :
-	LayoutFactory(), mw(_mw), radioID(_radioID)
+	LayoutFactory(_mw, _radioID)
 {
 	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 }
@@ -31,9 +31,9 @@ LayoutFactory::sptr Layout80211b::Create(MainWindow *_mw, int _radioID)
 void Layout80211b::Run()
 {
 	grTop = gr_make_top_block(std::string(name));
-	QString addr = QString("addr0=%1").arg(mw->panel->ipfield[0].ip->text().remove(' '));
+	QString addr = QString("addr0=%1").arg(mw->panel->le_ip[0]->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
-		addr.append(",addr%1=%2").arg(i).arg(mw->panel->ipfield[i].ip->text().remove(' '));
+		addr.append(",addr%1=%2").arg(i).arg(mw->panel->le_ip[i]->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
 		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
