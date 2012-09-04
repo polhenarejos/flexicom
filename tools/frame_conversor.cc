@@ -10,13 +10,14 @@ int main(int argc, char **argv)
 {
 	if (argc == 1)
 	{
-		std::cout<<"USE "<<argv[0]<<" FILE"<<std::endl;
+		std::cout<<"USE "<<argv[0]<<" FILE [c]"<<std::endl;
 		exit(-1);
 	}
 	char buf[1024], *real, *imag;
 	//int i = 0;
 	sprintf(buf, "%s.dat", argv[1]);
-	FILE *fp = fopen(argv[1], "r"), *fw = fopen(buf, "w");
+	bool force_complex = (argc > 2 && *argv[2] == 'c');
+	FILE *fp = fopen(argv[1], "r"), *fw = fopen(buf, "wb");
 	while (fgets(buf, 1024, fp))
 	{
 		//std::cout<<"Line: "<<++i<<std::endl;
@@ -32,8 +33,16 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			float comp = atof(real);
-			fwrite(&comp, sizeof(float), 1, fw);
+			if (force_complex)
+			{
+				std::complex<float> comp(atof(real), 0);
+				fwrite(&comp, sizeof(std::complex<float>), 1, fw);
+			}
+			else
+			{
+				float comp = atof(real);
+				fwrite(&comp, sizeof(float), 1, fw);
+			}
 		}
 	}
 	fclose(fw);
