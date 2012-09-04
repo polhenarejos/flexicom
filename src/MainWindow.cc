@@ -215,10 +215,7 @@ void MainWindow::AddCustomTab(QWidget *w, QString name)
 void MainWindow::RemoveCustomTabs()
 {
 	for (uint i = 0; i < tabs.size(); i++)
-	{
-		panel->widget(tabs[i])->deleteLater();
-		panel->removeTab(tabs[i]);
-	}
+		panel->removeTab(tabs[0]);
 	tabs.clear();
 }
 void MainWindow::AddCustomPlot(QWidget *w, int x, int y)
