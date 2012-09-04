@@ -545,7 +545,7 @@ void Panel::SetDevs(int devs)
 			break;
 		}
 	}
-	for (int r = 4; r < grid_ss->count(); r++)
+	for (int r = 3; r < grid_ss->count(); r++)
 		grid_ss->itemAt(r)->widget()->setHidden(true);
 	if (rb_chain[RB_RX]->isChecked())
 		rb_dev[6]->setHidden(true);
