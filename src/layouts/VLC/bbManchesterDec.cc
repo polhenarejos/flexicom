@@ -22,7 +22,7 @@ int bbManchesterDec::work(int no, gr_vector_const_void_star &input_items, gr_vec
 	int *optr = (int *)output_items[0];
 	for (int n = 0; n < no; n++)
 	{
-		*optr++ = *(iptr+d_mode)&0x1;
+		*optr++ = (*iptr+d_mode)&0x1;
 		if (d_flag_cc)
 			*(optr-1) = 2-4**(optr-1);
 		iptr += 2;
