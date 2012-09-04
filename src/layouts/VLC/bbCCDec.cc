@@ -68,7 +68,7 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	//tmp= new int[length];
 	tmp2=new int[out_cc_dec];
 	blocks_to_process = (noutput_items/out_cc_dec);
-	while (blocks_to_process>=0)
+	while (blocks_to_process>0)
 	{
 		memset(tmp2,0,sizeof(int)*out_cc_dec);
 		if(data_rate ==0)
