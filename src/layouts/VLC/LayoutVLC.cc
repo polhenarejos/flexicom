@@ -72,19 +72,6 @@ void LayoutVLC::Run()
 			printf("El valor de oversampling: %d\n", mw->panel->sp_ov->value());
 		grTop->connect(Source(0), 0, rx, 0);
 		grTop->start();
-		
-		if ((rx->vlc_var_rx.clock_rate*mw->panel->sp_ov->value() != mw->panel->sp_sps->value()) &&  mw->panel->rb_dev[1]->isChecked())			
-		{
-			try
-			{
-				throw mw->panel->sp_ov->value();
-			}
-			catch (int e)
-			{   
-				 std::cout << "The oversampling factor " << e << "is incorrect with the current configuration"<< std::endl;
-				 exit(-1);
-  			}
-		}
 	}
 	else //transmitter
 	{
@@ -123,20 +110,6 @@ void LayoutVLC::Run()
 		grTop->connect(ov, 0, Sink(0), 0);
 		//grTop->connect(tx, 0, sink, 0);
 		grTop->start();
-		if ((tx->vlc_var.clock_rate*mw->panel->sp_ov->value() != mw->panel->sp_sps->value()) && mw->panel->rb_dev[1]->isChecked())
-		{
-			try
-			{
-				throw mw->panel->sp_ov->value();
-			}
-			catch (int e)
-			{   
-				 std::cout << "The oversampling factor " << e << "is incorrect with the current configuration"<< std::endl;
-				 exit(-1);
-  			}
-			
-		}
-		
 	}
 }
 void LayoutVLC::Stop()
