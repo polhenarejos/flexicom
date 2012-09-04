@@ -68,9 +68,23 @@ void LayoutVLC::Run()
 	grTop = gr_make_top_block(std::string(name));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		rx = RxVLC::Create(this);
+		rx = RxVLC::Create(this, mw->panel->sp_ov->value());
+			printf("El valor de oversampling: %d\n", mw->panel->sp_ov->value());
 		grTop->connect(Source(0), 0, rx, 0);
 		grTop->start();
+		
+		if ((rx->vlc_var_rx.clock_rate*mw->panel->sp_ov->value() != mw->panel->sp_sps->value()) &&  mw->panel->rb_dev[1]->isChecked())			
+		{
+			try
+			{
+				throw mw->panel->sp_ov->value();
+			}
+			catch (int e)
+			{   
+				 std::cout << "The oversampling factor " << e << "is incorrect with the current configuration"<< std::endl;
+				 exit(-1);
+  			}
+		}
 	}
 	else //transmitter
 	{
@@ -103,11 +117,25 @@ void LayoutVLC::Run()
 		}
 		*/
 		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(4);
+		
+		Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(mw->panel->sp_ov->value());
 		grTop->connect(tx, 0, ov, 0);
 		grTop->connect(ov, 0, Sink(0), 0);
 		//grTop->connect(tx, 0, sink, 0);
 		grTop->start();
+		if ((tx->vlc_var.clock_rate*mw->panel->sp_ov->value() != mw->panel->sp_sps->value()) && mw->panel->rb_dev[1]->isChecked())
+		{
+			try
+			{
+				throw mw->panel->sp_ov->value();
+			}
+			catch (int e)
+			{   
+				 std::cout << "The oversampling factor " << e << "is incorrect with the current configuration"<< std::endl;
+				 exit(-1);
+  			}
+			
+		}
 		
 	}
 }
@@ -129,7 +157,7 @@ void LayoutVLC::RadioPressed(bool checked)
 		mw->AddCustomTab(CreateTabChat(), QString("Chat"));
 		mw->panel->rb_chain[RB_TX]->setHidden(false);
 		mw->panel->rb_chain[RB_RX]->setHidden(false);
-		mw->panel->rb_chain[RB_TX]->setChecked(true);
+		//mw->panel->rb_chain[RB_TX]->setChecked(false);
 		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));		
 	}

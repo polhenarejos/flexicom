@@ -159,7 +159,7 @@ void TxVLC::init_var()
 					vlc_var._cc_code.pre_cc_out = 0;
 					vlc_var._cc_code.cc_in=0;
 					vlc_var._cc_code.cc_out=0;
-					vlc_var.clock_rate = 400e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
+					vlc_var.clock_rate = 800e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
 					vlc_var.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
 					LayoutVLC::dec2bi(vlc_var.operating_mode+5, 6, vlc_var.MCSID);
 					switch (vlc_var.operating_mode)

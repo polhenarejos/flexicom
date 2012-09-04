@@ -21,7 +21,7 @@
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
 
-RxVLC::RxVLC(LayoutVLC * _ly) :
+RxVLC::RxVLC(LayoutVLC * _ly, int oversampling) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
 	ly(_ly)
 {
@@ -31,8 +31,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
-	Correlator::sptr corr = Correlator::Create(phr->length_sequence);
-	Timing::sptr tim = Timing::Create(4);
+	Correlator::sptr corr = Correlator::Create(phr->length_sequence, oversampling);
+	Timing::sptr tim = Timing::Create(oversampling);
 	connect(self(), 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
 	connect(corr, 0, tim, 0);
@@ -63,9 +63,9 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);	
 }
-RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
+RxVLC::sptr RxVLC::Create(LayoutVLC * _ly, int oversampling)
 {
-	return gnuradio::get_initial_sptr(new RxVLC(_ly));
+	return gnuradio::get_initial_sptr(new RxVLC(_ly, oversampling));
 }
 
 void RxVLC::init_var()
@@ -147,7 +147,7 @@ void RxVLC::init_var()
 					vlc_var_rx._cc_code.pre_cc_out = 0;
 					vlc_var_rx._cc_code.cc_in=0;
 					vlc_var_rx._cc_code.cc_out=0;
-					vlc_var_rx.clock_rate = 400e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
+					vlc_var_rx.clock_rate = 800e3; //with no dimming, we use the manchester encoder to produce the samples, so the speed has to be doubled
 					vlc_var_rx.operating_mode = ly->varVLC->cb_phy_op_mode[1]->currentIndex();
 					LayoutVLC::dec2bi(vlc_var_rx.operating_mode+5, 6, vlc_var_rx.MCSID);  
 					switch (vlc_var_rx.operating_mode)

@@ -517,7 +517,13 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	grid_ss->addWidget(sp_sps, i, 1);
 	grid_ss->addWidget(new QLabel(tr("Ksps")), i, 2);
 	i++;
-	//ONLY TCP/UDP (21)
+	sp_ov = new QSpinBox(p);
+	sp_ov->setSingleStep(1);
+	sp_ov->setRange(4,5);
+	grid_ss->addWidget(new QLabel(tr("Oversampling factor")), i, 0);
+	grid_ss->addWidget(sp_ov, i, 1);
+	i++;
+	//ONLY TCP/UDP (22)
 	for (int j = 0; j < MaxDevs; j++)
 	{
 		sp_port[j] = new QSpinBox(p);
@@ -563,6 +569,8 @@ void Panel::SetDevs(int devs)
 		grid_ss->itemAtPosition(20, 0)->widget()->setHidden(false);
 		grid_ss->itemAtPosition(20, 1)->widget()->setHidden(false);
 		grid_ss->itemAtPosition(20, 2)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(21, 0)->widget()->setHidden(false);
+		grid_ss->itemAtPosition(21, 1)->widget()->setHidden(false);
 	}
 	else if (dev == 4 || dev == 5)
 	{
@@ -570,8 +578,8 @@ void Panel::SetDevs(int devs)
 		grid_ss->itemAtPosition(10, 1)->widget()->setHidden(false);
 		for (int j = 0; j < devs; j++)
 		{
-			grid_ss->itemAtPosition(21+j, 0)->widget()->setHidden(false);
-			grid_ss->itemAtPosition(21+j, 1)->widget()->setHidden(false);
+			grid_ss->itemAtPosition(22+j, 0)->widget()->setHidden(false);
+			grid_ss->itemAtPosition(22+j, 1)->widget()->setHidden(false);
 		}
 	}
 	else if (dev == 2 || dev == 3 || dev == 6)

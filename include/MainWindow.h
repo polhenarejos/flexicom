@@ -119,6 +119,7 @@ class Panel : public QTabWidget
 		QSpinBox *sp_gain;
 		QSpinBox *sp_freq;
 		QSpinBox *sp_sps;
+		QSpinBox *sp_ov;
 		//TCP/UDP
 		QSpinBox *sp_port[MaxDevs];
 	

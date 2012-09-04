@@ -6,15 +6,15 @@
 #include <gr_io_signature.h>
 #include <malloc.h>
 
-Correlator::Correlator(int _copy, float _th) :
+Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	pattern(-1), copy(_copy), cpd(0), th(_th)
+	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
 					  { 1,-1,-1,1,1,-1,-1,-1,-1,-1,1,-1,-1,1,1,-1,1,1,-1,-1,1,1,1,1,1,-1,1,1,-1,-1,1,-1,-1,1,1,-1,-1,-1,-1,-1,1,-1,-1,1,1,-1,1,1,-1,-1,1,1,1,1,1,-1,1,1,-1,-1 },
    					  { -1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1 } };
-	ov = 4; //oversampler factor
+	//ov = 4; //oversampler factor
 	siz = 60*ov;
 	copy *= ov;
 	for (int t = 0; t < 2; t++)
@@ -29,9 +29,9 @@ Correlator::Correlator(int _copy, float _th) :
 	}
 	set_alignment(volk_get_alignment()/sizeof(float));
 }
-Correlator::sptr Correlator::Create(int _copy, float _th)
+Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, float _th)
 {
-	return sptr(new Correlator(_copy, _th));
+	return sptr(new Correlator(_copy, _ov,_th));
 }
 Correlator::~Correlator()
 {
