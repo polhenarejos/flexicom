@@ -138,5 +138,5 @@ int bbCCEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	delete [] tmp;
 	delete [] tmp2;
 	consume_each((noutput_items/out_cc)*length);
-	return noutput_items;
+	return (noutput_items/out_cc)*out_cc;
 }

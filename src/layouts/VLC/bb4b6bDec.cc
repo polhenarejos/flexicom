@@ -32,7 +32,7 @@ void bb4b6bDec::forecast(int noutput_items, gr_vector_int &ninput_items_required
 {
 	uint ninputs = ninput_items_required.size();
 	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i]= noutput_items/4*6; //for each six input bits, we generate 4 output bits
+		ninput_items_required[i]= noutput_items*6/4; //for each six input bits, we generate 4 output bits
 }
 
 int bb4b6bDec::distance(int *number)
@@ -62,7 +62,7 @@ int bb4b6bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_v
 	int tmp[6], tmp2[4];
 	
 	int dist;
-	samples_to_process= noutput_items/4*6;
+	samples_to_process= noutput_items/4;
 	//printf("noutput_items: %d\n", noutput_items);
 	while (samples_to_process>0)
 	{
@@ -74,7 +74,7 @@ int bb4b6bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_v
 		optr =optr +4;
 		samples_to_process=samples_to_process-6;
 	}
-	consume_each(noutput_items/4*6);
-	return noutput_items;
+	consume_each(noutput_items*6/4);
+	return (noutput_items/4)*4;
 	
 }

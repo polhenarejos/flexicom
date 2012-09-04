@@ -54,7 +54,7 @@ void bb8b10bDec::forecast(int noutput_items, gr_vector_int &ninput_items_require
 {
 	uint ninputs = ninput_items_required.size();
 	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i]= noutput_items/8*10; //for each six input bits, we generate 4 output bits
+		ninput_items_required[i]= noutput_items*10/8; //for each six input bits, we generate 4 output bits
 }
 
 int bb8b10bDec::distance(int *number, int RD_flag, int length)
@@ -161,7 +161,7 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 	int tmp[4], tmp2[6];
 	int dist;
 
-	samples_to_process= noutput_items/8*10;
+	samples_to_process= noutput_items/8;
 	//printf("noutput_items: %d\n", noutput_items);
 	while (samples_to_process>0)
 	{
@@ -198,7 +198,7 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 		//printf("Valor de RD:%d\n", RD);
 		
 	}
-	consume_each(noutput_items/8*10);
-	return noutput_items;
+	consume_each(noutput_items*10/8);
+	return (noutput_items/8)*8;
 	
 }

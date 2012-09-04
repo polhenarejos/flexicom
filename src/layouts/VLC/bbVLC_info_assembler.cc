@@ -133,5 +133,5 @@ int bbVLC_info_assembler::general_work(int noutput_items, gr_vector_int &ninput_
 	
 	consume(0,(noutput_items/length_frame)*length_PHR); 
 	consume(1,(noutput_items/length_frame)*length_data_payload); 
-	return noutput_items;
+	return (noutput_items/length_frame)*length_frame;
 }

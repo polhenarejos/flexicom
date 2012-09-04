@@ -54,7 +54,7 @@ void bb8b10bEnc::forecast(int noutput_items, gr_vector_int &ninput_items_require
 {
 	uint ninputs = ninput_items_required.size();
 	for (uint i=0; i < ninputs; i++)
-		ninput_items_required[i]= noutput_items/10*8; //for each eight input bits, we generate 10 output bit
+		ninput_items_required[i]= noutput_items*8/10; //for each eight input bits, we generate 10 output bit
 }
 
 int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
@@ -64,7 +64,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 	int samples_to_process,i, ones, zeros;
 	int index=0;
 	int output[10];
-	samples_to_process= noutput_items/10*8;
+	samples_to_process= noutput_items/10;
 	while (samples_to_process>0)
 	{
 		index = 0;
@@ -126,7 +126,7 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 		if (words_processed == 0)
 			RD=0;
 	}
-	consume_each(noutput_items/10*8);
-	return noutput_items;
+	consume_each(noutput_items*8/10);
+	return (noutput_items/10)*10;
 	
 }
