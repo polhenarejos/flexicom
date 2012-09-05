@@ -71,7 +71,6 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const float *iptr = (const float *)_i[0]; 
 	float *optr = (float *)_o[0];
 	unsigned int o = 0, rtd = 0;
-	static FILE *fp = fopen("capt3.dat", "wb");
 	if (!cpd)
 	{
 		if (strike)
@@ -94,7 +93,6 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			Correlate(iptr, TDP[pattern], C, no, vppm);
 		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? no*8 : no));
-		fwrite(C, sizeof(float), no, fp);
 		if (C[idx] > th)
 		{
 			if (!strike)
