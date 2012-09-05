@@ -7,7 +7,7 @@
 
 Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 0, 0)),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly)
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0)
 {
 }
 Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
@@ -62,6 +62,21 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 				MHR[ic] = *iptr;
 				//if (ic == 4)
 				//	PSDUParser(MHR);
+				if (ic == 2)
+				{
+					unsigned a = 0;
+					if (prevSeq == 0xff)
+						prevSeq = MHR[2]-1;
+					if (MHR[2] > prevSeq)
+						a = (MHR[2]-1-prevSeq);
+					else
+						a = (0xff-prevSeq+MHR[2]);
+					per += a;
+					total += a+1;
+					if (MHR[2] != (unsigned char)(prevSeq+1))
+						printf("PER = %f\n", (float)per/total);
+					prevSeq = MHR[2];
+				}
 			}
 			else if (ic == 5)
 			{

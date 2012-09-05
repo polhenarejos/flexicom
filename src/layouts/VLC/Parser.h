@@ -52,6 +52,9 @@ class Parser : public gr_block
 		int payload_ver;
 		QString payload;
 		LayoutVLC *ly;
+		unsigned int per;
+		unsigned char prevSeq;
+		unsigned int total;
 };
 
 #endif //_INC_PARSER_H_
