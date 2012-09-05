@@ -18,15 +18,6 @@
 #include <QTextEdit>
 #include <iostream>
 
-#include <gr_sig_source_f.h>
-#include <gr_float_to_complex.h>
-#include <gr_file_source.h>
-#include <gr_file_sink.h>
-#include <gr_null_sink.h>
-#include "bbMatlab.h"
-#include "../src/modules/Oversampler.cc"
-#include "Tcp.h"
-
 const char *LayoutVLC::name = "VLC";
 
 double rate_phy1_o [] = { 
@@ -68,49 +59,17 @@ void LayoutVLC::Run()
 	grTop = gr_make_top_block(std::string(name));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		rx = RxVLC::Create(this, mw->panel->sp_ov->value());
-			printf("El valor de oversampling: %d\n", mw->panel->sp_ov->value());
-		grTop->connect(Source(0), 0, rx, 0);
-		grTop->start();
+		rx = RxVLC::Create(this);
+		grTop->connect(Source(), 0, rx, 0);
 	}
 	else //transmitter
 	{
 		varVLC->le_chat->setEnabled(true);
 		varVLC->pb_chat->setEnabled(true);
-		/*usrp_tx = uhd_make_usrp_sink(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
-		usrp_tx->set_samp_rate(800e3);
-		usrp_tx->set_center_freq(0);
-		usrp_tx->set_gain(mw->panel->sp_gain->value());
-		//gr_sig_source_f_sptr sig = gr_make_sig_source_f(20e6, GR_SIN_WAVE, 200e3, 1, 0);
-		gr_file_source_sptr sig = gr_make_file_source(sizeof(float), "src/layouts/VLC/input_data.txt.dat", true);
-		gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
-		grTop->connect(sig, 0, f2c, 0);
-		grTop->connect(f2c, 0, usrp_tx, 0);
-		grTop->start();
-		*/tx = TxVLC::Create(this);
-		/*else
-		{
-			switch (tx->vlc_var.mod_type)
-			{
-				case 0:
-				usrp_tx->set_samp_rate(200e3);	
-				//other settings of USRP
-				break;
-				case 1:
-				usrp_tx->set_samp_rate(800e3);
-				//other settings of USRP, VPPM is OOK with twice the speed
-				break;
-			}
-		}
-		*/
-		//gr_udp_sink_sptr sink = gr_make_udp_sink(sizeof(float), "127.0.0.1", 5544);
-		
-		Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(mw->panel->sp_ov->value());
-		grTop->connect(tx, 0, ov, 0);
-		grTop->connect(ov, 0, Sink(0), 0);
-		//grTop->connect(tx, 0, sink, 0);
-		grTop->start();
+		tx = TxVLC::Create(this);
+		grTop->connect(tx, 0, Sink(), 0);
 	}
+	grTop->start();
 }
 void LayoutVLC::Stop()
 {

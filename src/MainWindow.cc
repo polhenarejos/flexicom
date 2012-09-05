@@ -148,6 +148,14 @@ void MainWindow::readSettings(QSettings *st)
 	panel->sp_gain->setValue(st->value("uhd/gain", 40).toInt());
 	panel->sp_freq->setValue(st->value("uhd/freq", 0).toInt());
 	panel->sp_sps->setValue(st->value("uhd/sps", 0).toInt());
+	if (st->value("uhd/ov", 0).toInt())
+	{
+		panel->ch_ov->setCheckState(Qt::Checked);
+		panel->sp_ov->setValue(st->value("uhd/ov", 0).toInt());
+	}
+	else
+		panel->sp_ov->setEnabled(false);
+	panel->ch_flip->setCheckState((Qt::CheckState)st->value("uhd/flip", Qt::Unchecked).toInt());
 	panel->SetDevs(st->value("uhd/devs", 1).toInt());
 }
 void MainWindow::writeSettings(QSettings *st)
@@ -204,6 +212,11 @@ void MainWindow::writeSettings(QSettings *st)
 	st->setValue("uhd/gain", panel->sp_gain->value());
 	st->setValue("uhd/freq", panel->sp_freq->value());
 	st->setValue("uhd/sps", panel->sp_sps->value());
+	if (panel->ch_ov->checkState() == Qt::Checked)
+		st->setValue("uhd/ov", panel->sp_ov->value());
+	else
+		st->setValue("uhd/ov", 0);
+	st->setValue("uhd/flip", panel->ch_flip->checkState());
 	emit SaveSettings(st);
 	setWindowModified(false);
 }
@@ -517,7 +530,9 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	sp_ov = new QSpinBox(p);
 	sp_ov->setSingleStep(1);
 	sp_ov->setRange(4,5);
-	grid_ss->addWidget(new QLabel(tr("Oversampling factor")), i, 0);
+	ch_ov = new QCheckBox(tr("Oversampling factor"), p);
+	QObject::connect(ch_ov, SIGNAL(stateChanged(int)), this, SLOT(OvChanged(int)));
+	grid_ss->addWidget(ch_ov, i, 0);
 	grid_ss->addWidget(sp_ov, i, 1);
 	i++;
 	//ONLY TCP/UDP (22)
@@ -529,7 +544,10 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 		grid_ss->addWidget(sp_port[j], i, 1);
 		i++;
 	}
-	//
+	//30
+	ch_flip = new QCheckBox(tr("Flip signal by -1"), p);
+	grid_ss->addWidget(ch_flip, i, 0, 1, 2);
+	i++;
 	SetDevs(sp_devs->value());
 	QObject::connect(sp_devs, SIGNAL(valueChanged(int)), this, SLOT(SetDevs(int)));
 	return p;
@@ -566,8 +584,6 @@ void Panel::SetDevs(int devs)
 		grid_ss->itemAtPosition(20, 0)->widget()->setHidden(false);
 		grid_ss->itemAtPosition(20, 1)->widget()->setHidden(false);
 		grid_ss->itemAtPosition(20, 2)->widget()->setHidden(false);
-		grid_ss->itemAtPosition(21, 0)->widget()->setHidden(false);
-		grid_ss->itemAtPosition(21, 1)->widget()->setHidden(false);
 	}
 	else if (dev == 4 || dev == 5)
 	{
@@ -587,6 +603,9 @@ void Panel::SetDevs(int devs)
 			grid_ss->itemAtPosition(2+j, 1)->widget()->setHidden(false);
 		}
 	}
+	grid_ss->itemAtPosition(21, 0)->widget()->setHidden(false);
+	grid_ss->itemAtPosition(21, 1)->widget()->setHidden(false);
+	grid_ss->itemAtPosition(30, 0)->widget()->setHidden(false);
 }
 void Panel::StateLayout(MainWindow::StatesLayout s)
 {
@@ -620,4 +639,11 @@ void Panel::ChangeChain(int id)
 void Panel::ChangeDev(int id)
 {
 	SetDevs(sp_devs->value());
+}
+void Panel::OvChanged(int state)
+{
+	if (state == Qt::Checked)
+		grid_ss->itemAtPosition(21, 1)->widget()->setEnabled(true);
+	else
+		grid_ss->itemAtPosition(21, 1)->widget()->setEnabled(false);
 }

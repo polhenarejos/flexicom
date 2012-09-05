@@ -19,14 +19,14 @@ class RxVLC : public gr_hier_block2
 {
 	public:
 		typedef boost::shared_ptr<RxVLC> sptr;
-		static sptr Create(LayoutVLC *, int);
+		static sptr Create(LayoutVLC *);
 		~RxVLC();
 		void stop();
 		VLCvar vlc_var_rx;
 		
 	private:
 		int poly[3];
-		RxVLC(LayoutVLC *, int);
+		RxVLC(LayoutVLC *);
 		LayoutVLC *ly;
 		void init_var();
 		int get_modulated_resources(int,int,int,int,int,int,int,int); //returns the number of bits after modulation

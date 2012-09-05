@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QFileInfo>
+#include <QCheckBox>
 #include "LayoutFactory.h"
 
 class Panel;
@@ -119,7 +120,9 @@ class Panel : public QTabWidget
 		QSpinBox *sp_gain;
 		QSpinBox *sp_freq;
 		QSpinBox *sp_sps;
+		QCheckBox *ch_ov;
 		QSpinBox *sp_ov;
+		QCheckBox *ch_flip;
 		//TCP/UDP
 		QSpinBox *sp_port[MaxDevs];
 	
@@ -128,6 +131,7 @@ class Panel : public QTabWidget
 		void StateLayout(MainWindow::StatesLayout);
 		void ChangeChain(int);
 		void ChangeDev(int);
+		void OvChanged(int);
 };
 
 #endif //_INC_MAINWINDOW_H_

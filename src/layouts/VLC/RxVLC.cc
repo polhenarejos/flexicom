@@ -21,7 +21,7 @@
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
 
-RxVLC::RxVLC(LayoutVLC * _ly, int oversampling) :
+RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
 	ly(_ly)
 {
@@ -31,8 +31,9 @@ RxVLC::RxVLC(LayoutVLC * _ly, int oversampling) :
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
-	Correlator::sptr corr = Correlator::Create(phr->length_sequence, oversampling);
-	Timing::sptr tim = Timing::Create(oversampling);
+	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
+	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov);
+	Timing::sptr tim = Timing::Create(ov);
 	connect(self(), 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
 	connect(corr, 0, tim, 0);
@@ -63,9 +64,9 @@ RxVLC::RxVLC(LayoutVLC * _ly, int oversampling) :
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);	
 }
-RxVLC::sptr RxVLC::Create(LayoutVLC * _ly, int oversampling)
+RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {
-	return gnuradio::get_initial_sptr(new RxVLC(_ly, oversampling));
+	return gnuradio::get_initial_sptr(new RxVLC(_ly));
 }
 
 void RxVLC::init_var()

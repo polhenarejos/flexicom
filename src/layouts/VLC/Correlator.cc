@@ -62,7 +62,7 @@ void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int 
 		volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr+n, siz*v);
 	}
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
-	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v, no);
+	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
 	free16Align(tN);
 }
@@ -93,7 +93,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			Correlate(iptr, TDP[pattern], C, no, vppm);
 		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? no*8 : no));
-		if (C[idx] > th)
+		if ((C[idx] > 1 && C[idx] > th*2) || (C[idx] <= 1 && C[idx] > th))
 		{
 			if (!strike)
 			{
