@@ -8,7 +8,7 @@
 
 Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov)
+	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
@@ -28,10 +28,11 @@ Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 		}
 	}
 	set_alignment(volk_get_alignment()/sizeof(float));
+	set_output_multiple(siz);
 }
 Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, float _th)
 {
-	return sptr(new Correlator(_copy, _ov,_th));
+	return sptr(new Correlator(_copy, _ov, _th));
 }
 Correlator::~Correlator()
 {
@@ -61,7 +62,7 @@ void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int 
 		volk_32f_x2_dot_prod_32f_u(tN+n, iptr+n, iptr+n, siz*v);
 	}
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
-	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
+	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
 	free16Align(tN);
 }
@@ -70,8 +71,11 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const float *iptr = (const float *)_i[0]; 
 	float *optr = (float *)_o[0];
 	unsigned int o = 0, rtd = 0;
+	static FILE *fp = fopen("capt3.dat", "wb");
 	if (!cpd)
 	{
+		if (strike)
+			no = siz;
 		unsigned int idx = 0;
 		float *C = (float *)malloc16Align(sizeof(float)*no*(pattern == -1 ? 8 : 1));
 		if (pattern == -1)
@@ -90,16 +94,32 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			Correlate(iptr, TDP[pattern], C, no, vppm);
 		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? no*8 : no));
+		fwrite(C, sizeof(float), no, fp);
 		if (C[idx] > th)
 		{
-			if (pattern == -1)
+			if (!strike)
 			{
-				vppm = idx/(4*no)+1;
-				pattern = idx/no;
+				strike = true;
+				consume_each(idx%no);
+				return 0;
 			}
-			printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
-			cpd = copy;
-			o = idx%no;
+			else
+			{
+				if (pattern == -1)
+				{
+					vppm = idx/(4*no)+1;
+					pattern = idx/no;
+				}
+				printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
+				cpd = copy;
+				o = idx%no;
+				strike = false;
+			}
+		}
+		else
+		{
+			if (strike)
+				strike = false;
 		}
 		free16Align(C);
 	}

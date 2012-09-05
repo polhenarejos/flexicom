@@ -35,6 +35,7 @@ class Correlator : public gr_block
 		unsigned int ov;
 		unsigned int siz;
 		unsigned int vppm;
+		bool strike;
 };
 
 #endif //_INC_CORRELATOR_H
