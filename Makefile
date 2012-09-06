@@ -57,6 +57,17 @@ CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib\$(PREF)
 ## NaturalDocs
 DOC_DIR=deps\doxygen\bin\$(PREF)
 DOC_BIN=$(DOC_DIR)\doxygen
+## XML
+XML_DIR=deps\rapidxml
+XML_INC_DIR=$(XML_DIR)
+## LZ4
+LZ4_DIR=$(XML_DIR)\lz4
+LZ4_INC_DIR=$(LZ4_DIR)\include
+LZ4_LIB_DIR=$(LZ4_DIR)\lib\$(PREF)
+## B64
+B64_DIR=$(XML_DIR)\libb64
+B64_INC_DIR=$(B64_DIR)\include
+B64_LIB_DIR=$(B64_DIR)\lib\$(PREF)
 
 ###############################
 
@@ -88,19 +99,20 @@ CMDLINE_CFLAG=/D CMDLINE
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
 GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk
-GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-digital.lib volk.lib
+GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-audio.lib volk.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
 CPPUNIT_LIB=/LIBPATH:$(CPPUNIT_LIB_DIR) cppunit.lib
+XML_INC=/I $(XML_INC_DIR) /I $(LZ4_INC_DIR) /I $(B64_INC_DIR)
+XML_LIB=/LIBPATH:$(LZ4_LIB_DIR) lz4.lib /LIBPATH:$(B64_LIB_DIR) b64.lib
 
-
-INC_FILES = /I $(INC_DIR) $(QT_INC) $(QWT_INC) $(BOOST_INC) $(LAYOUT_INC) $(GR_INC) $(UHD_INC)
+INC_FILES = /I $(INC_DIR) $(QT_INC) $(QWT_INC) $(BOOST_INC) $(LAYOUT_INC) $(GR_INC) $(UHD_INC) $(XML_INC)
 EXECFLAGS=$(DBGCFLAG) $(CFLAGS) $(INC_FILES) /Fo$(OBJ_DIR)/
 CFLAGS=/J /D NOMINMAX /D _WIN /D _WINDOWS /D _CRT_NONSTDC_NO_DEPRECATE /D _CRT_SECURE_NO_DEPRECATE /nologo /EHsc /c $(CMDLINE_CFLAG) 
 #user32.lib kernel32.lib ws2_32.lib winspool.lib shell32.lib gdi32.lib imm32.lib winmm.lib advapi32.lib
 LFLAGS=$(DBGLFLAG) /LIBPATH:$(OBJ_DIR) user32.lib kernel32.lib ws2_32.lib /nologo $(CMDLINE_LFLAG) $(QT_LIB) $(QWT_LIB) $(BOOST_LIB) $(GR_LIB) $(UHD_LIB) \
-	/INCREMENTAL:NO /MANIFEST 
+	$(XML_LIB) /INCREMENTAL:NO /MANIFEST 
 
 !if $(IS64) == 1
 CFLAGS = $(CFLAGS) /D _WIN64

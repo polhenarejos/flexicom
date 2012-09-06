@@ -50,7 +50,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 				*optr++ = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, sizeof(unsigned char)*8);
 				rtd++;
 			}
-			printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
+			//printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
 		}
 		else
 			printf("**************** %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));

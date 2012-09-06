@@ -53,7 +53,6 @@ LayoutFactory::sptr LayoutVLC::Create(MainWindow *_mw, int _radioID)
 {
 	return LayoutFactory::sptr(new LayoutVLC(_mw, _radioID));
 }
-
 void LayoutVLC::Run()
 {
 	grTop = gr_make_top_block(std::string(name));
@@ -140,6 +139,7 @@ QWidget *LayoutVLC::CreateTabOpts()
 	QGridLayout *grid = new QGridLayout(p);
 	grid->addWidget(gBox, 0, 0);
 	grid->addWidget(gBox_data, 0,1);
+	grid->addWidget(varVLC->ch_voip, 1, 0, 2, 1);
 	
 	//connections
 	QObject::connect(varVLC->cb_tx_mode, SIGNAL(currentIndexChanged (int)), this, SLOT(setPSDUunits(int)));
@@ -273,6 +273,8 @@ void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
 	varVLC->sp_frame_size[1]->setSingleStep(500);
 	varVLC->sp_frame_size[1]->setHidden(true);
 	QObject::connect(varVLC->sp_frame_size[1], SIGNAL(valueChanged(int)), this, SLOT(TrackChanges()));
+		
+	varVLC->ch_voip = new QCheckBox(tr("Enable Voice"), p);
 }
 
 void LayoutVLC::SaveSettings(QSettings *s)
@@ -299,6 +301,7 @@ void LayoutVLC::SaveSettings(QSettings *s)
 	s->setValue("VLC/phy_op_mode_3", varVLC->cb_phy_op_mode[3]->currentIndex());
 	s->setValue("VLC/frame_size_0", varVLC->sp_frame_size[0]->value());
 	s->setValue("VLC/frame_size_1", varVLC->sp_frame_size[1]->value());
+	s->setValue("VLC/voip", varVLC->ch_voip->checkState());
 }
 void LayoutVLC::ReadSettings(QSettings *s)
 {
@@ -321,6 +324,7 @@ void LayoutVLC::ReadSettings(QSettings *s)
 	//varVLC->sp_frame_size->setValue(s->value("VLC/frame_size_0",1).toInt());
 	varVLC->sp_frame_size[0]->setValue(s->value("VLC/frame_size_0",1).toInt());
 	varVLC->sp_frame_size[1]->setValue(s->value("VLC/frame_size_1",1).toInt());
+	varVLC->ch_voip->setCheckState((Qt::CheckState)s->value("VLC/voip", 0).toInt());
 }
 
 void LayoutVLC::setPSDUunits(int index)
