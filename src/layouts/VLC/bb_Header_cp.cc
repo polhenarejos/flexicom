@@ -45,11 +45,8 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		mtx.lock();
 		if (LayoutVLC::CheckCRC(tmp, length)) //crc ok!!
 		{
-			for (int n = 0; n < length-LayoutVLC::CRC_LENGTH; n += sizeof(unsigned char)*8)
-			{
-				*optr++ = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, sizeof(unsigned char)*8);
-				rtd++;
-			}
+			for (int n = 0; n < length-LayoutVLC::CRC_LENGTH; n += 8)
+				optr[rtd++] = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, 8);
 			printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
 		}
 		else

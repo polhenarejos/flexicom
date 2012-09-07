@@ -4,7 +4,7 @@
 
 #include "LayoutFactory.h"
 #include "Rx80211b.h"
-#include <qwt_plot.h>
+#include <qwt/qwt_plot.h>
 #include <gr_top_block.h>
 #include <QObject>
 #include <QComboBox>

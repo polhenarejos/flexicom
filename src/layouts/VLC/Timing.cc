@@ -11,7 +11,7 @@ Timing::Timing(unsigned int _decim, unsigned int _syms) :
 	syms(_syms)
 {
 	set_output_multiple(syms);
-	set_alignment(volk_get_alignment()/sizeof(int));
+	//set_alignment(volk_get_alignment()/sizeof(int));
 }
 Timing::sptr Timing::Create(unsigned int _decim, unsigned int _syms)
 {

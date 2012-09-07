@@ -8,7 +8,6 @@ DataSource::DataSource(int _len, bool _voip) :
 	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int))),
 	len(_len*8), ic(0), pend(false), voip(_voip)
 {
-	len -= 3;
 }
 DataSource::sptr DataSource::Create(int _len, bool _voip)
 {
@@ -27,9 +26,8 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			int pic = ic/8;
 			if (pic == 0)
 			{
-				unsigned char byte = 0x0;
-				//Frame version is 0
-				LayoutVLC::dec2bi((int)byte, 8, databyte);
+				memset(databyte, 0, sizeof(databyte));
+				databyte[2] = (voip ? 1 : 0);
 				assert(!pend);
 				if (data.size())
 					pend = true;
@@ -41,7 +39,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					//printf("Writing %d at %X (%X) [%d]\n",data[0].size & 0xff,optr,_o[0],(optr-_o[0])/4);
 					LayoutVLC::dec2bi((int)(data[0].size & 0xff), 8, databyte);
 					if (voip)
-						dataoff = len/8-data[0].size;
+						dataoff = len/8-data[0].size-3;
 					else
 						dataoff = 0;
 				}
@@ -56,7 +54,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						{
 							if (pic%4 == 0)
 								voip_samp = iptr[ci++];
-							LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)) & 0xff, 8, databyte);
+							LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)*8) & 0xff, 8, databyte);
 						}
 						else
 							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
@@ -68,7 +66,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						else
 							memset(databyte, 0, sizeof(databyte));
 					}
-					if (pic == len/8-1)
+					if (pic+3 == len/8-1)
 					{
 						if (data[0].free_method == 1)
 							free(data[0].data);
@@ -83,17 +81,21 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			{
 				if (voip)
 				{
-					pic -= 3;
-					if (pic%4 == 0)
-						voip_samp = iptr[ci++];
-					LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)) & 0xff, 8, databyte);
+					if (pic == 1 || pic == 2) //data_len
+						memset(databyte, 0, sizeof(databyte));
+					else
+					{
+						pic -= 3;
+						if (pic%4 == 0)
+							voip_samp = iptr[ci++];
+						LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)) & 0xff, 8, databyte);
+					}
 				}
 				else
 					memset(databyte, 0, sizeof(databyte));
 			}
 		}
 		*optr++ = databyte[mid];
-		printf("%d\n",ic);
 		ic = (ic+1)%len;
 	}
 	if (voip)

@@ -43,7 +43,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-1);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	if (voip)
-		connect(audio_make_source(44100, "PCIROOT(0)#PCI(1E00)#PCI(0200)"), 0, data_source, 0);
+		connect(audio_make_source(44100), 0, data_source, 0);
 	connect(data_source, 0, PSDU_gen, 0);
 	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);

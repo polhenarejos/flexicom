@@ -4,7 +4,6 @@
 #include <volk/volk.h>
 #include <gnuradio/malloc16.h>
 #include <gr_io_signature.h>
-#include <malloc.h>
 
 Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
@@ -27,7 +26,7 @@ Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 				std::fill_n(TDP[i+t*4]+j*s, s, _TDP[i][j]);
 		}
 	}
-	set_alignment(volk_get_alignment()/sizeof(float));
+	//set_alignment(volk_get_alignment()/sizeof(float));
 	set_output_multiple(siz);
 }
 Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, float _th)

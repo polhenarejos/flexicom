@@ -4,9 +4,9 @@
 
 #include <gr_block.h>
 #include <gr_io_signature.h>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_directpainter.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_directpainter.h>
 #include <QObject>
 #include <QMutex>
 

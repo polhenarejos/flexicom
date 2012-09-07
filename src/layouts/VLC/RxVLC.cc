@@ -18,6 +18,7 @@
 #include <QtGlobal>
 #include <iostream>
 #include <gr_null_sink.h>
+#include <gr_audio_sink.h>
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
 
@@ -62,7 +63,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		connect(psdu_dem,0, psdu_header_dem,0);
 	}	
 	connect(phr_header_dem, 0, phr_parser, 0);
-	connect(psdu_header_dem, 0, psdu_parser, 0);	
+	connect(psdu_header_dem, 0, psdu_parser, 0);
+	connect(psdu_parser, 0, audio_make_sink(44100), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {
