@@ -77,8 +77,8 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						a = (0xff-prevSeq+MHR[2]);
 					per += a;
 					total += a+1;
-					if (MHR[2] != (unsigned char)(prevSeq+1))
-						printf("PER = %f\n", (float)per/total);
+					//if (MHR[2] != (unsigned char)(prevSeq+1))
+					//	printf("PER = %f\n", (float)per/total);
 					prevSeq = MHR[2];
 				}
 			}
@@ -101,7 +101,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						payload_len |= (unsigned short)*iptr << 0x8;
 					else
 					{
-						int ric = ic-7;
+						int ric = ic-8;
 						if (voip)
 						{
 							if (ric < psdu_len-7-payload_len)
@@ -109,7 +109,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 								voip_samp |= ((unsigned int)*iptr << 8*(ric%4));
 								if (ric%4 == 3)
 								{
-									optr[rtd++] = (float)voip_samp;
+									optr[rtd++] = *((float *)&voip_samp);
 									voip_samp = 0;
 								}
 							}

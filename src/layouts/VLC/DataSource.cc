@@ -54,7 +54,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						{
 							if (pic%4 == 0)
 								voip_samp = iptr[ci++];
-							LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)*8) & 0xff, 8, databyte);
+							LayoutVLC::dec2bi((*((unsigned int *)&voip_samp) >> (pic%4)*8) & 0xff, 8, databyte);
 						}
 						else
 							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
@@ -88,7 +88,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						pic -= 3;
 						if (pic%4 == 0)
 							voip_samp = iptr[ci++];
-						LayoutVLC::dec2bi(((int)voip_samp >> (pic%4)) & 0xff, 8, databyte);
+						LayoutVLC::dec2bi((*((unsigned int *)&voip_samp) >> (pic%4)*8) & 0xff, 8, databyte);
 					}
 				}
 				else

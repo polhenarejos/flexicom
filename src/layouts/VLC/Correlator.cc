@@ -107,7 +107,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					vppm = idx/(4*no)+1;
 					pattern = idx/no;
 				}
-				printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
+				//printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
 				cpd = copy;
 				o = idx%no;
 				strike = false;

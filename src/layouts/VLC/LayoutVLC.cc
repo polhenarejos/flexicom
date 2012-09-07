@@ -438,7 +438,7 @@ unsigned int LayoutVLC::bi2dec(int *in, unsigned int GF)
 		o |= *in++<<i;
 	return o;
 }
-void LayoutVLC::dec2bi(int number, unsigned int GF, int *bin_number)
+void LayoutVLC::dec2bi(unsigned int number, unsigned int GF, int *bin_number)
 {
 	for (int i = 0; i < GF; i++)
 		*bin_number++ = (number >> i) & 0x1;

@@ -64,7 +64,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	}	
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
-	connect(psdu_parser, 0, audio_make_sink(44100), 0);
+	connect(psdu_parser, 0, audio_make_sink(11025), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {
