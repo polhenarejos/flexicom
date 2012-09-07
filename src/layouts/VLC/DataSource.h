@@ -9,7 +9,7 @@ class DataSource : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<DataSource> sptr;
-		static sptr Create(int);
+		static sptr Create(int, bool);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		int PushData(unsigned char *, unsigned short, int = 0);
 		typedef struct
@@ -20,12 +20,15 @@ class DataSource : public gr_block
 		}Data;
 		
 	private:
-		DataSource(int);
+		DataSource(int, bool = true);
 		int len;
 		int ic;
 		bool pend;
 		int databyte[8];
 		std::vector<Data> data;
+		bool voip;
+		float voip_samp;
+		int dataoff;
 };
 
 #endif //_INC_DATASOURCE_H_

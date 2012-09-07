@@ -9,6 +9,7 @@
 
 #include <gr_int_to_float.h>
 #include <gr_float_to_complex.h>
+#include <gr_audio_source.h>
 #include "bbPHR_generation.h"
 #include "bbPSDU_generation.h"
 #include "PHY_I_modulator.h"
@@ -37,9 +38,12 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	//GENERATION OF PHR, DATA
 	bbPHR_generation::sptr PHR_gen = bbPHR_generation::Create(vlc_var.tx_mode, vlc_var.PSDU_raw_length/8, vlc_var.PHR_raw_length, vlc_var.MCSID);	
 	bbPSDU_generation::sptr PSDU_gen = bbPSDU_generation::Create(vlc_var.PSDU_raw_length);
-	data_source = DataSource::Create(PSDU_gen->DataLength());
+	bool voip = ly->varVLC->ch_voip->checkState() == Qt::Checked;
+	data_source = DataSource::Create(PSDU_gen->DataLength(), voip);
 	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-1);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
+	if (voip)
+		connect(audio_make_source(44100, "PCIROOT(0)#PCI(1E00)#PCI(0200)"), 0, data_source, 0);
 	connect(data_source, 0, PSDU_gen, 0);
 	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);
