@@ -20,6 +20,10 @@
 #include "TxTagger.h"
 #include "bbMatlab.h"
 #include "DataSource.h"
+#include <gr_float_to_short.h>
+#include <vocoder_gsm_fr_encode_sp.h>
+#include <gr_vector_to_stream.h>
+#include <gr_multiply_const_ff.h>
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(gr_complex))),
@@ -44,8 +48,19 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-1);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	if (voip)
-		connect(gr_make_sig_source_f(11025, GR_SIN_WAVE, 350, 0.1), 0, data_source, 0);
+	{
+		gr_float_to_short_sptr f2s = gr_make_float_to_short();
+		vocoder_gsm_fr_encode_sp_sptr vocoder = vocoder_make_gsm_fr_encode_sp();
+		gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(unsigned char), 33);
+		gr_multiply_const_ff_sptr mc = gr_make_multiply_const_ff(32767);
+		connect(gr_make_sig_source_f(8000, GR_SIN_WAVE, 350, 0.1), 0, mc, 0);
+		//connect(audio_make_source(8000), 0, mc, 0);
+		connect(mc, 0, f2s, 0);
+		connect(f2s, 0, vocoder, 0);
+		connect(vocoder, 0, v2s, 0);
+		connect(v2s, 0, data_source, 0);
 		//connect(audio_make_source(11025), 0, data_source, 0);
+	}
 	connect(data_source, 0, PSDU_gen, 0);
 	//TxTagger::sptr tagger = TxTagger::Create(this);
 	//connect(tagger, 0, PHR_gen, 0);

@@ -21,6 +21,10 @@
 #include <gr_audio_sink.h>
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
+#include <vocoder_gsm_fr_decode_ps.h>
+#include <gr_short_to_float.h>
+#include <gr_stream_to_vector.h>
+#include <gr_multiply_const_ff.h>
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -64,7 +68,15 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	}	
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
-	connect(psdu_parser, 0, audio_make_sink(11025), 0);
+	gr_stream_to_vector_sptr s2v = gr_make_stream_to_vector(sizeof(unsigned char), 33);
+	vocoder_gsm_fr_decode_ps_sptr vocoder = vocoder_make_gsm_fr_decode_ps();
+	gr_short_to_float_sptr s2f = gr_make_short_to_float();
+	gr_multiply_const_ff_sptr mc = gr_make_multiply_const_ff(1./32767.);
+	connect(psdu_parser, 0, s2v, 0);
+	connect(s2v, 0, vocoder, 0);
+	connect(vocoder, 0, s2f, 0);
+	connect(s2f, 0, mc, 0);
+	connect(mc, 0, audio_make_sink(8000), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

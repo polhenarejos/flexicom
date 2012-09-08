@@ -5,7 +5,7 @@
 #include <gr_io_signature.h>
 
 DataSource::DataSource(int _len, bool _voip) :
-	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(unsigned char)), gr_make_io_signature(1, 1, sizeof(int))),
 	len(_len*8), ic(0), pend(false), voip(_voip)
 {
 }
@@ -15,7 +15,7 @@ DataSource::sptr DataSource::Create(int _len, bool _voip)
 }
 int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
-	const float *iptr = (voip ? (const float *)_i[0] : NULL);
+	const unsigned char *iptr = (voip ? (const unsigned char *)_i[0] : NULL);
 	int *optr = (int *)_o[0];
 	int ci = 0;
 	for (int n = 0; n < no; n++)
@@ -51,11 +51,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					if (voip)
 					{
 						if (pic < dataoff)
-						{
-							if (pic%4 == 0)
-								voip_samp = iptr[ci++];
-							LayoutVLC::dec2bi((*((unsigned int *)&voip_samp) >> (pic%4)*8) & 0xff, 8, databyte);
-						}
+							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 						else
 							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
 					}
@@ -85,11 +81,9 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						memset(databyte, 0, sizeof(databyte));
 					else
 					{
-						pic -= 3;
-						if (pic%4 == 0)
-							voip_samp = iptr[ci++];
-						LayoutVLC::dec2bi((*((unsigned int *)&voip_samp) >> (pic%4)*8) & 0xff, 8, databyte);
-					}
+						printf("%u ",iptr[ci]);
+						LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+						}
 				}
 				else
 					memset(databyte, 0, sizeof(databyte));

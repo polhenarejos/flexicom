@@ -27,7 +27,6 @@ class DataSource : public gr_block
 		int databyte[8];
 		std::vector<Data> data;
 		bool voip;
-		float voip_samp;
 		int dataoff;
 };
 
