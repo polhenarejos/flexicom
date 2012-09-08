@@ -100,18 +100,17 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						payload_len |= (unsigned short)*iptr << 0x8;
 					else
 					{
-						int ric = ic-8;
 						if (voip)
 						{
-							if (ric < psdu_len-7-payload_len)
+							if (ic < psdu_len-payload_len)
 							{
-								printf("%u ",*iptr);
+								//printf("%u ",*iptr);
 								optr[rtd++] = *iptr;
 							}
 							else
 							{
 								payload.append(*iptr);
-								if (ric+1 == psdu_len-7)
+								if (ic+1 == psdu_len)
 								{
 									payload.append('\n');
 									ly->ChatAppend(payload);
@@ -121,6 +120,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						}
 						else
 						{
+							int ric = ic-8;
 							if (ric < payload_len)
 								payload.append(*iptr);
 							else if (ric == payload_len)

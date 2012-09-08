@@ -53,8 +53,8 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 		vocoder_gsm_fr_encode_sp_sptr vocoder = vocoder_make_gsm_fr_encode_sp();
 		gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(unsigned char), 33);
 		gr_multiply_const_ff_sptr mc = gr_make_multiply_const_ff(32767);
-		connect(gr_make_sig_source_f(8000, GR_SIN_WAVE, 350, 0.1), 0, mc, 0);
-		//connect(audio_make_source(8000), 0, mc, 0);
+		//connect(gr_make_sig_source_f(8000, GR_SIN_WAVE, 350, 0.1), 0, mc, 0);
+		connect(audio_make_source(8000), 0, mc, 0);
 		connect(mc, 0, f2s, 0);
 		connect(f2s, 0, vocoder, 0);
 		connect(vocoder, 0, v2s, 0);

@@ -76,7 +76,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(s2v, 0, vocoder, 0);
 	connect(vocoder, 0, s2f, 0);
 	connect(s2f, 0, mc, 0);
-	connect(mc, 0, audio_make_sink(8000), 0);
+	connect(mc, 0, audio_make_sink(8000, "", false), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

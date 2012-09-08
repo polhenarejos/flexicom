@@ -81,9 +81,9 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 						memset(databyte, 0, sizeof(databyte));
 					else
 					{
-						printf("%u ",iptr[ci]);
+						//printf("%u ",iptr[ci]);
 						LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
-						}
+					}
 				}
 				else
 					memset(databyte, 0, sizeof(databyte));
