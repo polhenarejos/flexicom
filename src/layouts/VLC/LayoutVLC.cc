@@ -182,14 +182,14 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridErrors->addWidget(new QLabel(tr("0")), 0, 1);
 	gridErrors->addWidget(new QLabel(tr("PER: ")), 1, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 1, 1);
-	gridErrors->setRowStretch(1,1);
-	gridErrors->setColumnStretch(1,1);
+	//gridErrors->setRowStretch(1,1);
+	//gridErrors->setColumnStretch(1,1);
 	//Synching
 	QGroupBox *gBoxSynch = new QGroupBox(tr("Synchronization"));
 	gridSynch = new QGridLayout;
 	gBoxSynch->setLayout(gridSynch);
 	gridSynch->addWidget(new QLabel(tr("Synching: ")), 0, 0);
-	QLabel *la_synch = new QLabel(tr("<b><font color=red>Fail</font></b>"));
+	QLabel *la_synch = new QLabel(QString("<b><font color=red>Fail</font></b>"));
 	la_synch->setTextFormat(Qt::AutoText);
 	gridSynch->addWidget(la_synch, 0, 1);
 	//Meas
@@ -199,7 +199,7 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridMeas->addWidget(new QLabel(tr("SNR: ")), 0, 0);
 	gridMeas->addWidget(new QLabel(tr("0")), 0, 1);
 	gridMeas->addWidget(new QLabel(tr(" dB")), 0, 2);
-	gridMeas->setColumnStretch(1,1);
+	//gridMeas->setColumnStretch(1,1);
 	//
 	grid->addWidget(gBoxErrors, 0, 1);
 	grid->addWidget(gBoxSynch, 0, 0);
