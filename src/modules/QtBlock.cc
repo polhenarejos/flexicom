@@ -69,7 +69,11 @@ int Qt1D::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &i, 
 		else
 			volk_32f_convert_64f_a(yval[n], in[n], no);
 		//printf("fsamp in %lf (ds = %d)\n", yval[0][0], no);
+#ifdef _OSX
 		qc[n]->setRawData((const double *)xval, (const double *)yval[n], no);
+#else
+		qc[n]->setRawSamples((const double *)xval, (const double *)yval[n], no);
+#endif
 	}
 	mutex.unlock();
 	//qp->replot();

@@ -7,9 +7,9 @@
 #include "QtBlock.h"
 #include "Layout80211b.h"
 #include <gr_io_signature.h>
-#include <gr_firdes.h>
-#include <gr_pfb_arb_resampler_ccf.h>
-#include <gr_fir_filter_ccf.h>
+#include <filter/firdes.h>
+#include <filter/pfb_arb_resampler_ccf.h>
+#include <filter/fir_filter_ccf.h>
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
@@ -83,7 +83,7 @@ void Rx80211bThread::run()
 						<< "\tBSSID=" << addr3 << std::endl;
 				//		<< "\tSeqControl=" << p->sc << std::endl
 				//		<< "\tCRC Payload=0x" << std::hex << *((unsigned long *)&packet_data[size_d-4])<< std::dec << std::endl;
-				char *temp = (char *) (packet + sizeof(mac_header) +sizeof (beacon_header));
+				char *temp = (char *) (packet + sizeof(mac_header) +sizeof(beacon_header));
 				memset(ssid, 0, sizeof(ssid));
 				memcpy (ssid, &temp[2], temp[1]);
 				if (ssid[0])
@@ -105,10 +105,10 @@ Rx80211b::Rx80211b(Layout80211b *_ly) :
 	uint chip_rate = 10e6, interpolate_rate = 11, decimation_rate = 10;
 	double sample_rate = chip_rate * 11;
 	uint spb = 8;
-	std::vector<float> rate_taps = gr_firdes::low_pass_2(15, sample_rate, sample_rate / (2 * 11), .25 * sample_rate / 11, 9.f);
-	gr_pfb_arb_resampler_ccf_sptr resampler = gr_make_pfb_arb_resampler_ccf((double)interpolate_rate/decimation_rate, rate_taps);
+	std::vector<float> rate_taps = gr::filter::firdes::low_pass_2(15, sample_rate, sample_rate / (2 * 11), .25 * sample_rate / 11, 9.f);
+	gr::filter::pfb_arb_resampler_ccf::sptr resampler = gr::filter::pfb_arb_resampler_ccf::make((double)interpolate_rate/decimation_rate, rate_taps);
 	std::vector<float> filter_taps = BarkerTaps(spb);
-	gr_fir_filter_ccf_sptr filter = gr_make_fir_filter_ccf(1, filter_taps);
+	gr::filter::fir_filter_ccf::sptr filter = gr::filter::fir_filter_ccf::make(1, filter_taps);
 	BBN_Slicer::sptr slicer = BBN_Slicer::Create(11, 16);
 	BBN_DPSKDemod::sptr dpsk = BBN_DPSKDemod::Create();
 	BBN_PLCP::sptr plcp = BBN_PLCP::Create(msgq);
