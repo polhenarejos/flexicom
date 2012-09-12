@@ -67,6 +67,9 @@ class MainWindow : public QMainWindow
 		void AddCustomPlot(QWidget *, int = 0, int = 0);
 		void RemoveCustomPlots();
 		enum StatesLayout { STARTING, STARTED, STOPPING, STOPPED };
+		static unsigned int B64EncodeLen(float);
+		static unsigned int B64Encode(unsigned char *, unsigned int, unsigned char *);
+		static unsigned int B64Decode(unsigned char *, unsigned int, unsigned char *);
 		
 	public slots:
 		void clickMainButtons(QAbstractButton *);

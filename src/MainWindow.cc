@@ -416,6 +416,65 @@ void MainWindow::WindowModified()
 {
 	setWindowModified(true);
 }
+unsigned int MainWindow::B64EncodeLen(float len)
+{
+	float bound = len/3;
+	return (unsigned int)(bound-(int)bound == 0 ? bound : (int)bound+1)*4;
+}
+unsigned int MainWindow::B64Encode(unsigned char *data, unsigned int len, unsigned char *out) 
+{
+	static const char *base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	float bound = (float)len/3;
+	for (int i = 0; i < (unsigned int)bound; i++)
+	{
+		*out++ = base64_chars[(*data & 0xfc) >> 2];
+		*out++ = base64_chars[((*data & 0x03) << 4) + ((*(data+1) & 0xf0) >> 4)];
+		*out++ = base64_chars[((*(data+1) & 0x0f) << 2) + ((*(data+2) & 0xc0) >> 6)];
+		*out++ = base64_chars[*(data+2) & 0x3f];
+		data += 3;
+	}
+	int mod = len%3;
+	if (mod)
+	{
+		*out++ = base64_chars[(*data & 0xfc) >> 2];
+		if (mod == 2)
+		{
+			*out++ = base64_chars[((*data & 0x03) << 4) + ((*(data+1) & 0xf0) >> 4)];
+			*out++ = base64_chars[((*(data+1) & 0x0f) << 2)];
+		}
+		else
+		{
+			*out++ =  base64_chars[((*data & 0x03) << 4)];
+			*out++ = '=';
+		}
+		*out++ = '=';
+	}
+	return B64EncodeLen(len);
+}
+unsigned int MainWindow::B64Decode(unsigned char *data, unsigned int len, unsigned char *out)
+{
+	static unsigned int base64_pos[] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+								  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+								  0,0,0,0,0,0,0,0,0,0,0,62,0,0,0,63,
+								  52,53,54,55,56,57,58,59,60,61,0,0,0,0,0,0,
+								  0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+								  15,16,17,18,19,20,21,22,23,24,25,0,0,0,0,0,
+								  0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+								41,42,43,44,45,46,47,48,49,50,51,0,0,0,0,0 };
+	int bound = len/4;
+	for (int i = 0; i < bound; i++)
+	{
+		*out++ = (base64_pos[*data] << 2) + ((base64_pos[*(data+1)] & 0x30) >> 4);
+		*out++ = ((base64_pos[*(data+1)] & 0xf) << 4) + ((base64_pos[*(data+2)] & 0x3c) >> 2);
+		*out++ = ((base64_pos[*(data+2)] & 0x3) << 6) + base64_pos[*(data+3)];
+		data += 4;
+	}
+	if (*(data-2) == '=')
+		return (bound-1)*3+1;
+	else if (*(data-1) == '=')
+		return (bound-1)*3+2;
+	return bound*3;
+}
 
 //Panel
 Panel::Panel(MainWindow *w) :
