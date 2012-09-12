@@ -19,7 +19,7 @@ INCLUDEDIR=../include
 MOC=moc
 CFLAGS=-I$(INCLUDEDIR) -I$(INCLUDEDIR)/modules $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags gnuradio-uhd` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` `pkg-config --cflags uhd`
 ifeq ($(UNAME),"Darwin")
-	CFLAGS += -F/usr/local/qwt-6.0.0/lib 
+	CFLAGS += -F/usr/local/qwt-6.0.0/lib -D_OSX
 else
 	CFLAGS += -I/usr/include/qwt
 endif
