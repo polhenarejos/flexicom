@@ -9,7 +9,7 @@ In principle, the detection mode could be made blind, but in order to save proce
 The output of this block is binary, indicating the beginning or not of a frame depending on the detected TDP pattern.
 */
 
-
+class LayoutVLC;
 class Correlator : public gr_block
 {
 	public:
@@ -19,7 +19,7 @@ class Correlator : public gr_block
        * @param _topology: to indicate which is the sequence to do the correlation with the incoming samples.  
        * @param _d_mode: to indicate whether OOK or VPPM is being used
        */
-		static sptr Create(int, unsigned int, float = .75);
+		static sptr Create(int, unsigned int, LayoutVLC * = NULL, float = .75);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		void forecast(int, gr_vector_int &);
 		float *TDP[8];
@@ -27,7 +27,7 @@ class Correlator : public gr_block
 		~Correlator();
 							  	
 	private:
-		Correlator(int, unsigned int, float = .75);
+		Correlator(int, unsigned int, LayoutVLC * = NULL, float = .75);
 		void Correlate(const float *, float *, float *, int, int);
 		unsigned int copy;
 		unsigned int cpd;
@@ -36,6 +36,7 @@ class Correlator : public gr_block
 		unsigned int siz;
 		unsigned int vppm;
 		bool strike;
+		LayoutVLC *ly;
 };
 
 #endif //_INC_CORRELATOR_H

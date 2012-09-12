@@ -21,6 +21,7 @@
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
 #include "Audio.h"
+#include <digital_mpsk_snr_est_cc.h>
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -33,9 +34,11 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bbVLC_Frame_Extractor::sptr phr = bbVLC_Frame_Extractor::Create(0,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
-	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov);
+	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
-	connect(self(), 0, c2f, 0);
+	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_SVR, 1e3);
+	connect(self(), 0, snr, 0);
+	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
 	connect(corr, 0, tim, 0);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length);

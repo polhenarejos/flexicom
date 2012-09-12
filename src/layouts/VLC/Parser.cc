@@ -77,8 +77,12 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						a = (0xff-prevSeq+MHR[2]);
 					per += a;
 					total += a+1;
-					//if (MHR[2] != (unsigned char)(prevSeq+1))
-					//	printf("PER = %f\n", (float)per/total);
+					if (MHR[2] != (unsigned char)(prevSeq+1))
+					{
+						double PER = (double)per/total;
+						((QLabel *)(ly->gridErrors->itemAtPosition(0, 1)))->setText(QString::number(PER/psdu_len));
+						((QLabel *)(ly->gridErrors->itemAtPosition(1, 1)))->setText(QString::number(PER));
+					}
 					prevSeq = MHR[2];
 				}
 			}

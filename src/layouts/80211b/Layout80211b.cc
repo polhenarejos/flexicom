@@ -97,9 +97,9 @@ void Layout80211b::ReadSettings(QSettings *s)
 void Layout80211b::DrawPlots()
 {
 	pl_osc = new QwtPlot;
-	mw->AddCustomPlot(pl_osc, 0, 0);
+	//mw->AddCustomPlot(pl_osc, 0, 0);
 }
 void Layout80211b::RemovePlots()
 {
-	mw->RemoveCustomPlots();
+	//mw->RemoveCustomPlots();
 }

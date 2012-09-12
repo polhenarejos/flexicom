@@ -35,12 +35,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	qDBB->addButton(run_bt, QDialogButtonBox::ActionRole);
 	QObject::connect(qDBB, SIGNAL(clicked(QAbstractButton *)), this, SLOT(clickMainButtons(QAbstractButton *)));
 	QGridLayout *grid = new QGridLayout(w);
+	plots = new Plots(this);
 	panel = new Panel(this);
 	grid->addWidget(panel, 0, 0);
-	QGroupBox *plotBox = new QGroupBox(tr(""));
-	plotGrid = new QGridLayout;
-	plotBox->setLayout(plotGrid);
-	grid->addWidget(plotBox, 0, 1);
+	grid->addWidget(plots, 0, 1);
 	grid->addWidget(qDBB, 1, 1);
 	CreateMenu();
 	statusBar()->showMessage("Welcome");
@@ -230,19 +228,6 @@ void MainWindow::RemoveCustomTabs()
 	for (uint i = 0; i < tabs.size(); i++)
 		panel->removeTab(tabs[0]);
 	tabs.clear();
-}
-void MainWindow::AddCustomPlot(QWidget *w, int x, int y)
-{
-	plotGrid->addWidget(w, x, y);
-}
-void MainWindow::RemoveCustomPlots()
-{
-	QLayoutItem *item;
-	while ((item = plotGrid->takeAt(0)))
-	{
-		delete item->widget();
-		delete item;
-    }
 }
 void MainWindow::CreateMenu()
 {
@@ -507,6 +492,7 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 		RadioLayout *r = new RadioLayout;
 		rb_layout.push_back(r);
 		r->bt = new RadioButton;
+		QObject::connect(r->bt, SIGNAL(toggled(bool)), parent->plots, SLOT(ChangeLayout()));
 		r->layout = layouts[i](parent, i);
 		r->bt->setText(tr(r->layout->Name()));
 		vBox->addWidget(rb_layout.back()->bt);
@@ -705,4 +691,14 @@ void Panel::OvChanged(int state)
 		grid_ss->itemAtPosition(21, 1)->widget()->setEnabled(true);
 	else
 		grid_ss->itemAtPosition(21, 1)->widget()->setEnabled(false);
+}
+//Plots
+Plots::Plots(MainWindow *_parent) :
+	parent(_parent)
+{
+}
+void Plots::ChangeLayout()
+{
+	while (count())
+		removeTab(0);
 }

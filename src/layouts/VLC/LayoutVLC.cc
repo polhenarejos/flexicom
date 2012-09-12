@@ -90,6 +90,7 @@ void LayoutVLC::RadioPressed(bool checked)
 		//mw->panel->rb_chain[RB_TX]->setChecked(false);
 		ReadSettings(mw->s);
 		QObject::connect(mw, SIGNAL(SaveSettings(QSettings *)), this, SLOT(SaveSettings(QSettings *)));		
+		mw->plots->addTab(CreateTabMetrics(), QString("Metrics"));
 	}
 	else
 	{
@@ -167,6 +168,44 @@ QWidget *LayoutVLC::CreateTabChat()
 	varVLC->le_chat->setEnabled(false);
 	varVLC->pb_chat->setEnabled(false);
 	varVLC->tx_chat->setReadOnly(true);
+	return p;
+}
+QWidget *LayoutVLC::CreateTabMetrics()
+{
+	QWidget *p = new QWidget(mw);
+	QGridLayout *grid = new QGridLayout(p);
+	//Errors
+	QGroupBox *gBoxErrors = new QGroupBox(tr("Errors"));
+	gridErrors = new QGridLayout;
+	gBoxErrors->setLayout(gridErrors);
+	gridErrors->addWidget(new QLabel(tr("BER: ")), 0, 0);
+	gridErrors->addWidget(new QLabel(tr("0")), 0, 1);
+	gridErrors->addWidget(new QLabel(tr("PER: ")), 1, 0);
+	gridErrors->addWidget(new QLabel(tr("0")), 1, 1);
+	gridErrors->setRowStretch(1,1);
+	gridErrors->setColumnStretch(1,1);
+	//Synching
+	QGroupBox *gBoxSynch = new QGroupBox(tr("Synchronization"));
+	gridSynch = new QGridLayout;
+	gBoxSynch->setLayout(gridSynch);
+	gridSynch->addWidget(new QLabel(tr("Synching: ")), 0, 0);
+	QLabel *la_synch = new QLabel(tr("<b><font color=red>Fail</font></b>"));
+	la_synch->setTextFormat(Qt::AutoText);
+	gridSynch->addWidget(la_synch, 0, 1);
+	//Meas
+	QGroupBox *gBoxMeas = new QGroupBox(tr("Measurements"));
+	gridMeas = new QGridLayout;
+	gBoxMeas->setLayout(gridMeas);
+	gridMeas->addWidget(new QLabel(tr("SNR: ")), 0, 0);
+	gridMeas->addWidget(new QLabel(tr("0")), 0, 1);
+	gridMeas->addWidget(new QLabel(tr(" dB")), 0, 2);
+	gridMeas->setColumnStretch(1,1);
+	//
+	grid->addWidget(gBoxErrors, 0, 1);
+	grid->addWidget(gBoxSynch, 0, 0);
+	grid->addWidget(gBoxMeas, 1, 0);
+	grid->setRowStretch(2, 1);
+	grid->setColumnStretch(2, 1);
 	return p;
 }
 void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)

@@ -69,6 +69,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		TxVLC::sptr tx;
 		QWidget *CreateTabOpts();
 		QWidget *CreateTabChat();
+		QWidget *CreateTabMetrics();
 		void init_v_VLC (VarVLC *, QWidget *);
 		void ReadSettings(QSettings *);
 
@@ -84,6 +85,9 @@ class LayoutVLC : public QObject , public LayoutFactory
 		static unsigned short GenerateCRC(int *, int *, int);
 		static bool CheckCRC(int *, int);
 		static const int CRC_LENGTH = 16;
+		QGridLayout *gridErrors;
+		QGridLayout *gridSynch;
+		QGridLayout *gridMeas;
 		
 	public slots:
 		void RadioPressed(bool);

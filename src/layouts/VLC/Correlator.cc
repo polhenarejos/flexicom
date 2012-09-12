@@ -1,13 +1,14 @@
 // $Id$
 
 #include "Correlator.h"
+#include "LayoutVLC.h"
 #include <volk/volk.h>
 #include <gnuradio/malloc16.h>
 #include <gr_io_signature.h>
 
-Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
+Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false)
+	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
@@ -29,9 +30,9 @@ Correlator::Correlator(int _copy, unsigned int _ov, float _th) :
 	//set_alignment(volk_get_alignment()/sizeof(float));
 	set_output_multiple(siz);
 }
-Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, float _th)
+Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th)
 {
-	return sptr(new Correlator(_copy, _ov, _th));
+	return sptr(new Correlator(_copy, _ov, _ly, _th));
 }
 Correlator::~Correlator()
 {
@@ -70,6 +71,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const float *iptr = (const float *)_i[0]; 
 	float *optr = (float *)_o[0];
 	unsigned int o = 0, rtd = 0;
+	printf("IEEEEE\n");
 	if (!cpd)
 	{
 		if (strike)
@@ -111,6 +113,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				cpd = copy;
 				o = idx%no;
 				strike = false;
+				((QLabel *)ly->gridSynch->itemAtPosition(0, 1))->setText(QString("<b><font color=green>Ok!</font></b>"));
 			}
 		}
 		else
@@ -125,6 +128,17 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		rtd = std::min(cpd, no-o);
 		memcpy(optr, iptr+o, sizeof(float)*rtd);
 		cpd -= rtd;
+	}
+	else
+		((QLabel *)ly->gridSynch->itemAtPosition(0, 1))->setText(QString("<b><font color=red>Fail</font></b>"));
+	//Grab SNR tags
+	const uint64_t nread = this->nitems_read(0);
+	std::vector<gr_tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
+	for (int i = 0; i < tags.size(); i++)
+	{
+		const pmt::pmt_t &value = tags[i].value;
+		((QLabel *)ly->gridMeas->itemAtPosition(0, 1))->setText(QString::number(pmt::pmt_to_double(pmt_tuple_ref(value, 1))));
 	}
 	if (o+rtd)
 		consume_each(o+rtd);

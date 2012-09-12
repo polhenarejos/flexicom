@@ -21,6 +21,7 @@
 #include "LayoutFactory.h"
 
 class Panel;
+class Plots;
 #define RB_TX 0
 #define RB_RX 1
 
@@ -57,15 +58,12 @@ class MainWindow : public QMainWindow
 		MainWindow(QWidget * = NULL);
 		bool initd;
 		Panel *panel;
+		Plots *plots;
 		void closeEvent(QCloseEvent *);
 		QSettings *s;
-		QGridLayout *plotGrid;
 		//! Method which allow the creation of particular tab for the selected communication system
 		void AddCustomTab(QWidget *, QString);
 		void RemoveCustomTabs();
-		//! Method which allow the creation of particular plots for the selected communication system
-		void AddCustomPlot(QWidget *, int = 0, int = 0);
-		void RemoveCustomPlots();
 		enum StatesLayout { STARTING, STARTED, STOPPING, STOPPED };
 		static unsigned int B64EncodeLen(float);
 		static unsigned int B64Encode(unsigned char *, unsigned int, unsigned char *);
@@ -136,5 +134,18 @@ class Panel : public QTabWidget
 		void ChangeDev(int);
 		void OvChanged(int);
 };
-
+class Plots : public QTabWidget
+{
+	Q_OBJECT
+	
+	private:
+		MainWindow *parent;
+		
+	public:
+		Plots(MainWindow * = NULL);
+		
+	public slots:
+		void ChangeLayout();
+		
+};
 #endif //_INC_MAINWINDOW_H_
