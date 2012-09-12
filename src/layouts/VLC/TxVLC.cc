@@ -1,4 +1,5 @@
 // $Id$
+
 #include "compat.h"
 #include "TxVLC.h"
 #include <gr_io_signature.h>
@@ -6,7 +7,6 @@
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
-
 #include <gr_int_to_float.h>
 #include <gr_float_to_complex.h>
 #include "bbPHR_generation.h"
