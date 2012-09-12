@@ -112,7 +112,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				cpd = copy;
 				o = idx%no;
 				strike = false;
-				((QLabel *)ly->gridSynch->itemAtPosition(0, 1)->widget())->setText(QString("<b><font color=green>Ok!</font></b>"));
+				ly->EmitChangeMetric((QLabel *)ly->gridSynch->itemAtPosition(0, 1)->widget(), QString("<b><font color=green>Ok!</font></b>"));
 			}
 		}
 		else
@@ -129,13 +129,13 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		cpd -= rtd;
 	}
 	else
-		((QLabel *)ly->gridSynch->itemAtPosition(0, 1)->widget())->setText(QString("<b><font color=red>Fail</font></b>"));
+		ly->EmitChangeMetric((QLabel *)ly->gridSynch->itemAtPosition(0, 1)->widget(), QString("<b><font color=red>Fail</font></b>"));
 	//Grab SNR tags
 	const uint64_t nread = this->nitems_read(0);
 	std::vector<gr_tag_t> tags;
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
 	if (tags.size())
-		((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget())->setText(QString::number(pmt::pmt_to_double(tags[0].value)));
+		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value)));
 	if (o+rtd)
 		consume_each(o+rtd);
 	else //didnt found anything

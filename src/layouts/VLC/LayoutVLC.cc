@@ -41,6 +41,7 @@ LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
 	QObject::connect(mw->panel->rb_layout[radioID]->bt, SIGNAL(toggled(bool)), this, SLOT(RadioPressed(bool)));
 	QObject::connect(mw, SIGNAL(StateLayoutChanged(MainWindow::StatesLayout)), this, SLOT(StateLayout(MainWindow::StatesLayout)));
 	QObject::connect(this, SIGNAL(ChatSigText(QString &)), this, SLOT(ChatText(QString &)));
+	QObject::connect(this, SIGNAL(ChangeMetric(QLabel *, QString)), this, SLOT(ChangedMetric(QLabel *, QString)));
 	qRegisterMetaType<QString>("QString &");
 }
 const char *LayoutVLC::Name()
@@ -543,4 +544,12 @@ bool LayoutVLC::CheckCRC(int *in, int size)
 	for (int i = 0; i < CRC_LENGTH; i++)
 		excrc |= dt[i]<<i;
 	return (excrc == crc);
+}
+void LayoutVLC::EmitChangeMetric(QLabel *la, QString s)
+{
+	emit ChangeMetric(la, s);
+}
+void LayoutVLC::ChangedMetric(QLabel *la, QString s)
+{
+	la->setText(s);
 }

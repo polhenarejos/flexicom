@@ -88,6 +88,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		QGridLayout *gridErrors;
 		QGridLayout *gridSynch;
 		QGridLayout *gridMeas;
+		void EmitChangeMetric(QLabel *, QString);
 		
 	public slots:
 		void RadioPressed(bool);
@@ -100,9 +101,11 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void ChatClicked();
 		void ChatText(QString &);
 		void ChatAppend(QString &);
+		void ChangedMetric(QLabel *, QString);
 		
 	signals:
 		void ChatSigText(QString &);
+		void ChangeMetric(QLabel *, QString);
 };
 
 #endif //_INC_LAYOUTVLC_H_
