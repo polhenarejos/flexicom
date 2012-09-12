@@ -88,7 +88,7 @@ CMDLINE_CFLAG=/D CMDLINE
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
 GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk
-GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-digital.lib volk.lib
+GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-audio.lib gnuradio-vocoder.lib gnuradio-filter.lib volk.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
@@ -147,6 +147,9 @@ install_deps:
 		$(COPY) $(QT_BIN_DIR)\QtCore4.dll QtCore4.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-core.dll gnuradio-core.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-uhd.dll gnuradio-uhd.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-audio.dll gnuradio-audio.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-vocoder.dll gnuradio-vocoder.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-filter.dll gnuradio-filter.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gruel.dll gruel.dll >nul
 		$(COPY) $(GR_BIN_DIR)\volk.dll volk.dll >nul
 		$(COPY) $(GR_BIN_DIR)\libfftw3f-3.dll libfftw3f-3.dll >nul
