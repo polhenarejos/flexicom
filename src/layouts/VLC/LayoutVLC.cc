@@ -1,8 +1,6 @@
 // $Id$
 
 #include "LayoutVLC.h"
-#include <gr_uhd_usrp_source.h>
-#include <gr_uhd_usrp_sink.h>
 #include "RxVLC.h"
 #include "TxVLC.h"
 #include "MainWindow.h"
