@@ -21,6 +21,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;
 	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("VocoderReset"));
+	static uint64_t proff = 0;
 	for (int n = 0; n < no; n++)
 	{
 		int mid = ic%8;
@@ -60,11 +61,12 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 								std::fill_n(databyte, 8, 1);
 								prevreset = false;
 							}
-							else if (tags.size() && tags[0].offset == nread+ci && n > 1)
+							else if (tags.size() && tags[0].offset == nread+ci && tags[0].offset != proff)
 							{
 								std::fill_n(databyte, 8, 1);
 								tags.erase(tags.begin());
 								prevreset = true;
+								proff = tags[0].offset;
 							}
 							else
 								LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
@@ -104,12 +106,13 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 							std::fill_n(databyte, 8, 1);
 							prevreset = false;
 						}
-						else if (tags.size() && tags[0].offset == nread+ci && n > 1)
+						else if (tags.size() && tags[0].offset == nread+ci && tags[0].offset != proff)
 						{
-							//printf("%d Get reset at %d\n",n,nread+ci);
+							//printf("Get reset at %d (%d)\n",nread+ci,n);
 							std::fill_n(databyte, 8, 1);
 							tags.erase(tags.begin());
 							prevreset = true;
+							proff = tags[0].offset;
 						}
 						else
 							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
