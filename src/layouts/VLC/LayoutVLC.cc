@@ -183,6 +183,8 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridErrors->addWidget(new QLabel(tr("0")), 0, 1);
 	gridErrors->addWidget(new QLabel(tr("PER: ")), 1, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 1, 1);
+	gridErrors->addWidget(new QLabel(tr("Lost packets: ")), 2, 0);
+	gridErrors->addWidget(new QLabel(tr("0")), 2, 1);
 	//gridErrors->setRowStretch(1,1);
 	//gridErrors->setColumnStretch(1,1);
 	//Synching
