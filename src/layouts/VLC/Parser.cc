@@ -114,7 +114,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 									prevreset = true;
 								else if (prevreset)
 								{
-									if (*iptr == 0xFF)
+									if (*iptr == 0xFF && cpd <= 0)
 									{
 										//printf("Got reset at %d\n",nitems_written(0)+rtd);
 										add_item_tag(0, nitems_written(0)+rtd, pmt::pmt_string_to_symbol("VocoderReset"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
