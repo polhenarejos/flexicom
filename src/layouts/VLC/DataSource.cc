@@ -55,16 +55,16 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					{
 						if (pic < dataoff)
 						{
-							if (tags.size() && tags[0].offset == nread+ci)
+							if (prevreset)
+							{
+								std::fill_n(databyte, 8, 1);
+								prevreset = false;
+							}
+							else if (tags.size() && tags[0].offset == nread+ci && n > 1)
 							{
 								std::fill_n(databyte, 8, 1);
 								tags.erase(tags.begin());
 								prevreset = true;
-							}
-							else if (prevreset)
-							{
-								std::fill_n(databyte, 8, 1);
-								prevreset = false;
 							}
 							else
 								LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
@@ -99,17 +99,17 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					else
 					{
 						//printf("%u ",iptr[ci]);
-						if (!prevreset && tags.size() && tags[0].offset == nread+ci)
-						{
-							//printf("Get reset at %d\n",nread+ci);
-							std::fill_n(databyte, 8, 1);
-							tags.erase(tags.begin());
-							prevreset = true;
-						}
-						else if (prevreset)
+						if (prevreset)
 						{
 							std::fill_n(databyte, 8, 1);
 							prevreset = false;
+						}
+						else if (tags.size() && tags[0].offset == nread+ci && n > 1)
+						{
+							//printf("%d Get reset at %d\n",n,nread+ci);
+							std::fill_n(databyte, 8, 1);
+							tags.erase(tags.begin());
+							prevreset = true;
 						}
 						else
 							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
