@@ -1,11 +1,14 @@
 // $Id$
+
 #include "QtBlock.h"
+#include "compat.h"
 #include <volk/volk.h>
 #include <gnuradio/malloc16.h>
 #ifdef _WIN
 #include <windows.h>
 #else
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 QtBlock::QtBlock(QwtPlot *_qp, std::string _s, gr_io_signature_sptr _io) :
