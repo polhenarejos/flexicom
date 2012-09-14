@@ -135,7 +135,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	std::vector<gr_tag_t> tags;
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
 	if (tags.size())
-		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value)));
+		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g', 3));
 	if (o+rtd)
 		consume_each(o+rtd);
 	else //didnt found anything
