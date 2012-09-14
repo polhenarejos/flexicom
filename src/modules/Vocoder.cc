@@ -75,7 +75,7 @@ int VocoderDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_s
 	unsigned int o = 0;
 	for (int n = 0; n < no; n += GSM_SAMPLES_PER_FRAME)
 	{
-		if (tags.size() && nread+o && tags[0].offset == nread+o)
+		if (tags.size() && tags[0].offset == nread+o)
 		{
 			//printf("Resetting at %d\n",nread+o);
 			gsm_destroy(dgsm);

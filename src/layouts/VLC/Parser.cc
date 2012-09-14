@@ -7,7 +7,7 @@
 
 Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 1, sizeof(unsigned char))),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0), prevreset(false)
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0), prevreset(false), cpd(0)
 {
 }
 Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
@@ -77,7 +77,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						a = (0xff-prevSeq+MHR[2]);
 					per += a;
 					total += a+1;
-					if (MHR[2] != (unsigned char)(prevSeq+1))
+					//if (MHR[2] != (unsigned char)(prevSeq+1))
 					{
 						double PER = (double)per/total;
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(PER/psdu_len));
@@ -117,15 +117,18 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 									{
 										//printf("Got reset at %d\n",nitems_written(0)+rtd);
 										add_item_tag(0, nitems_written(0)+rtd, pmt::pmt_string_to_symbol("VocoderReset"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
+										cpd = 3300;
 									}
-									else
+									else if (cpd)
 									{
-										optr[rtd++] = 0xFF;
-										optr[rtd++] = *iptr;
+										if (cpd-- > 0)
+											optr[rtd++] = 0xFF;
+										if (cpd-- > 0)
+											optr[rtd++] = *iptr;
 									}
 									prevreset = false;
 								}
-								else
+								else if (cpd-- > 0)
 									optr[rtd++] = *iptr;
 							}
 							else

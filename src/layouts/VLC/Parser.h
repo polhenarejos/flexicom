@@ -57,6 +57,7 @@ class Parser : public gr_block
 		unsigned int total;
 		bool voip;
 		bool prevreset;
+		int cpd;
 };
 
 #endif //_INC_PARSER_H_

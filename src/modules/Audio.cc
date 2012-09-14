@@ -14,7 +14,7 @@ AudioSource::AudioSource(unsigned int _freq) :
 {
 	VocoderEncoder::sptr vocoder = VocoderEncoder::Create();
 	gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(unsigned char), 33);
-	connect(gr_make_sig_source_f(8000, GR_SIN_WAVE, 350, 0.1), 0, vocoder, 0);
+	connect(gr_make_sig_source_f(7000, GR_SIN_WAVE, 350, 0.1), 0, vocoder, 0);
 	//connect(audio_make_source(8000), 0, vocoder, 0);
 	connect(vocoder, 0, v2s, 0);
 	connect(v2s, 0, self(), 0);
@@ -30,7 +30,7 @@ AudioSink::AudioSink(unsigned int _freq) :
 	gr_stream_to_vector_sptr s2v = gr_make_stream_to_vector(sizeof(unsigned char), 33);
 	connect(self(), 0, s2v, 0);
 	connect(s2v, 0, vocoder, 0);
-	connect(vocoder, 0, audio_make_sink(8000, "", false), 0);
+	connect(vocoder, 0, audio_make_sink(6100, "", false), 0);
 }
 AudioSink::sptr AudioSink::Create(unsigned int _freq)
 {
