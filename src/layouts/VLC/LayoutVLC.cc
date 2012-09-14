@@ -206,7 +206,7 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	grid->addWidget(gBoxSynch, 0, 0);
 	grid->addWidget(gBoxMeas, 1, 0);
 	grid->setRowStretch(2, 1);
-	grid->setColumnStretch(2, 1);
+	//grid->setColumnStretch(2, 1);
 	return p;
 }
 void LayoutVLC::init_v_VLC(VarVLC *varVLC, QWidget *p)
