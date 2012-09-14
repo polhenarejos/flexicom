@@ -7,7 +7,7 @@
 
 Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 1, sizeof(unsigned char))),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0)
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0), prevreset(false)
 {
 }
 Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
@@ -109,7 +109,24 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 							if (ic < psdu_len-payload_len)
 							{
 								//printf("%u ",*iptr);
-								optr[rtd++] = *iptr;
+								if (*iptr == 0xFF && !prevreset) //reset
+									prevreset = true;
+								else if (prevreset)
+								{
+									if (*iptr == 0xFF)
+									{
+										//printf("Got reset at %d\n",nitems_written(0)+rtd);
+										add_item_tag(0, nitems_written(0)+rtd, pmt::pmt_string_to_symbol("VocoderReset"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
+									}
+									else
+									{
+										optr[rtd++] = 0xFF;
+										optr[rtd++] = *iptr;
+									}
+									prevreset = false;
+								}
+								else
+									optr[rtd++] = *iptr;
 							}
 							else
 							{

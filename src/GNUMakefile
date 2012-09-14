@@ -13,7 +13,7 @@ LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEn
 					PHY_II_demodulator.cc bbRSDec.cc bb4b6bDec.cc bb8b10bDec.cc Interleaver.cc Puncture.cc \
 					Correlator.cc Timing.cc DataSource.cc
 TESTS+=test_CC.cc test_RLL.cc test_RS.cc test_VLCInterleaver.cc
-MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc Tcp.cc Oversampler.cc Audio.cc
+MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc Tcp.cc Oversampler.cc Audio.cc Vocoder.cc
 VPATH=layouts/80211b:layouts/VLC:modules:layouts/VLC/test:../test
 CFLAGS_LAYOUTS=-Ilayouts/VLC -Ilayouts/80211b
 OBJS=$(SOURCES:%.cc=$(OUTDIR)/%.o)
@@ -41,7 +41,7 @@ MAKE=make $(MAKEARGS)
 all: build
 
 build: $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o
-	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o $(LDFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o $(LDFLAGS) GSM.a
 	@$(CP) $(OUTDIR)/$(TARGET) ../$(TARGET)
 
 $(OUTDIR)/MainWindow.o: MainWindow.cc $(INCLUDES)

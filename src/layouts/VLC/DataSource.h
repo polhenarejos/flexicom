@@ -28,6 +28,7 @@ class DataSource : public gr_block
 		std::vector<Data> data;
 		bool voip;
 		int dataoff;
+		bool prevreset;
 };
 
 #endif //_INC_DATASOURCE_H_

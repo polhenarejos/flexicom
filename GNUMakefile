@@ -23,7 +23,7 @@ ifeq ($(UNAME),"Darwin")
 else
 	CFLAGS += -I/usr/include/qwt
 endif
-LDFLAGS=-lboost_system-mt -lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` `pkg-config --libs gnuradio-audio` `pkg-config --libs gnuradio-vocoder` -lqwt `pkg-config --libs QtGui` `pkg-config --libs uhd` `pkg-config --libs volk`
+LDFLAGS=-lboost_system-mt -lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` `pkg-config --libs gnuradio-audio` -lqwt `pkg-config --libs QtGui` `pkg-config --libs uhd` `pkg-config --libs volk`
 XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -DLV_HAVE_GENERIC -O2
 
 MAKEARGS=-f GNUMakefile 'CFLAGS=${CFLAGS}' \

@@ -131,7 +131,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	else
 		ly->EmitChangeMetric((QLabel *)ly->gridSynch->itemAtPosition(0, 1)->widget(), QString("<b><font color=red>Fail</font></b>"));
 	//Grab SNR tags
-	const uint64_t nread = this->nitems_read(0);
+	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
 	if (tags.size())

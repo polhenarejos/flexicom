@@ -6,7 +6,7 @@
 
 DataSource::DataSource(int _len, bool _voip) :
 	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(unsigned char)), gr_make_io_signature(1, 1, sizeof(int))),
-	len(_len*8), ic(0), pend(false), voip(_voip)
+	len(_len*8), ic(0), pend(false), voip(_voip), prevreset(false)
 {
 }
 DataSource::sptr DataSource::Create(int _len, bool _voip)
@@ -18,6 +18,9 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const unsigned char *iptr = (voip ? (const unsigned char *)_i[0] : NULL);
 	int *optr = (int *)_o[0];
 	int ci = 0;
+	const uint64_t nread = nitems_read(0);
+	std::vector<gr_tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("VocoderReset"));
 	for (int n = 0; n < no; n++)
 	{
 		int mid = ic%8;
@@ -51,7 +54,21 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					if (voip)
 					{
 						if (pic < dataoff)
-							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+						{
+							if (tags.size() && tags[0].offset == nread+ci)
+							{
+								std::fill_n(databyte, 8, 1);
+								tags.erase(tags.begin());
+								prevreset = true;
+							}
+							else if (prevreset)
+							{
+								std::fill_n(databyte, 8, 1);
+								prevreset = false;
+							}
+							else
+								LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+						}
 						else
 							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
 					}
@@ -82,7 +99,20 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					else
 					{
 						//printf("%u ",iptr[ci]);
-						LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+						if (!prevreset && tags.size() && tags[0].offset == nread+ci)
+						{
+							//printf("Get reset at %d\n",nread+ci);
+							std::fill_n(databyte, 8, 1);
+							tags.erase(tags.begin());
+							prevreset = true;
+						}
+						else if (prevreset)
+						{
+							std::fill_n(databyte, 8, 1);
+							prevreset = false;
+						}
+						else
+							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 					}
 				}
 				else

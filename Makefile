@@ -88,7 +88,7 @@ CMDLINE_CFLAG=/D CMDLINE
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
 GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk
-GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-audio.lib gnuradio-vocoder.lib gnuradio-filter.lib gnuradio-digital.lib volk.lib gruel.lib
+GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-audio.lib gnuradio-filter.lib gnuradio-digital.lib volk.lib gruel.lib GSM.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
@@ -120,7 +120,8 @@ DBGLFLAG=/debug
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/LayoutFactory.obj
 
 MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj $(OBJ_DIR)/MSE.obj $(OBJ_DIR)/Tcp.obj \
-		  $(OBJ_DIR)/Oversampler.obj $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj $(OBJ_DIR)/Audio.obj
+		  $(OBJ_DIR)/Oversampler.obj $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj $(OBJ_DIR)/Audio.obj \
+		  $(OBJ_DIR)/Vocoder.obj
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj  $(OBJ_DIR)/TxVLC.obj $(OBJ_DIR)/RxVLC.obj \
@@ -148,7 +149,6 @@ install_deps:
 		$(COPY) $(GR_BIN_DIR)\gnuradio-core.dll gnuradio-core.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-uhd.dll gnuradio-uhd.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-audio.dll gnuradio-audio.dll >nul
-		$(COPY) $(GR_BIN_DIR)\gnuradio-vocoder.dll gnuradio-vocoder.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-filter.dll gnuradio-filter.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-digital.dll gnuradio-digital.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gruel.dll gruel.dll >nul
