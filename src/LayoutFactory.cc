@@ -49,13 +49,13 @@ void LayoutFactory::Setup()
 GeneralSink::GeneralSink(int dev, int devs, Panel *panel) :
 	gr_hier_block2("GeneralSink", gr_make_io_signature(1, devs, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0))
 {
-	boost::shared_ptr<gr_basic_block> end = self();
+	gr_basic_block_sptr end = self();
 	if (panel->ch_ov->checkState() == Qt::Checked)
 	{
 		Oversampler<gr_complex>::sptr ovb = Oversampler<gr_complex>::Create(panel->sp_ov->value());
 		for (int j = 0; j < devs; j++)
 			connect(self(), j, ovb, j);
-		end = gnuradio::detail::sptr_magic::fetch_initial_sptr(ovb.get());
+		end = ovb->to_basic_block();
 	}
 	if (dev != 1)
 	{
@@ -94,13 +94,13 @@ GeneralSink::sptr GeneralSink::Create(int dev, int devs, Panel *panel)
 GeneralSource::GeneralSource(int dev, int devs, Panel *panel) :
 	gr_hier_block2("GeneralSource", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, devs, sizeof(gr_complex)))
 {
-	boost::shared_ptr<gr_basic_block> end = self();
+	gr_basic_block_sptr end = self();
 	if (panel->ch_flip->checkState() == Qt::Checked)
 	{
 		GeneralFlip::sptr fl = GeneralFlip::Create(devs);
 		for (int j = 0; j < devs; j++)
 			connect(fl, j, self(), j);
-		end = gnuradio::detail::sptr_magic::fetch_initial_sptr(fl.get());
+		end = fl->self();
 	}
 	if (dev != 1)
 	{
@@ -139,7 +139,7 @@ GeneralFlip::GeneralFlip(int devs) :
 {
 	for (int j = 0; j < devs; j++)
 	{
-		gr_multiply_const_cc_sptr mc = gr_make_multiply_const_cc(gr_complex(-1,0)); 
+		gr_multiply_const_cc_sptr mc = gr_make_multiply_const_cc(gr_complex(-1,0));
 		connect(self(), j, mc, 0);
 		connect(mc, 0, self(), j);
 	}
