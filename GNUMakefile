@@ -18,14 +18,16 @@ TESTDIR=test
 INCLUDEDIR=../include
 MOC=moc
 CFLAGS=-I$(INCLUDEDIR) -I$(INCLUDEDIR)/modules $(XFLAGS) `pkg-config --cflags gnuradio-core` -I `pkg-config --cflags gnuradio-uhd` -I `pkg-config --cflags QtGui` `pkg-config --cflags QtCore` `pkg-config --cflags uhd`
-ifeq ($(UNAME),"Darwin")
+ifeq ($(UNAME),Darwin)
 	CFLAGS += -F/usr/local/qwt-6.0.0/lib -D_OSX
+	LDFLAGS += -lboost_system-mt
 else
 	CFLAGS += -I/usr/include/qwt
+	LDFLAGS += -lboost_system 
 endif
-LDFLAGS=-lboost_system -lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` `pkg-config --libs gnuradio-audio` -lqwt `pkg-config --libs QtGui` \
+LDFLAGS+=-lm `pkg-config --libs gnuradio-core` `pkg-config --libs gnuradio-uhd` `pkg-config --libs gnuradio-audio` -lqwt `pkg-config --libs QtGui` \
 	`pkg-config --libs uhd` `pkg-config --libs volk` `pkg-config --libs gnuradio-digital` `pkg-config --libs gnuradio-filter`
-XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -DLV_HAVE_GENERIC -O2
+XFLAGS=-msse3 -mfpmath=sse -ffast-math -Wall -fno-strict-aliasing -g -pg -O2
 
 MAKEARGS=-f GNUMakefile 'CFLAGS=${CFLAGS}' \
 		'CC=${CC}' \
