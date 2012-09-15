@@ -5,9 +5,9 @@
 #include <gr_io_signature.h>
 #include <math.h>
 
-bb_Header_cp::bb_Header_cp(Type _type, int _raw_length) :
+bb_Header_cp::bb_Header_cp(Type _type, int _raw_length, LayoutVLC *_ly) :
 	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
-	raw_length(_raw_length), type(_type)
+	raw_length(_raw_length), type(_type), ly(_ly)
 {
 	if (type == PHR)
 		length = 48;
@@ -16,9 +16,9 @@ bb_Header_cp::bb_Header_cp(Type _type, int _raw_length) :
 	olen = length/8-2;
 	set_output_multiple(olen);
 }
-bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length)
+bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length, LayoutVLC *_ly)
 {
-	return sptr(new bb_Header_cp(_type, _raw_length));
+	return sptr(new bb_Header_cp(_type, _raw_length, _ly));
 }
 
 void bb_Header_cp::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
@@ -49,6 +49,8 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		}
 		else
 		{
+			QLabel *la = (QLabel *)ly->gridErrors->itemAtPosition(3,1)->widget();
+			ly->EmitChangeMetric(la, QString::number(la->text().toInt()+1));
 			//printf("**************** %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));
 		}
 		mtx.unlock();
