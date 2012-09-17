@@ -37,9 +37,10 @@ class App : public QApplication
 \image html VLC.jpg "Flexicom GUI and VLC configuration tab"
 */
 
-
-#if defined(_WIN) && !defined(CMDLINE)
+#ifdef _WIN
 #include <windows.h>
+#endif
+#if defined(_WIN) && !defined(CMDLINE)
 #include <QStringList>
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -57,6 +58,15 @@ int main(int argc, char **argv)
 	app.setOrganizationName(QString("FlexiCom"));
     app.setOrganizationDomain(QString("flexicom.com"));
     app.setApplicationName(QString("FlexiCom"));
+    QIcon ico;
+#ifdef _WIN
+    HICON hIcon = (HICON)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(100), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADTRANSPARENT );
+    ico = QIcon(QPixmap::fromWinHICON(hIcon));
+    ::DestroyIcon(hIcon);
+#elif _OSX
+#else
+#endif
+	app.setWindowIcon(ico);
     MainWindow mainWindow;
     mainWindow.show();
     return app.exec(); 

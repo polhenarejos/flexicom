@@ -158,7 +158,8 @@ install_deps:
 		$(COPY) $(QWT_BIN_DIR)\qwt.dll qwt.dll >nul
 		
 exe: objs $(OBJ_DIR)/main.obj
-	$(LINK) $(LFLAGS) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj /MAP /OUT:$(TARGET).exe
+	rc /nologo /Fo$(OBJ_DIR)/res.res $(SRC_DIR)\res\res.rc
+	$(LINK) $(LFLAGS) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj $(OBJ_DIR)/res.res /MAP /OUT:$(TARGET).exe
 	
 objs: $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS)
 
