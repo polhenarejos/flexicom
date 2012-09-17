@@ -36,7 +36,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
-	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_SVR, 1e3);
+	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_SKEW, 1e3);
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
