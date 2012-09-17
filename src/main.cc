@@ -65,6 +65,7 @@ int main(int argc, char **argv)
     ::DestroyIcon(hIcon);
 #elif _OSX
 #else
+	ico = QIcon("./src/res/image200.png");
 #endif
 	app.setWindowIcon(ico);
     MainWindow mainWindow;
