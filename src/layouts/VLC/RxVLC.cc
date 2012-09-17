@@ -36,7 +36,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
-	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_SVR, 1e3);
+	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_M2M4, 1e3);
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
@@ -45,26 +45,23 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length, ly);
 	Parser::sptr phr_parser = Parser::Create(Parser::PHR);
 	Parser::sptr psdu_parser = Parser::Create(Parser::PSDU, ly, vlc_var_rx.PSDU_raw_length-16);
-	connect(tim,0,phr,0);
-	connect(tim,0,psdu,0);
+	gr_basic_block_sptr phr_dem, psdu_dem;
 	if (vlc_var_rx.phy_type ==0) // PHY I
 	{
-		PHY_I_demodulator::sptr phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, 0);
-		PHY_I_demodulator::sptr psdu_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length, vlc_var_rx.operating_mode);
-		connect(phr, 0, phr_dem, 0);
-		connect(psdu, 0, psdu_dem, 0);
-		connect(phr_dem, 0, phr_header_dem,0);
-		connect(psdu_dem,0, psdu_header_dem,0);
+		phr_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out,PHR_modulated_length, vlc_var_rx.PHR_raw_length, 0)->self();
+		psdu_dem = PHY_I_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length, vlc_var_rx.operating_mode)->self();
 	}
 	else
 	{
-		PHY_II_demodulator::sptr phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length);
-		PHY_II_demodulator::sptr psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length);
-		connect(phr, 0, phr_dem, 0);
-		connect(psdu, 0, psdu_dem, 0);
-		connect(phr_dem, 0, phr_header_dem,0);
-		connect(psdu_dem,0, psdu_header_dem,0);
-	}	
+		phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length)->self();
+		psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length)->self();
+	}
+	connect(tim,0,phr,0);
+	connect(tim,0,psdu,0);
+	connect(phr, 0, phr_dem, 0);
+	connect(psdu, 0, psdu_dem, 0);
+	connect(phr_dem, 0, phr_header_dem, 0);
+	connect(psdu_dem, 0, psdu_header_dem, 0);
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
 	connect(psdu_parser, 0, AudioSink::Create(8000), 0);
