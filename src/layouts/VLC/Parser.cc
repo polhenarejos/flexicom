@@ -145,15 +145,18 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						}
 						else
 						{
-							int ric = ic-8;
-							if (ric < payload_len)
-								payload.append(*iptr);
-							else if (ric == payload_len)
+							if (payload_len)
 							{
-								//printf("\n");
-								payload.append('\n');
-								ly->ChatAppend(payload);
-								payload.clear();
+								int ric = ic-8;
+								if (ric < payload_len)
+									payload.append(*iptr);
+								else if (ric == payload_len)
+								{
+									//printf("\n");
+									payload.append('\n');
+									ly->ChatAppend(payload);
+									payload.clear();
+								}
 							}
 						}
 					}
