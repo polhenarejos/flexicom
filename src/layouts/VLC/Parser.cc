@@ -92,6 +92,9 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 				payload_len = 0x0;
 				payload_ver = *iptr & 0x3;
 				voip = (*iptr & 0x4);
+				ly->mtx.lock();
+				ly->bits += 8;
+				ly->mtx.unlock();
 			}
 			else
 			{
@@ -161,6 +164,9 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						}
 					}
 				}
+				ly->mtx.lock();
+				ly->bits += 8;
+				ly->mtx.unlock();
 			}
 			ic = (ic+1)%psdu_len;
 			iptr++;

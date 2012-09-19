@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QComboBox>
 #include <QSettings>
+#include <QTimer>
+#include <QMutex>
 
 class uhd_usrp_source;
 class uhd_usrp_sink;
@@ -72,6 +74,8 @@ class LayoutVLC : public QObject , public LayoutFactory
 		QWidget *CreateTabMetrics();
 		void init_v_VLC (VarVLC *, QWidget *);
 		void ReadSettings(QSettings *);
+		QTimer *timer;
+		unsigned int secs;
 
 	public:
 		LayoutVLC(MainWindow *, int);
@@ -86,9 +90,11 @@ class LayoutVLC : public QObject , public LayoutFactory
 		static bool CheckCRC(int *, int);
 		static const int CRC_LENGTH = 16;
 		QGridLayout *gridErrors;
-		QGridLayout *gridSynch;
+		QGridLayout *gridLink;
 		QGridLayout *gridMeas;
 		void EmitChangeMetric(QLabel *, QString);
+		unsigned int bits;
+		QMutex mtx;
 		
 	public slots:
 		void RadioPressed(bool);
@@ -102,6 +108,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void ChatText(QString &);
 		void ChatAppend(QString &);
 		void ChangedMetric(QLabel *, QString);
+		void UpdateSpeed();
 		
 	signals:
 		void ChatSigText(QString &);

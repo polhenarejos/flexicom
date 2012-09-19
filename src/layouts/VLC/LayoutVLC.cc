@@ -43,6 +43,8 @@ LayoutVLC::LayoutVLC(MainWindow *_mw, int _radioID) :
 	QObject::connect(this, SIGNAL(ChatSigText(QString &)), this, SLOT(ChatText(QString &)));
 	QObject::connect(this, SIGNAL(ChangeMetric(QLabel *, QString)), this, SLOT(ChangedMetric(QLabel *, QString)));
 	qRegisterMetaType<QString>("QString &");
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(UpdateSpeed()));
 }
 const char *LayoutVLC::Name()
 {
@@ -68,10 +70,13 @@ void LayoutVLC::Run()
 		tx = TxVLC::Create(this);
 		grTop->connect(tx, 0, Sink(), 0);
 	}
+	secs = bits = 0;
+	timer->start(1000);
 	grTop->start();
 }
 void LayoutVLC::Stop()
 {
+	timer->stop();
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 		rx->stop();
 	else
@@ -190,13 +195,16 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	//gridErrors->setRowStretch(1,1);
 	//gridErrors->setColumnStretch(1,1);
 	//Synching
-	QGroupBox *gBoxSynch = new QGroupBox(tr("Synchronization"));
-	gridSynch = new QGridLayout;
-	gBoxSynch->setLayout(gridSynch);
-	gridSynch->addWidget(new QLabel(tr("Synching: ")), 0, 0);
+	QGroupBox *gBoxSynch = new QGroupBox(tr("Link info"));
+	gridLink = new QGridLayout;
+	gBoxSynch->setLayout(gridLink);
+	gridLink->addWidget(new QLabel(tr("Synching: ")), 0, 0);
 	QLabel *la_synch = new QLabel(QString("<b><font color=red>Fail</font></b>"));
 	la_synch->setTextFormat(Qt::AutoText);
-	gridSynch->addWidget(la_synch, 0, 1);
+	gridLink->addWidget(la_synch, 0, 1);
+	gridLink->addWidget(new QLabel(tr("Speed: ")), 1, 0);
+	gridLink->addWidget(new QLabel(tr("0")), 1, 1);
+	gridLink->addWidget(new QLabel(tr("Kb/s")), 1, 2);
 	//Meas
 	QGroupBox *gBoxMeas = new QGroupBox(tr("Measurements"));
 	gridMeas = new QGridLayout;
@@ -556,4 +564,10 @@ void LayoutVLC::EmitChangeMetric(QLabel *la, QString s)
 void LayoutVLC::ChangedMetric(QLabel *la, QString s)
 {
 	la->setText(s);
+}
+void LayoutVLC::UpdateSpeed()
+{
+	mtx.lock();
+	((QLabel *)gridLink->itemAtPosition(1,1)->widget())->setText(QString::number(bits/(++secs*1024)));
+	mtx.unlock();
 }
