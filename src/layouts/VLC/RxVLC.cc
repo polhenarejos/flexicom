@@ -22,6 +22,8 @@
 #include <gr_complex_to_xxx.h>
 #include "Audio.h"
 #include "SNR.h"
+#include <gr_multiply_const_cc.h>
+#include <gr_add_const_cc.h>
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -37,7 +39,11 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
 	SNR::sptr snr = SNR::Create();
-	connect(self(), 0, snr, 0);
+	gr_multiply_const_cc_sptr mul = gr_make_multiply_const_cc(gr_complex(2,0));
+	gr_add_const_cc_sptr add = gr_make_add_const_cc(gr_complex(-1,0));
+	connect(self(), 0, mul, 0);
+	connect(mul, 0, add, 0);
+	connect(add, 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
 	connect(corr, 0, tim, 0);
