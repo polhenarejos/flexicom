@@ -21,7 +21,7 @@
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
 #include "Audio.h"
-#include <digital_mpsk_snr_est_cc.h>
+#include "SNR.h"
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -36,7 +36,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
-	digital_mpsk_snr_est_cc_sptr snr = digital_make_mpsk_snr_est_cc(SNR_EST_M2M4, 1e3);
+	SNR::sptr snr = SNR::Create();
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
