@@ -63,7 +63,6 @@ int main(int argc, char **argv)
     HICON hIcon = (HICON)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(100), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADTRANSPARENT );
     ico = QIcon(QPixmap::fromWinHICON(hIcon));
     ::DestroyIcon(hIcon);
-#elif _OSX
 #else
 	ico = QIcon("./src/res/image200.png");
 #endif
