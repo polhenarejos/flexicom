@@ -18,7 +18,6 @@ class bb8b10bEnc : public gr_block
 		static sptr Create(int);
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
-		~bb8b10bEnc();
 	
 	private:
 		bb8b10bEnc(int);
