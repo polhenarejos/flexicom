@@ -20,10 +20,10 @@
 #include <gr_null_sink.h>
 #include "bbMatlab.h"
 #include <gr_complex_to_xxx.h>
-#include "Audio.h"
 #include "SNR.h"
 #include <gr_multiply_const_cc.h>
 #include <gr_add_const_cc.h>
+#include <gr_udp_sink.h>
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -62,7 +62,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		phr_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF,PHR_modulated_length, vlc_var_rx.PHR_raw_length)->self();
 		psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length)->self();
 	}
-	bool voip = ly->varVLC->ch_voip->checkState() == Qt::Checked;
+	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
 	connect(tim,0,phr,0);
 	connect(tim,0,psdu,0);
 	connect(phr, 0, phr_dem, 0);
@@ -71,8 +71,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(psdu_dem, 0, psdu_header_dem, 0);
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
-	if (voip)
-		connect(psdu_parser, 0, AudioSink::Create(8000), 0);
+	if (media)
+		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 8000), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {
