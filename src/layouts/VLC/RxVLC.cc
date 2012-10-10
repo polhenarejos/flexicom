@@ -72,7 +72,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(phr_header_dem, 0, phr_parser, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
 	if (media)
-		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 8000), 0);
+		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 5005), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

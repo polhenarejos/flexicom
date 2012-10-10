@@ -35,7 +35,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-1);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	if (media)
-		connect(gr_make_udp_source(sizeof(unsigned char), "127.0.0.1", 8000), 0, data_source, 0);
+		connect(gr_make_udp_source(sizeof(unsigned char), "127.0.0.1", 5004), 0, data_source, 0);
 	connect(data_source, 0, PSDU_gen, 0);
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	gr_basic_block_sptr phr, psdu;
