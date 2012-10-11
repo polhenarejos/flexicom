@@ -18,8 +18,7 @@
 #include "TxTagger.h"
 #include "bbMatlab.h"
 #include "DataSource.h"
-#define ssize_t size_t
-#include <gr_udp_source.h>
+#include <gr_file_source.h>
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(gr_complex))),
@@ -35,7 +34,7 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	ly->varVLC->le_chat->setMaxLength(PSDU_gen->DataLength()-1);
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;
 	if (media)
-		connect(gr_make_udp_source(sizeof(unsigned char), "127.0.0.1", 5004), 0, data_source, 0);
+		connect(gr_make_file_source(sizeof(unsigned char), "tx.ts", false), 0, data_source, 0);
 	connect(data_source, 0, PSDU_gen, 0);
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	gr_basic_block_sptr phr, psdu;
