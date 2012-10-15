@@ -18,11 +18,6 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const unsigned char *iptr = (voip ? (const unsigned char *)_i[0] : NULL);
 	int *optr = (int *)_o[0];
 	int ci = 0;
-	const uint64_t nread = (voip ? nitems_read(0) : 0);
-	std::vector<gr_tag_t> tags;
-	if (voip)
-		get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("VocoderReset"));
-	static uint64_t proff = 0;
 	for (int n = 0; n < no; n++)
 	{
 		int mid = ic%8;
@@ -56,22 +51,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					if (voip)
 					{
 						if (pic < dataoff)
-						{
-							if (prevreset)
-							{
-								std::fill_n(databyte, 8, 1);
-								prevreset = false;
-							}
-							else if (tags.size() && tags[0].offset == nread+ci && tags[0].offset != proff)
-							{
-								std::fill_n(databyte, 8, 1);
-								tags.erase(tags.begin());
-								prevreset = true;
-								proff = tags[0].offset;
-							}
-							else
-								LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
-						}
+							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 						else
 							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
 					}
@@ -100,24 +80,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					if (pic == 1 || pic == 2) //data_len
 						memset(databyte, 0, sizeof(databyte));
 					else
-					{
-						//printf("%u ",iptr[ci]);
-						if (prevreset)
-						{
-							std::fill_n(databyte, 8, 1);
-							prevreset = false;
-						}
-						else if (tags.size() && tags[0].offset == nread+ci && tags[0].offset != proff)
-						{
-							//printf("Get reset at %d (%d)\n",nread+ci,n);
-							std::fill_n(databyte, 8, 1);
-							tags.erase(tags.begin());
-							prevreset = true;
-							proff = tags[0].offset;
-						}
-						else
-							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
-					}
+						LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 				}
 				else
 					memset(databyte, 0, sizeof(databyte));

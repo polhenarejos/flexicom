@@ -50,7 +50,7 @@ typedef struct
 	QTextEdit *tx_chat;
 	QLineEdit *le_chat;
 	QPushButton *pb_chat;
-	QCheckBox *ch_voip;
+	QCheckBox *ch_media;
 }VarVLC;
 
 /*! \brief The class where the layout of the VLC communication system is defined

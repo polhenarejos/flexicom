@@ -111,30 +111,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						if (voip)
 						{
 							if (ic < psdu_len-payload_len)
-							{
-								//printf("%u ",*iptr);
-								if (*iptr == 0xFF && !prevreset) //reset
-									prevreset = true;
-								else if (prevreset)
-								{
-									if (*iptr == 0xFF && cpd <= 0)
-									{
-										//printf("Got reset at %d\n",nitems_written(0)+rtd);
-										add_item_tag(0, nitems_written(0)+rtd, pmt::pmt_string_to_symbol("VocoderReset"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
-										cpd = 3300;
-									}
-									else if (cpd)
-									{
-										if (cpd-- > 0)
-											optr[rtd++] = 0xFF;
-										if (cpd-- > 0)
-											optr[rtd++] = *iptr;
-									}
-									prevreset = false;
-								}
-								else if (cpd-- > 0)
-									optr[rtd++] = *iptr;
-							}
+								optr[rtd++] = *iptr;
 							else
 							{
 								payload.append(*iptr);
