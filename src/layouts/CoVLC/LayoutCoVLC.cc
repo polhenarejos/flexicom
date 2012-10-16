@@ -5,7 +5,8 @@
 #include <stdio.h>
 
 const char *LayoutCoVLC::name = "CoVLC";
-
+static int _d_ = RegisterLayout(LayoutCoVLC::Create);
+	
 LayoutCoVLC::LayoutCoVLC(MainWindow *_mw, int _radioID) :
 	LayoutFactory(_mw, _radioID)
 {

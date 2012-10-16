@@ -148,4 +148,8 @@ class Plots : public QTabWidget
 		void ChangeLayout();
 		
 };
+
+typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
+int RegisterLayout(CreateFunc);
+
 #endif //_INC_MAINWINDOW_H_
