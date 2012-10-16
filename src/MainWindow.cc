@@ -4,6 +4,7 @@
 #include "MainWindow.h"
 #include "layouts/VLC/LayoutVLC.h"
 #include "layouts/80211b/Layout80211b.h"
+#include "layouts/CoVLC/LayoutCoVLC.h"
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -20,6 +21,7 @@ typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
 CreateFunc layouts[] = {
 	Layout80211b::Create,
 	LayoutVLC::Create,
+	LayoutCoVLC::Create,
 	NULL
 };
 
