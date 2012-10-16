@@ -73,11 +73,7 @@ TEST_DIR=test
 QT_CORE_DIR=$(QT_INC_DIR)\QtCore
 QT_GUI_DIR=$(QT_INC_DIR)\QtGui
 QT_INC=/I $(QT_CORE_DIR) /I $(QT_GUI_DIR) /I $(QT_INC_DIR) 
-!if $(DEBUG) == 1
 QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib 
-!else
-QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib 
-!endif
 QWT_INC=/I $(QWT_INC_DIR)
 QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) qwt.lib
 !if $(CMDLINE) == 0
@@ -94,11 +90,9 @@ UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
 CPPUNIT_LIB=/LIBPATH:$(CPPUNIT_LIB_DIR) cppunit.lib
 
-
 INC_FILES = /I $(INC_DIR) $(QT_INC) $(QWT_INC) $(BOOST_INC) $(LAYOUT_INC) $(GR_INC) $(UHD_INC)
 EXECFLAGS=$(DBGCFLAG) $(CFLAGS) $(INC_FILES) /Fo$(OBJ_DIR)/
 CFLAGS=/J /D NOMINMAX /D _WIN /D _WINDOWS /D _CRT_NONSTDC_NO_DEPRECATE /D _CRT_SECURE_NO_DEPRECATE /nologo /EHsc /c $(CMDLINE_CFLAG) 
-#user32.lib kernel32.lib ws2_32.lib winspool.lib shell32.lib gdi32.lib imm32.lib winmm.lib advapi32.lib
 LFLAGS=$(DBGLFLAG) /LIBPATH:$(OBJ_DIR) user32.lib kernel32.lib ws2_32.lib /nologo $(CMDLINE_LFLAG) $(QT_LIB) $(QWT_LIB) $(BOOST_LIB) $(GR_LIB) $(UHD_LIB) \
 	/INCREMENTAL:NO /MANIFEST 
 
@@ -121,7 +115,7 @@ OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/Lay
 
 MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj $(OBJ_DIR)/MSE.obj $(OBJ_DIR)/Tcp.obj \
 		  $(OBJ_DIR)/Oversampler.obj $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj \
-		  $(OBJ_DIR)/SNR.obj
+		  $(OBJ_DIR)/SNR.obj $(OBJ_DIR)/BER.obj
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj  $(OBJ_DIR)/TxVLC.obj $(OBJ_DIR)/RxVLC.obj \
@@ -132,7 +126,6 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \
         $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj $(OBJ_DIR)/bb_Header_cp.obj $(OBJ_DIR)/Interleaver.obj $(OBJ_DIR)/Puncture.obj $(OBJ_DIR)/Timing.obj $(OBJ_DIR)/Parser.obj \
 		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/Correlator.obj
-
 
 TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/test_CC.obj $(OBJ_DIR)/test_RS.obj  $(OBJ_DIR)/test_VLCInterleaver.obj
 
@@ -213,4 +206,3 @@ doc: docdep
 	$(DOC_BIN) doc\doxy.conf
 	
 docdep:
-

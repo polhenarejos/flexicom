@@ -17,7 +17,7 @@ Timing::sptr Timing::Create(unsigned int _decim, unsigned int _syms)
 {
 	return sptr(new Timing(_decim, _syms));
 }
-int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
 	const float *iptr = (const float *)_i[0];
 	int *optr = (int *)_o[0];
