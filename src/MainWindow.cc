@@ -16,12 +16,12 @@
 #include <QStatusBar>
 #include <QButtonGroup>
 
-typedef LayoutFactory::sptr (*CreateFunc)(MainWindow *, int);
-CreateFunc layouts[] = {
-	Layout80211b::Create,
-	LayoutVLC::Create,
-	NULL
-};
+std::vector<CreateFunc> layouts;
+int RegisterLayout(CreateFunc _f)
+{
+	layouts.push_back(_f);
+	return 0;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -487,7 +487,7 @@ QWidget *Panel::CreateLayoutTab(QWidget *w)
 	bg_chain->addButton(rb_chain[RB_RX], RB_RX);
 	QObject::connect(bg_chain, SIGNAL(buttonClicked(int)), this, SLOT(ChangeChain(int)));
 	gBoxchain->setLayout(cBox);
-	for (uint i = 0; layouts[i]; i++)
+	for (uint i = 0; i < layouts.size(); i++)
 	{
 		RadioLayout *r = new RadioLayout;
 		rb_layout.push_back(r);

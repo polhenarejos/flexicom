@@ -17,6 +17,7 @@
 #include <iostream>
 
 const char *LayoutVLC::name = "VLC";
+static int _d_ = RegisterLayout(LayoutVLC::Create);
 
 double rate_phy1_o [] = { 
 	11.67, 24.44, 48.89, 73.3, 100
