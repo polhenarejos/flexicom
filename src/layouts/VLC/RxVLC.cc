@@ -61,7 +61,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length)->self();
 	}
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
-	BER::sptr ber = BER::Create(sizeof(int), 1, vlc_var_rx.PSDU_raw_length, vlc_var_rx.PSDU_raw_length-40, 40);
+	BER::sptr ber = BER::Create(sizeof(int), 1, vlc_var_rx.PSDU_raw_length-56, vlc_var_rx.PSDU_raw_length, 40);
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
 	connect(tim,0,phr,0);
 	connect(tim,0,psdu,0);

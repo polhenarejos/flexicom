@@ -37,6 +37,11 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	int blocks_to_process = (noutput_items/olen);
 	int *tmp = new int[length+LayoutVLC::CRC_LENGTH];
 	memset(tmp,0,sizeof(int)*length+LayoutVLC::CRC_LENGTH);
+	const uint64_t nread = nitems_read(0);
+	std::vector<gr_tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+ninput_items[0], pmt::pmt_string_to_symbol("BER"));
+	if (tags.size())
+		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value)));
 	int rtd = 0;
 	for (int i = 0; i < blocks_to_process; i++)
 	{
