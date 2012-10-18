@@ -8,7 +8,7 @@
 
 Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly)
+	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly), idle(0)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
@@ -73,26 +73,24 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	unsigned int o = 0, rtd = 0;
 	if (!cpd)
 	{
-		if (strike)
-			no = siz;
-		unsigned int idx = 0;
-		float *C = (float *)malloc16Align(sizeof(float)*no*(pattern == -1 ? 8 : 1));
+		unsigned int idx = 0, corr = (strike ? siz : no);
+		float *C = (float *)malloc16Align(sizeof(float)*corr*(pattern == -1 ? 8 : 1));
 		if (pattern == -1)
 		{
 			for (int t = 0; t < 2; t++)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					float *tC = (float *)malloc16Align(sizeof(float)*no);
-					Correlate(iptr, TDP[t*4+i], tC, no, t+1);
-					memcpy(C+(t*4+i)*no, tC, sizeof(float)*no);
+					float *tC = (float *)malloc16Align(sizeof(float)*corr);
+					Correlate(iptr, TDP[t*4+i], tC, corr, t+1);
+					memcpy(C+(t*4+i)*corr, tC, sizeof(float)*corr);
 					free16Align(tC);
 				}
 			}
 		}
 		else
-			Correlate(iptr, TDP[pattern], C, no, vppm);
-		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? no*8 : no));
+			Correlate(iptr, TDP[pattern], C, corr, vppm);
+		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? corr*8 : corr));
 		if ((C[idx] > 1 && C[idx] > th*2) || (C[idx] <= 1 && C[idx] > th))
 		{
 			if (!strike)
@@ -105,21 +103,18 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			{
 				if (pattern == -1)
 				{
-					vppm = idx/(4*no)+1;
-					pattern = idx/no;
+					vppm = idx/(4*corr)+1;
+					pattern = idx/corr;
 				}
 				//printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
 				cpd = copy;
-				o = idx%no;
+				o = idx%corr;
 				strike = false;
 				ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=green>Ok!</font></b>"));
 			}
 		}
 		else
-		{
-			if (strike)
-				strike = false;
-		}
+			strike = false;
 		free16Align(C);
 	}
 	if (cpd)
@@ -127,9 +122,15 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		rtd = std::min(cpd, no-o);
 		memcpy(optr, iptr+o, sizeof(float)*rtd);
 		cpd -= rtd;
+		if (!cpd)
+			idle = siz*3;
 	}
-	else
-		ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=red>Fail</font></b>"));
+	else if (!strike)
+	{
+		if (idle < 0)
+			ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=red>Fail</font></b>"));
+		idle -= no;
+	}
 	//Grab SNR tags
 	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;

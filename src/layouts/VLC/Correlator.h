@@ -37,6 +37,7 @@ class Correlator : public gr_block
 		unsigned int vppm;
 		bool strike;
 		LayoutVLC *ly;
+		int idle;
 };
 
 #endif //_INC_CORRELATOR_H
