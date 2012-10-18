@@ -87,6 +87,9 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 							ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value)));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(1, 1)->widget(), QString::number(PER));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(2, 1)->widget(), QString::number(per));
+						ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(2, 1)->widget(), QString::number(total));
+						QLabel *la = (QLabel *)ly->gridErrors->itemAtPosition(4,1)->widget();
+						ly->EmitChangeMetric(la, QString::number(la->text().toInt()+1));
 					}
 					prevSeq = MHR[2];
 				}

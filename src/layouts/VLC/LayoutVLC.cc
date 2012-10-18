@@ -193,6 +193,8 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridErrors->addWidget(new QLabel(tr("0")), 2, 1);
 	gridErrors->addWidget(new QLabel(tr("Missed CRC: ")), 3, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 3, 1);
+	gridErrors->addWidget(new QLabel(tr("Passed CRC: ")), 4, 0);
+	gridErrors->addWidget(new QLabel(tr("0")), 4, 1);
 	//gridErrors->setRowStretch(1,1);
 	//gridErrors->setColumnStretch(1,1);
 	//Synching
@@ -206,6 +208,8 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridLink->addWidget(new QLabel(tr("Speed: ")), 1, 0);
 	gridLink->addWidget(new QLabel(tr("0")), 1, 1);
 	gridLink->addWidget(new QLabel(tr("Kb/s")), 1, 2);
+	gridLink->addWidget(new QLabel(tr("Total packets: ")), 2, 0);
+	gridLink->addWidget(new QLabel(tr("0")), 2, 1);
 	//Meas
 	QGroupBox *gBoxMeas = new QGroupBox(tr("Measurements"));
 	gridMeas = new QGridLayout;
@@ -213,6 +217,9 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridMeas->addWidget(new QLabel(tr("SNR: ")), 0, 0);
 	gridMeas->addWidget(new QLabel(tr("0")), 0, 1);
 	gridMeas->addWidget(new QLabel(tr(" dB")), 0, 2);
+	gridMeas->addWidget(new QLabel(tr("Power: ")), 1, 0);
+	gridMeas->addWidget(new QLabel(tr("0")), 1, 1);
+	gridMeas->addWidget(new QLabel(tr(" dB")), 1, 2);
 	//gridMeas->setColumnStretch(1,1);
 	//
 	grid->addWidget(gBoxErrors, 0, 1);

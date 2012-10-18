@@ -137,6 +137,9 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
 	if (tags.size())
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g', 3));
+	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("power"));
+	if (tags.size())
+		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g'));
 	if (o+rtd)
 		consume_each(o+rtd);
 	else //didnt found anything

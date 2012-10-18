@@ -15,6 +15,7 @@ bb_Header_cp::bb_Header_cp(Type _type, int _raw_length, LayoutVLC *_ly) :
 		length = raw_length;
 	olen = length/8-2;
 	set_output_multiple(olen);
+	bits = total = 0;
 }
 bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length, LayoutVLC *_ly)
 {
@@ -40,7 +41,6 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	for (int i = 0; i < blocks_to_process; i++)
 	{
 		memcpy(tmp, iptr, sizeof(int)*length);
-		mtx.lock();
 		if (LayoutVLC::CheckCRC(tmp, length)) //crc ok!!
 		{
 			for (int n = 0; n < length-LayoutVLC::CRC_LENGTH; n += 8)
@@ -49,11 +49,12 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 		}
 		else
 		{
+			mtx.lock();
 			QLabel *la = (QLabel *)ly->gridErrors->itemAtPosition(3,1)->widget();
 			ly->EmitChangeMetric(la, QString::number(la->text().toInt()+1));
+			mtx.unlock();
 			//printf("**************** %s NOK\n", (type == PSDU ? "PSDU" : "PHR"));
 		}
-		mtx.unlock();
 		iptr += raw_length;
 	}
 	delete [] tmp;
