@@ -24,6 +24,8 @@
 #include <gr_multiply_const_cc.h>
 #include <gr_add_const_cc.h>
 #include <gr_udp_sink.h>
+#include "BER.h"
+#include <gr_null_source.h>
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -39,11 +41,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
 	SNR::sptr snr = SNR::Create();
-	gr_multiply_const_cc_sptr mul = gr_make_multiply_const_cc(gr_complex(2,0));
-	gr_add_const_cc_sptr add = gr_make_add_const_cc(gr_complex(-1,0));
-	connect(self(), 0, mul, 0);
-	connect(mul, 0, add, 0);
-	connect(add, 0, snr, 0);
+	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
 	connect(corr, 0, tim, 0);
@@ -63,6 +61,8 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length)->self();
 	}
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
+	BER::sptr ber = BER::Create(sizeof(unsigned char), 8, vlc_var_rx.PSDU_raw_length, vlc_var_rx.PSDU_raw_length-5, 5);
+	gr_null_source_sptr nls = gr_make_null_source(sizeof(unsigned char));
 	connect(tim,0,phr,0);
 	connect(tim,0,psdu,0);
 	connect(phr, 0, phr_dem, 0);
@@ -70,7 +70,9 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(phr_dem, 0, phr_header_dem, 0);
 	connect(psdu_dem, 0, psdu_header_dem, 0);
 	connect(phr_header_dem, 0, phr_parser, 0);
-	connect(psdu_header_dem, 0, psdu_parser, 0);
+	connect(psdu_header_dem, 0, ber, 0);
+	connect(nls, 0, ber, 1);
+	connect(ber, 0, psdu_parser, 0);
 	if (media)
 		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 5005), 0);
 }

@@ -80,7 +80,11 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 					//if (MHR[2] != (unsigned char)(prevSeq+1))
 					{
 						double PER = (double)per/total;
-						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(PER/psdu_len));
+						const uint64_t nread = nitems_read(0);
+						std::vector<gr_tag_t> tags;
+						get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("BER"));
+						if (tags.size())
+							ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value)));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(1, 1)->widget(), QString::number(PER));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(2, 1)->widget(), QString::number(per));
 					}
