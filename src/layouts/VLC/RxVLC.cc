@@ -61,18 +61,18 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 		psdu_dem = PHY_II_demodulator::Create(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF,PSDU_modulated_length, vlc_var_rx.PSDU_raw_length)->self();
 	}
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
-	BER::sptr ber = BER::Create(sizeof(unsigned char), 8, vlc_var_rx.PSDU_raw_length, vlc_var_rx.PSDU_raw_length-5, 5);
-	gr_null_source_sptr nls = gr_make_null_source(sizeof(unsigned char));
+	BER::sptr ber = BER::Create(sizeof(int), 1, vlc_var_rx.PSDU_raw_length, vlc_var_rx.PSDU_raw_length-40, 40);
+	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
 	connect(tim,0,phr,0);
 	connect(tim,0,psdu,0);
 	connect(phr, 0, phr_dem, 0);
 	connect(psdu, 0, psdu_dem, 0);
 	connect(phr_dem, 0, phr_header_dem, 0);
-	connect(psdu_dem, 0, psdu_header_dem, 0);
 	connect(phr_header_dem, 0, phr_parser, 0);
-	connect(psdu_header_dem, 0, ber, 0);
 	connect(nls, 0, ber, 1);
-	connect(ber, 0, psdu_parser, 0);
+	connect(psdu_dem, 0, ber, 0);
+	connect(ber, 0, psdu_header_dem, 0);
+	connect(psdu_header_dem, 0, psdu_parser, 0);
 	if (media)
 		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 5005), 0);
 }
