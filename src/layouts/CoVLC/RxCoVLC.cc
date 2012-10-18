@@ -1,6 +1,6 @@
 // $Id$
 
-#include "TxCoVLC.h"
+#include "RxCoVLC.h"
 #include "LayoutCoVLC.h"
 #include <gr_io_signature.h>
 #include <gr_vector_source_b.h>
@@ -20,18 +20,55 @@
 #include <gr_sig_source_f.h>
 #include <filter/firdes.h>
 #include <filter/fir_filter_ccf.h>
+#include <gr_keep_one_in_n.h>
 #include <gr_keep_m_in_n.h>
 #include <gr_null_source.h>
 #include <gr_stream_mux.h>
-#include "../../modules/Oversampler.cc"
 #include "bbMatlab.h"
 
 #define ISQRT2 0.7071067811865475
 
-TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
-	gr_hier_block2("TxCoVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(gr_complex))),
+RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
+	gr_hier_block2("RxCoVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
 	ly(_ly)
 {
+	std::vector<float> f(0);
+	gr_complex_to_float_sptr c2f = gr_make_complex_to_float();
+	gr_sig_source_f_sptr cos = gr_make_sig_source_f(2000e3, GR_COS_WAVE, 500e3, 1., 0.);
+	gr_sig_source_f_sptr sin = gr_make_sig_source_f(2000e3, GR_SIN_WAVE, 500e3, 1., 0.);
+	gr_multiply_ff_sptr mulI = gr_make_multiply_ff(), mulQ = gr_make_multiply_ff();
+	gr_sub_ff_sptr sub = gr_make_sub_ff();
+	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
+	std::vector<float> taps = gr::filter::firdes::low_pass_2(1, 2000e3, 200e3, 100e3, 90);
+	gr_keep_m_in_n_sptr filt_delay = gr_make_keep_m_in_n(sizeof(gr_complex), 400, 400+taps.size(), taps.size());
+	gr_null_source_sptr nls = gr_make_null_source(sizeof(gr_complex));
+	std::vector<int> lens(2); lens[0] = 400; lens[1] = taps.size();
+	gr_stream_mux_sptr mux = gr_make_stream_mux(sizeof(gr_complex), lens);
+	gr::filter::fir_filter_ccf::sptr filter = gr::filter::fir_filter_ccf::make(1, taps);
+	gr_keep_one_in_n_sptr decim = gr_make_keep_one_in_n(sizeof(gr_complex), 5);
+	gr_keep_m_in_n_sptr cyc = gr_make_keep_m_in_n(sizeof(gr_complex), 64, 80, 16);
+	gr_stream_to_vector_sptr s2v = gr_make_stream_to_vector(sizeof(gr_complex), 64);
+	gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(gr_complex), 64);
+	gr_fft_vcc_sptr fft = gr_make_fft_vcc(64, true, f, true, 2);
+	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom", sizeof(gr_complex));
+	connect(self(), 0, c2f, 0);
+	connect(c2f, 0, mulI, 0);
+	connect(cos, 0, mulI, 1);
+	connect(c2f, 0, mulQ, 0);
+	connect(sin, 0, mulQ, 1);
+	connect(mulI, 0, f2c, 0);
+	connect(mulQ, 0, f2c, 1);
+	connect(f2c, 0, mux, 0);
+	connect(nls, 0, mux, 1);
+	connect(mux, 0, filter, 0);
+	connect(filter, 0, filt_delay, 0);
+	connect(filt_delay, 0, decim, 0);
+	connect(decim, 0, cyc, 0);
+	connect(cyc, 0, s2v, 0);
+	connect(s2v, 0, fft, 0);
+	connect(fft, 0, v2s, 0);
+	connect(v2s, 0, bbm, 0);
+	/*
 	unsigned char _v[] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,0,0,0,1,0,0,0,1,1,0,1,1,0,1,0,1,1,1,1,1,1,0,
 					0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,1,0,0,1,0,0,0,1,1,1,0,0,1,0,1,1,1,
 					0,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,1,1,0,0,1,0,1,0,1,0,0,1,0,1,0,0,
@@ -54,14 +91,9 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	gr_multiply_ff_sptr mulI = gr_make_multiply_ff(), mulQ = gr_make_multiply_ff();
 	gr_sub_ff_sptr sub = gr_make_sub_ff();
 	std::vector<float> taps = gr::filter::firdes::low_pass_2(1, 2000e3, 200e3, 200e3, 90);
-	gr_null_source_sptr nls = gr_make_null_source(sizeof(gr_complex));
-	std::vector<int> lens(2); lens[0] = 400; lens[1] = taps.size();
-	gr_stream_mux_sptr mux = gr_make_stream_mux(sizeof(gr_complex), lens);
-	gr_keep_m_in_n_sptr filt_delay = gr_make_keep_m_in_n(sizeof(gr_complex), 400, 400+taps.size(), taps.size());
 	gr::filter::fir_filter_ccf::sptr filter = gr::filter::fir_filter_ccf::make(1, taps);
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(5);
-	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom2", sizeof(gr_complex));
 	connect(ds, 0, pck, 0);
 	connect(pck, 0, upck, 0);
 	connect(upck, 0, ch2sym, 0);
@@ -70,11 +102,8 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	connect(fft, 0, mc, 0);
 	connect(mc, 0, ofdm, 0);
 	connect(ofdm, 0, ov, 0);
-	connect(ov, 0, mux, 0);
-	connect(nls, 0, mux, 1);
-	connect(mux, 0, filter, 0);
-	connect(filter, 0, filt_delay, 0);
-	connect(filt_delay, 0, c2f, 0);
+	connect(ov, 0, filter, 0);
+	connect(filter, 0, c2f, 0);
 	connect(c2f, 0, mulI, 0);
 	connect(cos, 0, mulI, 1);
 	connect(c2f, 1, mulQ, 0);
@@ -83,9 +112,9 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	connect(mulQ, 0, sub, 1);
 	connect(sub, 0, f2c, 0);
 	connect(f2c, 0, self(), 0);
-	connect(f2c, 0 , bbm, 0);
+	*/
 }
-TxCoVLC::sptr TxCoVLC::Create(LayoutCoVLC * _ly)
+RxCoVLC::sptr RxCoVLC::Create(LayoutCoVLC * _ly)
 {
-	return gnuradio::get_initial_sptr(new TxCoVLC(_ly));
+	return gnuradio::get_initial_sptr(new RxCoVLC(_ly));
 }

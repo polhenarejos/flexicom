@@ -2,6 +2,7 @@
 
 #include "LayoutCoVLC.h"
 #include "TxCoVLC.h"
+#include "RxCoVLC.h"
 #include <stdio.h>
 
 const char *LayoutCoVLC::name = "CoVLC";
@@ -28,8 +29,8 @@ void LayoutCoVLC::Run()
 	}
 	else //transmitter
 	{
-		gr_basic_block_sptr tx = TxCoVLC::Create(this);
-		grTop->connect(tx, 0, Sink(), 0);
+		gr_basic_block_sptr tx = TxCoVLC::Create(this), rx = RxCoVLC::Create(this);
+		grTop->connect(tx, 0, rx, 0);
 	}
 	grTop->start();
 }
