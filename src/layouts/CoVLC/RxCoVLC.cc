@@ -25,6 +25,7 @@
 #include <gr_null_source.h>
 #include <gr_stream_mux.h>
 #include "bbMatlab.h"
+#include <gr_null_sink.h>
 
 #define ISQRT2 0.7071067811865475
 
@@ -39,7 +40,7 @@ RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
 	gr_multiply_ff_sptr mulI = gr_make_multiply_ff(), mulQ = gr_make_multiply_ff();
 	gr_sub_ff_sptr sub = gr_make_sub_ff();
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
-	std::vector<float> taps = gr::filter::firdes::low_pass_2(1, 2000e3, 200e3, 100e3, 90);
+	std::vector<float> taps = gr::filter::firdes::low_pass_2(1, 2000e3, 200e3, 200e3, 50);
 	gr_keep_m_in_n_sptr filt_delay = gr_make_keep_m_in_n(sizeof(gr_complex), 400, 400+taps.size(), taps.size());
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(gr_complex));
 	std::vector<int> lens(2); lens[0] = 400; lens[1] = taps.size();
@@ -51,6 +52,7 @@ RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
 	gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(gr_complex), 64);
 	gr_fft_vcc_sptr fft = gr_make_fft_vcc(64, true, f, true, 2);
 	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom", sizeof(gr_complex));
+	gr_null_sink_sptr nl = gr_make_null_sink(sizeof(gr_complex));
 	connect(self(), 0, c2f, 0);
 	connect(c2f, 0, mulI, 0);
 	connect(cos, 0, mulI, 1);
@@ -67,6 +69,7 @@ RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
 	connect(cyc, 0, s2v, 0);
 	connect(s2v, 0, fft, 0);
 	connect(fft, 0, v2s, 0);
+	connect(v2s, 0, nl, 0);
 	connect(v2s, 0, bbm, 0);
 	/*
 	unsigned char _v[] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,0,0,0,1,0,0,0,1,1,0,1,1,0,1,0,1,1,1,1,1,1,0,
