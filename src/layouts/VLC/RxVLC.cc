@@ -46,8 +46,14 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
-	connect(corr, 0, now, 0);
-	connect(now, 0, tim, 0);
+	if (ly->mw->panel->rb_dev[1]->isChecked())
+	{
+		NoOverflow::sptr now = NoOverflow::Create(sizeof(float), phr->length_sequence*ov);
+		connect(corr, 0, now, 0);
+		connect(now, 0, tim, 0);
+	}
+	else
+		connect(corr, 0, tim, 0);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length, ly);
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length, ly);
 	Parser::sptr phr_parser = Parser::Create(Parser::PHR);
