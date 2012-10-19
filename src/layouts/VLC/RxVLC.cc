@@ -26,6 +26,7 @@
 #include <gr_udp_sink.h>
 #include "BER.h"
 #include <gr_null_source.h>
+#include "NoOverflow.h"
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -41,10 +42,12 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
 	Timing::sptr tim = Timing::Create(ov);
 	SNR::sptr snr = SNR::Create();
+	NoOverflow::sptr now = NoOverflow::Create(sizeof(float), phr->length_sequence*ov);
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
 	connect(c2f, 0, corr, 0);
-	connect(corr, 0, tim, 0);
+	connect(corr, 0, now, 0);
+	connect(now, 0, tim, 0);
 	bb_Header_cp::sptr phr_header_dem = bb_Header_cp::Create(bb_Header_cp::PHR, vlc_var_rx.PHR_raw_length, ly);
 	bb_Header_cp::sptr psdu_header_dem = bb_Header_cp::Create(bb_Header_cp::PSDU, vlc_var_rx.PSDU_raw_length, ly);
 	Parser::sptr phr_parser = Parser::Create(Parser::PHR);
