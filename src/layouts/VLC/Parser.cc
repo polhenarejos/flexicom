@@ -80,9 +80,9 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 					//if (MHR[2] != (unsigned char)(prevSeq+1))
 					{
 						double PER = (double)per/total;
-						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(0, 1)->widget(), QString::number(PER/psdu_len));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(1, 1)->widget(), QString::number(PER));
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(2, 1)->widget(), QString::number(per));
+						ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(2, 1)->widget(), QString::number(total));
 					}
 					prevSeq = MHR[2];
 				}

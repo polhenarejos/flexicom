@@ -28,7 +28,8 @@ Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
 		}
 	}
 	//set_alignment(volk_get_alignment()/sizeof(float));
-	set_output_multiple(siz);
+	//set_output_multiple(siz);
+	set_tag_propagation_policy(TPP_DONT);
 }
 Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th)
 {
@@ -137,7 +138,17 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	if (tags.size())
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g', 3));
 	if (o+rtd)
+	{
 		consume_each(o+rtd);
+		get_tags_in_range(tags, 0, nread+o, nread+o+rtd);
+		const uint64_t nwrit = nitems_written(0);
+		for (int i = 0; i < tags.size(); i++)
+		{
+    		gr_tag_t new_tag = tags[i];
+    		new_tag.offset = nwrit+(new_tag.offset-nread);
+    		add_item_tag(0, new_tag);
+  		}
+	}
 	else //didnt found anything
 		consume_each(no);
 	return rtd;

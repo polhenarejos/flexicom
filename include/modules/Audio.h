@@ -1,4 +1,4 @@
-// $Id: InterPunct.h 179 2012-08-22 11:46:41Z phenarejos $
+// $Id$
 
 #ifndef _INC_AUDIO_H_
 #define _INC_AUDIO_H_
