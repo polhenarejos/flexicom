@@ -1,4 +1,4 @@
-// $Id: InterPunct.cc 181 2012-08-22 13:35:18Z phenarejos $
+// $Id$
 
 #include "Audio.h"
 #include "Vocoder.h"

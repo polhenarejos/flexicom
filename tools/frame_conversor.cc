@@ -1,4 +1,4 @@
-// $Id: frame_conversor.cc 433 2010-06-22 07:40:45Z phenarejos $
+// $Id$
 
 #include <iostream>
 #include <stdio.h>

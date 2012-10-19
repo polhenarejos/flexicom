@@ -1,4 +1,4 @@
-// $Id: SHM.h 232 2012-09-03 13:15:31Z phenarejos $
+// $Id$
 
 #ifndef _INC_BER_H_
 #define _INC_BER_H_

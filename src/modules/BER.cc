@@ -1,4 +1,4 @@
-// $Id: Timing.cc 251 2012-09-07 23:12:26Z phenarejos $
+// $Id$
 
 #include "BER.h"
 #include <gr_io_signature.h>
