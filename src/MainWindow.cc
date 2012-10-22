@@ -574,7 +574,7 @@ QWidget *Panel::CreateUHDTab(QWidget *w)
 	i++;
 	sp_ov = new QSpinBox(p);
 	sp_ov->setSingleStep(1);
-	sp_ov->setRange(4,5);
+	sp_ov->setRange(1,5);
 	ch_ov = new QCheckBox(tr("Oversampling factor"), p);
 	QObject::connect(ch_ov, SIGNAL(stateChanged(int)), this, SLOT(OvChanged(int)));
 	grid_ss->addWidget(ch_ov, i, 0);

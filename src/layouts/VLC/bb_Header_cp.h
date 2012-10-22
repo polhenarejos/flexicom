@@ -31,6 +31,8 @@ class bb_Header_cp : public gr_block
 		int olen;
 		Type type;
 		LayoutVLC *ly;
+		unsigned int bits;
+		unsigned int total;
 		unsigned int CRCok;
 		unsigned int CRCnok;
 };
