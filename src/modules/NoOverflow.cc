@@ -5,7 +5,7 @@
 
 NoOverflow::NoOverflow(size_t _s, unsigned int _chunk) :
 	gr_sync_block("NoOverflow", gr_make_io_signature(1, gr_io_signature::IO_INFINITE, _s), gr_make_io_signature(1, gr_io_signature::IO_INFINITE, _s)),
-	s(_s), chunk(_chunk), pos(0)
+	s(_s), chunk(_chunk)
 {
 	set_output_multiple(chunk);
 }
