@@ -54,7 +54,8 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	gr_sig_source_f_sptr sin = gr_make_sig_source_f(2000e3, GR_SIN_WAVE, 500e3, 1., 0.);
 	gr_multiply_ff_sptr mulI = gr_make_multiply_ff(), mulQ = gr_make_multiply_ff();
 	gr_sub_ff_sptr sub = gr_make_sub_ff();
-	std::vector<float> taps = gr::filter::firdes::low_pass_2(1, 2000e3, 200e3, 200e3, 90);
+	std::vector<float> taps(4);
+	taps[0] = 0.041565; taps[1] = 0.458435; taps[2] = 0.458435; taps[3] = 0.041565;
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(gr_complex));
 	std::vector<int> lens(2); lens[0] = 400; lens[1] = taps.size();
 	gr_stream_mux_sptr mux = gr_make_stream_mux(sizeof(gr_complex), lens);
@@ -62,7 +63,7 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	gr::filter::fir_filter_ccf::sptr filter = gr::filter::fir_filter_ccf::make(1, taps);
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(5);
-	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom2", sizeof(gr_complex));
+	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom2", sizeof(unsigned char));
 	connect(ds, 0, pck, 0);
 	connect(pck, 0, upck, 0);
 	connect(upck, 0, ch2sym, 0);
@@ -84,7 +85,7 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	connect(mulQ, 0, sub, 1);
 	connect(sub, 0, f2c, 0);
 	connect(f2c, 0, self(), 0);
-	connect(f2c, 0 , bbm, 0);
+	connect(ds, 0 , bbm, 0);
 }
 TxCoVLC::sptr TxCoVLC::Create(LayoutCoVLC * _ly)
 {
