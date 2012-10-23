@@ -35,12 +35,14 @@ bbMatlab::bbMatlab(std::string f, size_t _s) :
 		close(fd);
 		throw std::runtime_error("Cannot fdopen");
 	}
-	if (s == sizeof(gr_complex)) //32
+	if (s == sizeof(gr_complex)) //64
 		cplx = 1;
-	else if (s == sizeof(float)) //16
+	else if (s == sizeof(float)) //32
 		cplx = 0;
-	else if (s == sizeof(gr_complexd)) //64
+	else if (s == sizeof(gr_complexd)) //128
 		cplx = 2;
+	else if (s == sizeof(unsigned char)) //8
+		cplx = 3;
 }
 
 #include <iostream>
@@ -90,6 +92,22 @@ int bbMatlab::work(int no, gr_vector_const_void_star &i, gr_vector_void_star &o)
 			{
 				in = (const gr_complexd *)i[ip];
 				sprintf(buf, "%f\t%f\t", (double)in[n].real(), (double)in[n].imag());
+				fwrite(buf, 1, strlen(buf), fp);
+			}
+			sprintf(buf, "\n");
+			fwrite(buf, 1, strlen(buf), fp);
+			n++;
+		}
+	}
+	else if (cplx == 3)
+	{
+		const unsigned char *in;
+		while (n < no)
+		{
+			for (unsigned int ip = 0; ip < ninp; ip++)
+			{
+				in = (const unsigned char *)i[ip];
+				sprintf(buf, "%d\t", (int)in[n]);
 				fwrite(buf, 1, strlen(buf), fp);
 			}
 			sprintf(buf, "\n");

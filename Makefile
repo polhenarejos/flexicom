@@ -98,7 +98,8 @@ LFLAGS=$(DBGLFLAG) /LIBPATH:$(OBJ_DIR) user32.lib kernel32.lib ws2_32.lib /nolog
 
 !if $(IS64) == 1
 CFLAGS = $(CFLAGS) /D _WIN64
-LFLAGS = $(LFLAGS) /MACHINE:X64
+LIBFLAGS = /MACHINE:X64
+LFLAGS = $(LFLAGS) $(LIBFLAGS)
 !else
 CFLAGS = $(CFLAGS) /D _WIN32 /arch:SSE2 /D _USE_32BIT_TIME_T 
 !endif
@@ -114,7 +115,7 @@ DBGLFLAG=/debug
 OBJ_FILES=$(OBJ_DIR)/MainWindow.obj $(OBJ_DIR)/MainWindow_moc.obj $(OBJ_DIR)/LayoutFactory.obj
 
 MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.obj $(OBJ_DIR)/MSE.obj $(OBJ_DIR)/Tcp.obj \
-		  $(OBJ_DIR)/Oversampler.obj $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj \
+		  $(OBJ_DIR)/SHM.obj $(OBJ_DIR)/De2Bi.obj $(OBJ_DIR)/Bi2De.obj $(OBJ_DIR)/gr_symbols_to_chunks_cb.obj \
 		  $(OBJ_DIR)/SNR.obj $(OBJ_DIR)/BER.obj $(OBJ_DIR)/NoOverflow.obj
 
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
@@ -125,16 +126,16 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj  $(OBJ_DIR)/PHY_II_modulator.obj $(OBJ_DIR)/PHY_I_demodulator.obj $(OBJ_DIR)/PHY_II_demodulator.obj \
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \
         $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj $(OBJ_DIR)/bb_Header_cp.obj $(OBJ_DIR)/Interleaver.obj $(OBJ_DIR)/Puncture.obj $(OBJ_DIR)/Timing.obj $(OBJ_DIR)/Parser.obj \
-		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/Correlator.obj
+		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/Correlator.obj \
+		$(OBJ_DIR)/LayoutCoVLC.obj $(OBJ_DIR)/LayoutCoVLC_moc.obj $(OBJ_DIR)/TxCoVLC.obj $(OBJ_DIR)/RxCoVLC.obj
 
 TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/test_CC.obj $(OBJ_DIR)/test_RS.obj  $(OBJ_DIR)/test_VLCInterleaver.obj
 
 TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 
-all: exe install_deps
+all: $(TARGET).exe install_deps
 	$(RM) Makefile.auto
-	$(MT) /nologo -outputresource:"$(TARGET).exe;1" -manifest $(TARGET).exe.manifest
-	$(RM) $(TARGET).exe.manifest $(TARGET).map $(TARGET).exp
+	
 
 install_deps:
 		$(COPY) $(QT_BIN_DIR)\QtGui4.dll QtGui4.dll	>nul
@@ -149,15 +150,20 @@ install_deps:
 		$(COPY) $(UHD_BIN_DIR)\uhd.dll uhd.dll >nul
 		$(COPY) $(QWT_BIN_DIR)\qwt.dll qwt.dll >nul
 		
-exe: objs $(OBJ_DIR)/main.obj
+$(TARGET).exe: objs $(OBJ_DIR)/main.obj
 	rc /nologo /Fo$(OBJ_DIR)/res.res $(SRC_DIR)\res\res.rc
-	$(LINK) $(LFLAGS) $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS) $(OBJ_DIR)/main.obj $(OBJ_DIR)/res.res /MAP /OUT:$(TARGET).exe
+	$(LINK) $(LFLAGS) $(OBJ_FILES) $(OBJ_DIR)/Modules.lib $(LAYOUTS) $(OBJ_DIR)/main.obj $(OBJ_DIR)/res.res /MAP /OUT:$(TARGET).exe
+	$(MT) /nologo -outputresource:"$(TARGET).exe;1" -manifest $(TARGET).exe.manifest
+	$(RM) $(TARGET).exe.manifest $(TARGET).map $(TARGET).exp
 	
-objs: $(OBJ_FILES) $(MOD_FILES) $(LAYOUTS)
+objs: $(OBJ_FILES) $(OBJ_DIR)/Modules.lib $(LAYOUTS)
 
 clean:
 	$(RM) "$(OBJ_DIR)\*.obj" 
-	
+
+$(OBJ_DIR)/Modules.lib: $(MOD_FILES)
+	lib $(LIBFLAGS) /OUT:$(OBJ_DIR)/Modules.lib $(MOD_FILES)
+
 frame_conversor: tools/frame_conversor.cc
 	$(CC) /EHsc /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) tools/frame_conversor.cc
 	
@@ -190,6 +196,12 @@ $(OBJ_DIR)/Layout80211b_moc.obj: $(LAYOUT_DIR)/80211b/Layout80211b.h
 $(OBJ_DIR)/LayoutVLC_moc.obj: $(LAYOUT_DIR)/VLC/LayoutVLC.h
 	$(MOC) $(LAYOUT_DIR)/VLC/LayoutVLC.h -o $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
 	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/VLC/LayoutVLC_moc.cc
+
+{$(LAYOUT_DIR)/CoVLC}.cc{$(OBJ_DIR)}.obj:
+	$(CC) $(EXECFLAGS) /Fd$(OBJ_DIR) $<
+$(OBJ_DIR)/LayoutCoVLC_moc.obj: $(LAYOUT_DIR)/CoVLC/LayoutCoVLC.h
+	$(MOC) $(LAYOUT_DIR)/CoVLC/LayoutCoVLC.h -o $(LAYOUT_DIR)/CoVLC/LayoutCoVLC_moc.cc
+	$(CC) $(EXECFLAGS) /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) $(LAYOUT_DIR)/CoVLC/LayoutCoVLC_moc.cc
 
 #Test Suite
 test: test_files
