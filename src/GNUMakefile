@@ -14,7 +14,7 @@ LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEn
 					Correlator.cc Timing.cc DataSource.cc
 TESTS+=test_CC.cc test_RLL.cc test_RS.cc test_VLCInterleaver.cc
 MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc Tcp.cc Oversampler.cc Audio.cc Vocoder.cc SNR.cc \
-				BER.cc
+				BER.cc NoOverflow.cc
 VPATH=layouts/80211b:layouts/VLC:modules:layouts/VLC/test:../test
 CFLAGS_LAYOUTS=-Ilayouts/VLC -Ilayouts/80211b
 OBJS=$(SOURCES:%.cc=$(OUTDIR)/%.o)

@@ -95,6 +95,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 		void EmitChangeMetric(QLabel *, QString);
 		unsigned int bits;
 		QMutex mtx;
+		void SendReport();
 		
 	public slots:
 		void RadioPressed(bool);

@@ -84,6 +84,8 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(2, 1)->widget(), QString::number(per));
 						ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(2, 1)->widget(), QString::number(total));
 					}
+					if (total == 50e3)
+						ly->SendReport();
 					prevSeq = MHR[2];
 				}
 			}

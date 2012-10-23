@@ -28,8 +28,8 @@ Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
 		}
 	}
 	//set_alignment(volk_get_alignment()/sizeof(float));
-	//set_output_multiple(siz);
-	set_tag_propagation_policy(TPP_DONT);
+	set_output_multiple(siz);
+	//set_tag_propagation_policy(TPP_DONT);
 }
 Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th)
 {
@@ -141,18 +141,20 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("power"));
 	if (tags.size())
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g'));
-	if (o+rtd)
+	static bool freset = false;
+	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("rx_time"));
+	if (tags.size())
 	{
-		consume_each(o+rtd);
-		get_tags_in_range(tags, 0, nread+o, nread+o+rtd);
-		const uint64_t nwrit = nitems_written(0);
-		for (int i = 0; i < tags.size(); i++)
+		if (freset)
 		{
-    		gr_tag_t new_tag = tags[i];
-    		new_tag.offset = nwrit+(new_tag.offset-nread);
-    		add_item_tag(0, new_tag);
-  		}
+			ly->SendReport();
+			exit(-1);
+		}
+		else
+			freset = true;
 	}
+	if (o+rtd)
+		consume_each(o+rtd);
 	else //didnt found anything
 		consume_each(no);
 	return rtd;
