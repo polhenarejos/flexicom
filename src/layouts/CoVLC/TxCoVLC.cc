@@ -18,7 +18,6 @@
 #include <gr_multiply_ff.h>
 #include <gr_sub_ff.h>
 #include <gr_sig_source_f.h>
-#include <filter/firdes.h>
 #include <filter/fir_filter_ccf.h>
 #include <gr_keep_m_in_n.h>
 #include <gr_null_source.h>
