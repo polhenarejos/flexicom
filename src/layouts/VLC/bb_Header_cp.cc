@@ -7,7 +7,7 @@
 
 bb_Header_cp::bb_Header_cp(Type _type, int _raw_length, LayoutVLC *_ly) :
 	gr_block("bb_Header_cp", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
-	raw_length(_raw_length), type(_type), ly(_ly), CRCok(0), CRCnok(0)
+	raw_length(_raw_length), type(_type), ly(_ly)
 {
 	if (type == PHR)
 		length = 48;
@@ -15,7 +15,6 @@ bb_Header_cp::bb_Header_cp(Type _type, int _raw_length, LayoutVLC *_ly) :
 		length = raw_length;
 	olen = length/8-2;
 	set_output_multiple(olen);
-	bits = total = 0;
 }
 bb_Header_cp::sptr bb_Header_cp::Create(Type _type, int _raw_length, LayoutVLC *_ly)
 {
@@ -38,6 +37,7 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 	int *tmp = new int[length+LayoutVLC::CRC_LENGTH];
 	memset(tmp,0,sizeof(int)*length+LayoutVLC::CRC_LENGTH);
 	const uint64_t nread = nitems_read(0);
+	static unsigned int CRCok = 0, CRCnok = 0;
 	std::vector<gr_tag_t> tags;
 	get_tags_in_range(tags, 0, nread, nread+ninput_items[0], pmt::pmt_string_to_symbol("BER"));
 	if (tags.size())
@@ -51,10 +51,16 @@ int bb_Header_cp::general_work(int noutput_items, gr_vector_int &ninput_items, g
 			for (int n = 0; n < length-LayoutVLC::CRC_LENGTH; n += 8)
 				optr[rtd++] = (unsigned char)LayoutVLC::bi2dec((int *)iptr+n, 8);
 			//printf("%s OK!\n", type == PHR ? "PHR" : "PSDU");
+			mtx.lock();
 			ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(4,1)->widget(), QString::number(++CRCok));
+			mtx.unlock();
 		}
 		else
+		{
+			mtx.lock();
 			ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(3,1)->widget(), QString::number(++CRCnok));
+			mtx.unlock();
+		}
 		iptr += raw_length;
 	}
 	delete [] tmp;
