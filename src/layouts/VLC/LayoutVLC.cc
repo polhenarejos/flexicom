@@ -576,6 +576,20 @@ void LayoutVLC::ChangedMetric(QLabel *la, QString s)
 void LayoutVLC::UpdateSpeed()
 {
 	mtx.lock();
-	((QLabel *)gridLink->itemAtPosition(1,1)->widget())->setText(QString::number(bits/(++secs*1024)));
+	((QLabel *)gridLink->itemAtPosition(1,1)->widget())->setText(QString::number((double)bits/(++secs*1024),'g',4));
 	mtx.unlock();
+}
+void LayoutVLC::SendReport()
+{
+	char buf[512];
+	sprintf(buf, "php -q send_sms.php \"BER: %f, PER: %f, Lost: %d, Total: %d, Miss: %d, Pass: %d, Rate: %.2f\"", 
+		((QLabel *)gridErrors->itemAtPosition(0, 1)->widget())->text().toFloat(),
+		((QLabel *)gridErrors->itemAtPosition(1, 1)->widget())->text().toFloat(),
+		((QLabel *)gridErrors->itemAtPosition(2, 1)->widget())->text().toInt(),
+		((QLabel *)gridLink->itemAtPosition(2, 1)->widget())->text().toInt(),
+		((QLabel *)gridErrors->itemAtPosition(3, 1)->widget())->text().toInt(),
+		((QLabel *)gridErrors->itemAtPosition(4, 1)->widget())->text().toInt(),
+		((QLabel *)gridLink->itemAtPosition(1, 1)->widget())->text().toFloat()
+		);
+	system(buf);
 }

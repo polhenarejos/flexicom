@@ -8,7 +8,8 @@
 #include <gnuradio/malloc16.h>
 
 SNR::SNR() :
-	gr_sync_block("SNR", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(1, 1, sizeof(gr_complex)))
+	gr_sync_block("SNR", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(1, 1, sizeof(gr_complex))),
+	snrs(0), times(0)
 {
 }
 SNR::sptr SNR::Create()
@@ -30,8 +31,13 @@ int SNR::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 		volk_32f_accumulator_s32f_a(&A, tN, no);
 		A *= A/(no*no);
 		volk_32f_x2_dot_prod_32f_a(&denA, tN, tN, no);
-		float gamma = 10*log10(A/(denA/(no-1)-no*A/(no-1)));
-		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("snr"), pmt::pmt_from_double((double)gamma), pmt::pmt_string_to_symbol(name()));
+		//float gamma = 10*log10(A/(denA/(no-1)-no*A/(no-1)));
+		//snrs += gamma;
+		times++;
+		float power = denA/no;
+		snrs += 10.*log10((power-7e-9)/7e-9);
+		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("power"), pmt::pmt_from_double((double)10.*log10(denA/no)), pmt::pmt_string_to_symbol(name()));
+		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("snr"), pmt::pmt_from_double((double)snrs/times), pmt::pmt_string_to_symbol(name()));
 		free16Align(tN);
 	}
 	memcpy(optr, iptr, sizeof(gr_complex)*no);
