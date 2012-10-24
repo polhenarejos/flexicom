@@ -191,10 +191,14 @@ QWidget *LayoutVLC::CreateTabMetrics()
 	gridErrors->addWidget(new QLabel(tr("0")), 1, 1);
 	gridErrors->addWidget(new QLabel(tr("Lost packets: ")), 2, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 2, 1);
-	gridErrors->addWidget(new QLabel(tr("Missed CRC: ")), 3, 0);
+	gridErrors->addWidget(new QLabel(tr("PHR CRC: ")), 3, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 3, 1);
-	gridErrors->addWidget(new QLabel(tr("Passed CRC: ")), 4, 0);
+	gridErrors->addWidget(new QLabel(tr(" / ")), 3, 2);
+	gridErrors->addWidget(new QLabel(tr("0")), 3, 3);
+	gridErrors->addWidget(new QLabel(tr("PSDU CRC: ")), 4, 0);
 	gridErrors->addWidget(new QLabel(tr("0")), 4, 1);
+	gridErrors->addWidget(new QLabel(tr(" / ")), 4, 2);
+	gridErrors->addWidget(new QLabel(tr("0")), 4, 3);
 	//gridErrors->setRowStretch(1,1);
 	//gridErrors->setColumnStretch(1,1);
 	//Synching
@@ -582,13 +586,15 @@ void LayoutVLC::UpdateSpeed()
 void LayoutVLC::SendReport()
 {
 	char buf[512];
-	sprintf(buf, "php -q send_sms.php \"BER: %f, PER: %f, Lost: %d, Total: %d, Miss: %d, Pass: %d, Rate: %.2f\"", 
+	sprintf(buf, "php -q send_sms.php \"BER: %f, PER: %f, Lost: %d, Total: %d, PHR CRC: %d/%d, PSDU CRC: %d/%d, Rate: %.2f\"", 
 		((QLabel *)gridErrors->itemAtPosition(0, 1)->widget())->text().toFloat(),
 		((QLabel *)gridErrors->itemAtPosition(1, 1)->widget())->text().toFloat(),
 		((QLabel *)gridErrors->itemAtPosition(2, 1)->widget())->text().toInt(),
 		((QLabel *)gridLink->itemAtPosition(2, 1)->widget())->text().toInt(),
 		((QLabel *)gridErrors->itemAtPosition(3, 1)->widget())->text().toInt(),
+		((QLabel *)gridErrors->itemAtPosition(3, 3)->widget())->text().toInt(),
 		((QLabel *)gridErrors->itemAtPosition(4, 1)->widget())->text().toInt(),
+		((QLabel *)gridErrors->itemAtPosition(4, 3)->widget())->text().toInt(),
 		((QLabel *)gridLink->itemAtPosition(1, 1)->widget())->text().toFloat()
 		);
 	system(buf);
