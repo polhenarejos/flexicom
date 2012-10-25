@@ -135,7 +135,6 @@ TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 all: $(TARGET).exe install_deps
 	$(RM) Makefile.auto
 	
-
 install_deps:
 		$(COPY) $(QT_BIN_DIR)\QtGui4.dll QtGui4.dll	>nul
 		$(COPY) $(QT_BIN_DIR)\QtCore4.dll QtCore4.dll >nul
@@ -161,7 +160,7 @@ clean:
 	$(RM) "$(OBJ_DIR)\*.obj" 
 
 $(OBJ_DIR)/Modules.lib: $(MOD_FILES)
-	lib $(LIBFLAGS) /OUT:$(OBJ_DIR)/Modules.lib $(MOD_FILES)
+	lib /NOLOGO $(LIBFLAGS) /OUT:$(OBJ_DIR)/Modules.lib $(MOD_FILES)
 
 frame_conversor: tools/frame_conversor.cc
 	$(CC) /EHsc /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) tools/frame_conversor.cc
