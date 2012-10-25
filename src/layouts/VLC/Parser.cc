@@ -7,7 +7,7 @@
 
 Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 1, sizeof(unsigned char))),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), prevSeq(0xff), total(0), prevreset(false), cpd(0)
+	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), total(0), prevreset(false), cpd(0)
 {
 }
 Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
@@ -68,15 +68,18 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 				//	PSDUParser(MHR);
 				if (ic == 2)
 				{
-					unsigned a = 0;
-					if (prevSeq == 0xff)
-						prevSeq = MHR[2]-1;
-					if (MHR[2] > prevSeq)
-						a = (MHR[2]-1-prevSeq);
+					if (prevreset)
+					{
+						unsigned char a = 0x0;
+						if (MHR[2] > prevSeq)
+							a = (MHR[2]-1-prevSeq);
+						else
+							a = (0xff-prevSeq+MHR[2]);
+						per += a;
+						total += a+1;
+					}
 					else
-						a = (0xff-prevSeq+MHR[2]);
-					per += a;
-					total += a+1;
+						prevreset = true;
 					//if (MHR[2] != (unsigned char)(prevSeq+1))
 					{
 						double PER = (double)per/total;
@@ -84,8 +87,6 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(2, 1)->widget(), QString::number(per));
 						ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(2, 1)->widget(), QString::number(total));
 					}
-					if (total == 100e3)
-						ly->SendReport();
 					prevSeq = MHR[2];
 				}
 			}
