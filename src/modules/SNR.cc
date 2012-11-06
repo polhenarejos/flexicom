@@ -16,6 +16,7 @@ SNR::sptr SNR::Create()
 {
 	return sptr(new SNR());
 }
+#include <stdio.h>
 int SNR::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
 	const gr_complex *iptr = (const gr_complex *)_i[0];
@@ -35,9 +36,9 @@ int SNR::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 		//snrs += gamma;
 		times++;
 		float power = denA/no;
-		snrs += 10.*log10((power-7e-9)/7e-9);
+		snrs = 10.*log10((power-7e-9)/7e-9);
 		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("power"), pmt::pmt_from_double((double)10.*log10(denA/no)), pmt::pmt_string_to_symbol(name()));
-		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("snr"), pmt::pmt_from_double((double)snrs/times), pmt::pmt_string_to_symbol(name()));
+		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("snr"), pmt::pmt_from_double((double)snrs), pmt::pmt_string_to_symbol(name()));
 		free16Align(tN);
 	}
 	memcpy(optr, iptr, sizeof(gr_complex)*no);
