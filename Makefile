@@ -133,13 +133,14 @@ TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/
 TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 
 all: $(TARGET).exe install_deps
-	$(RM) Makefile.auto
+	$(RM) Makefile.auto Is64.exe
 	
 install_deps:
 		$(COPY) $(QT_BIN_DIR)\QtGui4.dll QtGui4.dll	>nul
 		$(COPY) $(QT_BIN_DIR)\QtCore4.dll QtCore4.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-core.dll gnuradio-core.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-uhd.dll gnuradio-uhd.dll >nul
+		$(COPY) $(GR_BIN_DIR)\gnuradio-fft.dll gnuradio-fft.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-filter.dll gnuradio-filter.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gnuradio-digital.dll gnuradio-digital.dll >nul
 		$(COPY) $(GR_BIN_DIR)\gruel.dll gruel.dll >nul

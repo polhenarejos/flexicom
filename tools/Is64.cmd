@@ -12,4 +12,4 @@ IF %ERRORLEVEL% == 0 (
 	echo IS64=0
 )
 
-@del *.obj Is64.exe
+@del *.obj 
