@@ -14,6 +14,8 @@ class SNR : public gr_sync_block
 		
 	private:
 		SNR();
+		float snrs;
+		int times;
 };
 
 #endif //_INC_SNR_H_

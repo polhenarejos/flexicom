@@ -113,11 +113,14 @@ void MainWindow::readSettings(QSettings *st)
 	resize(st->value("mw/size", QSize(300,50)).toSize());
 	move(st->value("mw/pos", QPoint(200, 200)).toPoint());
 	for (unsigned int i = 0; i < panel->rb_layout.size(); i++)
-		panel->rb_layout[i]->bt->force_toggle(false);	
-	if (panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->isChecked())
-		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->force_toggle(true);
-	else
-		panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
+		panel->rb_layout[i]->bt->force_toggle(false);
+	if (st->value("layout/layout", 0).toInt() < panel->rb_layout.size())
+	{
+		if (panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->isChecked())
+			panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->force_toggle(true);
+		else
+			panel->rb_layout[st->value("layout/layout", 0).toInt()]->bt->setChecked(true);
+	}
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->setChecked(true);
 	panel->rb_chain[st->value("layout/chain", 0).toInt()]->click();
 	panel->sp_devs->setValue(st->value("uhd/devs", 1).toInt());

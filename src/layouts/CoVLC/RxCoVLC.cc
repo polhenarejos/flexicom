@@ -21,6 +21,9 @@
 #include "bbMatlab.h"
 #include <gr_null_sink.h>
 #include "gr_symbols_to_chunks_cb.h"
+#include "OFDMSync.h"
+#include <gr_noise_source_c.h>
+#include <gr_add_cc.h>
 
 #define ISQRT2 0.7071067811865475
 
@@ -54,7 +57,14 @@ RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
 	gr_symbols_to_chunks_cb_sptr sym2ch = gr_make_symbols_to_chunks_cb(tbl);
 	gr_packed_to_unpacked_bb_sptr upck = gr_make_packed_to_unpacked_bb(1, GR_MSB_FIRST);
 	gr_keep_m_in_n_sptr tupck = gr_make_keep_m_in_n(sizeof(unsigned char), 2, 8, 6);
-	connect(self(), 0, c2f, 0);
+	gr_keep_m_in_n_sptr cfreq = gr_make_keep_m_in_n(sizeof(gr_complex), 56, 64, 4);
+	OFDMSync::sptr sync = OFDMSync::Create(64, 16);
+	//gr_noise_source_c_sptr noise = gr_make_noise_source_c(GR_GAUSSIAN, 0.01, -238497);
+	gr_null_source_sptr noise = gr_make_null_source(sizeof(gr_complex));
+	gr_add_cc_sptr addn = gr_make_add_cc();
+	connect(self(), 0, addn, 0);
+	connect(noise, 0, addn, 1);
+	connect(addn, 0, c2f, 0);
 	connect(c2f, 0, mulI, 0);
 	connect(cos, 0, mulI, 1);
 	connect(c2f, 0, mulQ, 0);
@@ -66,12 +76,14 @@ RxCoVLC::RxCoVLC(LayoutCoVLC * _ly) :
 	connect(mux, 0, filter, 0);
 	connect(filter, 0, filt_delay, 0);
 	connect(filt_delay, 0, decim, 0);
-	connect(decim, 0, cyc, 0);
+	connect(decim, 0, sync, 0);
+	connect(sync, 0, cyc, 0);
 	connect(cyc, 0, mc, 0);
 	connect(mc, 0, s2v, 0);
 	connect(s2v, 0, fft, 0);
 	connect(fft, 0, v2s, 0);
-	connect(v2s, 0, sym2ch, 0);
+	connect(v2s, 0, cfreq, 0);
+	connect(cfreq, 0, sym2ch, 0);
 	connect(sym2ch, 0, upck, 0);
 	connect(upck, 0, tupck, 0);
 	connect(tupck, 0, nl, 0);

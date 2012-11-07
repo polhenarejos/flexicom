@@ -32,10 +32,15 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	ly(_ly)
 {
 	unsigned char _v[] = { 
-					0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,0,0,0,1,0,0,0,1,1,0,
-					1,1,0,1,0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,1,0,0,1,0,
-					0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,1,1,0,0,
-					1,0,1,0,1,0,0,1,0,1,0,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0 };
+					1,0,1,1,0,1,0,0,1,0,0,1,1,1,0,0,0,1,0,0,0,1,1,0,1,1,0,1,
+					0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,1,0,0,1,0,
+					0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,
+					1,1,0,0,1,0,1,0,1,0,0,1,0,1,0,0,0,0,1,0,1,0,0,1,1,1,0,1,
+					0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,
+					0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,1,0,0,1,0,
+					0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,0,0,1,0,0,1,0,0,0,1,0,1,1,
+					1,0,1,1,0,1,0,0,1,0,0,1,1,1,0,0,0,1,0,0,0,1,1,0,1,1,0,1,
+					 };
 	std::vector<unsigned char> v(_v, _v+sizeof(_v)/sizeof(unsigned char));
 	std::vector<float> f(0);
 	gr_vector_source_b_sptr ds = gr_make_vector_source_b(v, false);
@@ -45,6 +50,9 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	std::vector<gr_complex> tbl(_tbl, _tbl+sizeof(_tbl)/sizeof(gr_complex));
 	gr_fft_vcc_sptr fft = gr_make_fft_vcc(64, false, f, true, 2);
 	gr_chunks_to_symbols_bc_sptr ch2sym = gr_make_chunks_to_symbols_bc(tbl);
+	gr_null_source_sptr fftnls = gr_make_null_source(sizeof(gr_complex));
+	std::vector<int> fftmxv(3); fftmxv[0] = 4; fftmxv[1] = 56; fftmxv[2] = 4;
+	gr_stream_mux_sptr fftmx = gr_make_stream_mux(sizeof(gr_complex), fftmxv);
 	gr_stream_to_vector_sptr s2v = gr_make_stream_to_vector(sizeof(gr_complex), 64);
 	gr_multiply_const_cc_sptr mc = gr_make_multiply_const_cc(gr_complex(1./64, 0), 64);
 	digital_ofdm_cyclic_prefixer_sptr ofdm = digital_make_ofdm_cyclic_prefixer(64, 64+16);
@@ -62,11 +70,18 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	gr::filter::fir_filter_ccf::sptr filter = gr::filter::fir_filter_ccf::make(1, taps);
 	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
 	Oversampler<gr_complex>::sptr ov = Oversampler<gr_complex>::Create(5);
-	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom2", sizeof(unsigned char));
+	bbMatlab::sptr bbm = bbMatlab::Create("Flexicom2", sizeof(gr_complex));
+	//Artificial delay
+	std::vector<int> delay(2); delay[0] = 0*5; delay[1] = 400;
+	gr_stream_mux_sptr dmux = gr_make_stream_mux(sizeof(gr_complex), delay);
+	gr_null_source_sptr dnls = gr_make_null_source(sizeof(gr_complex));
 	connect(ds, 0, pck, 0);
 	connect(pck, 0, upck, 0);
 	connect(upck, 0, ch2sym, 0);
-	connect(ch2sym, 0, s2v, 0);
+	connect(fftnls, 0, fftmx, 0);
+	connect(ch2sym, 0, fftmx, 1);
+	connect(fftnls, 0, fftmx, 2);
+	connect(fftmx, 0, s2v, 0);
 	connect(s2v, 0, fft, 0);
 	connect(fft, 0, mc, 0);
 	connect(mc, 0, ofdm, 0);
@@ -83,8 +98,10 @@ TxCoVLC::TxCoVLC(LayoutCoVLC * _ly) :
 	connect(mulI, 0, sub, 0);
 	connect(mulQ, 0, sub, 1);
 	connect(sub, 0, f2c, 0);
-	connect(f2c, 0, self(), 0);
-	connect(ds, 0 , bbm, 0);
+	connect(dnls, 0, dmux, 0);
+	connect(f2c, 0, dmux, 1);
+	connect(dmux, 0, self(), 0);
+	connect(fftmx, 0 , bbm, 0);
 }
 TxCoVLC::sptr TxCoVLC::Create(LayoutCoVLC * _ly)
 {

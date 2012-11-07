@@ -127,7 +127,7 @@ LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/L
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \
         $(OBJ_DIR)/bb_bit_removal.obj $(OBJ_DIR)/bbVLC_Frame_Extractor.obj $(OBJ_DIR)/bb_Header_cp.obj $(OBJ_DIR)/Interleaver.obj $(OBJ_DIR)/Puncture.obj $(OBJ_DIR)/Timing.obj $(OBJ_DIR)/Parser.obj \
 		$(OBJ_DIR)/DataSource.obj $(OBJ_DIR)/Correlator.obj \
-		$(OBJ_DIR)/LayoutCoVLC.obj $(OBJ_DIR)/LayoutCoVLC_moc.obj $(OBJ_DIR)/TxCoVLC.obj $(OBJ_DIR)/RxCoVLC.obj
+		$(OBJ_DIR)/LayoutCoVLC.obj $(OBJ_DIR)/LayoutCoVLC_moc.obj $(OBJ_DIR)/TxCoVLC.obj $(OBJ_DIR)/RxCoVLC.obj $(OBJ_DIR)/OFDMSync.obj
 
 TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/test_CC.obj $(OBJ_DIR)/test_RS.obj  $(OBJ_DIR)/test_VLCInterleaver.obj
 
@@ -136,7 +136,6 @@ TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 all: $(TARGET).exe install_deps
 	$(RM) Makefile.auto
 	
-
 install_deps:
 		$(COPY) $(QT_BIN_DIR)\QtGui4.dll QtGui4.dll	>nul
 		$(COPY) $(QT_BIN_DIR)\QtCore4.dll QtCore4.dll >nul
@@ -162,7 +161,7 @@ clean:
 	$(RM) "$(OBJ_DIR)\*.obj" 
 
 $(OBJ_DIR)/Modules.lib: $(MOD_FILES)
-	lib $(LIBFLAGS) /OUT:$(OBJ_DIR)/Modules.lib $(MOD_FILES)
+	lib /NOLOGO $(LIBFLAGS) /OUT:$(OBJ_DIR)/Modules.lib $(MOD_FILES)
 
 frame_conversor: tools/frame_conversor.cc
 	$(CC) /EHsc /Fo$(OBJ_DIR)/ /Fd$(OBJ_DIR) tools/frame_conversor.cc
