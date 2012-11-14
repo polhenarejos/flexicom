@@ -11,7 +11,7 @@ class Bi2De : public gr_sync_decimator
 		typedef boost::shared_ptr<Bi2De> sptr;                             
 		static sptr Create(unsigned int);                                  
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &); 
-		~Bi2De();                                                          
+		static void Decode(const int *, int *, int, int);
 		                                                                   
 	private:                                                               
 		Bi2De(unsigned int);                                                                                                           

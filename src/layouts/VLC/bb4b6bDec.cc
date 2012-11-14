@@ -5,14 +5,13 @@
 #include <gr_io_signature.h>
 #include <math.h>
 
-bb4b6bDec::bb4b6bDec():
-	gr_block("bb4b6bDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
-{
-	int table[] = {  0,0,1,1,1,0, 0,0,1,1,0,1, 0,1,0,0,1,1, 0,1,0,1,1,0,
+const int bb4b6bDec::table[] = {  0,0,1,1,1,0, 0,0,1,1,0,1, 0,1,0,0,1,1, 0,1,0,1,1,0,
                      0,1,0,1,0,1, 1,0,0,0,1,1, 1,0,0,1,1,0, 1,0,0,1,0,1,
 			         0,1,1,0,0,1, 0,1,1,0,1,0, 0,1,1,1,0,0, 1,1,0,0,0,1,
 			         1,1,0,0,1,0, 1,0,1,0,0,1, 1,0,1,0,1,0, 1,0,1,1,0,0};
-	memcpy(Table6b, table, sizeof(table));
+bb4b6bDec::bb4b6bDec():
+	gr_block("bb4b6bDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
+{
 	set_output_multiple(4); //the number of outputs has to be a multiple of 4
 }
 bb4b6bDec::sptr bb4b6bDec::Create()
@@ -32,7 +31,7 @@ int bb4b6bDec::distance(int *number)
 	{
 		int a = 0;
 		for (int j = 0; j < 6; j++)
-			a += number[j]*Table6b[i*6+j];
+			a += number[j]*table[i*6+j];
 		if (a > dist)
 		{
 			dist = a;
@@ -41,16 +40,20 @@ int bb4b6bDec::distance(int *number)
 	}
 	return idx;
 }
-int bb4b6bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
+void bb4b6bDec::Decode(const int *iptr, int *optr, int noutput_items)
 {
-	const int *iptr = (const int *)input_items[0];
-	int *optr = (int *)output_items[0];
 	for (int i = 0; i < noutput_items/4; i++)
 	{
 		LayoutVLC::dec2bi(distance((int *)iptr), 4, optr);
 		iptr += 6;
 		optr += 4;
 	}
+}
+int bb4b6bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
+{
+	const int *iptr = (const int *)input_items[0];
+	int *optr = (int *)output_items[0];
+	Decode(iptr, optr, noutput_items);
 	consume_each(noutput_items*6/4);
 	return noutput_items;
 }

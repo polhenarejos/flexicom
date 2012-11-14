@@ -13,6 +13,7 @@ class Interleaver : public gr_sync_block
 		typedef boost::shared_ptr<Interleaver> sptr;
 		static sptr Create(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, Mode);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
+		static void Decode(const int *, int *, int, int, std::vector<unsigned int> &, Mode);
 		
 	private:
 		Interleaver(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, Mode);

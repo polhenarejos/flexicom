@@ -22,6 +22,7 @@ class bbManchesterDec : public gr_sync_decimator
 		static sptr Create(int,int);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 		~bbManchesterDec();
+		static void Decode(const int *, int *, int, int, int);
 	
 	private:
 		bbManchesterDec(int,int);

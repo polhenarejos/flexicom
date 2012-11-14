@@ -18,11 +18,13 @@ class bb4b6bDec : public gr_block
 		static sptr Create();
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
-	
+		static int distance(int *);
+		static const int table[];
+		
+		static void Decode(const int *, int *, int);
+		
 	private:
 		bb4b6bDec();
-		int Table6b[6*16];
-		int distance(int *);
 };
 
 #endif //_INC_BB4B6BDEC_H_

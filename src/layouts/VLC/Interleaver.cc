@@ -13,6 +13,7 @@ Interleaver::Interleaver(unsigned int _GF, unsigned int _N, unsigned int _K, uns
 	unsigned int S_block = N * D;
 	unsigned int p = N - (S%N);
 	//ivector.resize(S_block);
+	//printf("!! %d %d %d %d %d %d %d %d\n",raw_length,rs_length,S_block,S_frame,S,D,N,K);
 	for (unsigned int i = 0; i < S_block; i++)
 		ivector.push_back((i%D)*N + i/D);
 	set_output_multiple(rs_length);
@@ -21,12 +22,8 @@ Interleaver::sptr Interleaver::Create(unsigned int _GF, unsigned int _N, unsigne
 {
 	return sptr(new Interleaver(_GF, _N, _K, _raw_length, _rs_length, _mode));
 }
-#include <QMutex>
-extern QMutex mtx;
-int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+void Interleaver::Decode(const int *iptr, int *optr, int no, int rs_length, std::vector<unsigned int> &ivector, Mode mode)
 {
-	const int *iptr = (const int *)_i[0];
-	int *optr = (int *)_o[0];
 	for (int n = 0; n < no/rs_length; n++)
 	{
 		for (int i = 0; i < ivector.size(); i++)
@@ -41,5 +38,11 @@ int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star
 		else
 			optr += rs_length;
 	}
+}
+int Interleaver::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+{
+	const int *iptr = (const int *)_i[0];
+	int *optr = (int *)_o[0];
+	Decode(iptr, optr, no, rs_length, ivector, mode);
 	return no;
 }

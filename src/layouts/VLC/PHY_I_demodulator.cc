@@ -66,6 +66,7 @@ PHY_I_demodulator::PHY_I_demodulator(unsigned int _phy_type, unsigned int _phy_m
 		{
 			InterPunct::sptr deintlv = InterPunct::Create(GF, rs_out, rs_in, raw_length,mod_length*4/(6*GF), InterPunct::DEINTERPUNCT);
 			bbRSDec::sptr rs_dec = bbRSDec::Create(GF, rs_out, rs_in, phy_type, deintlv->out);
+				printf("%d %d\n",rs_dec->out_rs_dec,deintlv->out);
 			bb_bit_removal::sptr bbr = bb_bit_removal::Create(rs_dec->out_rs_dec,raw_length);
 			connect(self(), 0, RLL, 0);
 			connect(RLL,0, RLL2,0);

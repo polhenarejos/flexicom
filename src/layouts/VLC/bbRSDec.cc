@@ -15,6 +15,7 @@ bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_ty
 	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
 		//for PHY II coincides the fact that the possible rates (n,k) -> 160-128=64-32=255-223
 	out_rs_dec=rs_out_elements();
+	printf("!!! %d %d %d %d\n",out_rs_dec, pre_length, N, phy_type);
 	//printf("\n\n\nEl valor de out_rs_dec es:%d\n", out_rs_dec);
 	set_output_multiple(out_rs_dec);
 	//printf("Reed Solomon\n");
@@ -79,19 +80,14 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 		{
 			for (i=0; i<RS_words; i++)
 			{
-				//memcpy(tmp,iptr,sizeof(unsigned char)*N);
-				for(j=0;j<N;j++)
-				{
-					tmp[j]= (unsigned char)iptr[0];
-					iptr ++;
-				}
+				std::copy(iptr, iptr+sizeof(unsigned char)*N, tmp);
+				iptr += N;
 				vlc_rs->decode(tmp2,tmp);
 				for (j=0; j< K; j++)
 				{
-					LayoutVLC::dec2bi(tmp2[j], GF,optr);
+					LayoutVLC::dec2bi(tmp2[j], GF, optr);
 					optr = optr + GF;
 				}
-				//iptr = iptr + N;
 			}
 			if (pre_length%N!=0)
 			{
@@ -99,23 +95,14 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				//we will have to insert zeros in the middle of the frame to perform the rs-decoding
 				memset(tmp,0,sizeof(unsigned char)*N);
 				memset(tmp2,0,sizeof(unsigned char)*K);
-				for (j=0;j<remaining_words;j++)
-				{
-					tmp[j]=(unsigned char)iptr[0];
-					iptr++;
-				}
-				for (j=K;j<N;j++)
-				{
-					tmp[j]=(unsigned char)iptr[0];
-					iptr ++;
-				}
+				std::copy(iptr, iptr+remaining_words, tmp);
+				std::copy(iptr+remaining_words, iptr+remaining_words+N-K, tmp+K);
 				vlc_rs->decode(tmp2,tmp);
 				for (i=0; i< remaining_words; i++)
 				{
 					LayoutVLC::dec2bi(tmp2[i],GF,optr);
 					optr = optr + GF;
 				}
-				//iptr = iptr + (pre_length%N);
 			}
 			blocks_to_process--;
 		}
@@ -127,7 +114,11 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 			for (i=0; i<RS_words; i++)
 			{
 				memset(tmp,0,sizeof(unsigned char)*255);
-				for(j=0;j<K;j++)
+				memset(tmp2,0,sizeof(unsigned char)*223);
+				std::copy(iptr, iptr+K, tmp);
+				std::copy(iptr+K, iptr+K+32, tmp+223);
+				iptr += K+32;
+				/*for(j=0;j<K;j++)
 				{
 					tmp[j]= (unsigned char)iptr[0];
 					iptr ++;
@@ -136,14 +127,13 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				{
 					tmp[j] = (unsigned char)iptr[0];
 					iptr ++;
-				}
+				}*/
 				vlc_rs->decode(tmp2,tmp);
 				for (j=0; j< K; j++)
 				{
 					LayoutVLC::dec2bi(tmp2[j], GF,optr);
 					optr = optr + GF;
 				}
-				//iptr = iptr + N;
 			}
 			if (pre_length%N!=0)
 			{
@@ -151,7 +141,10 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				//we will have to insert zeros in the middle of the frame to perform the rs-decoding
 				memset(tmp,0,sizeof(unsigned char)*255);
 				memset(tmp2,0,sizeof(unsigned char)*223);
-				for (j=0;j<remaining_words;j++)
+				std::copy(iptr, iptr+remaining_words, tmp);
+				std::copy(iptr+remaining_words, iptr+remaining_words+32, tmp+223);
+				iptr += remaining_words+32;
+				/*for (j=0;j<remaining_words;j++)
 				{
 					tmp[j]=(unsigned char)iptr[0];
 					iptr++;
@@ -160,7 +153,7 @@ int bbRSDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 				{
 					tmp[j]=(unsigned char)iptr[0];
 					iptr ++;
-				}
+				}*/
 				vlc_rs->decode(tmp2,tmp);
 				for (i=0; i< remaining_words; i++)
 				{

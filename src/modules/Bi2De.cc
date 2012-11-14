@@ -12,18 +12,19 @@ Bi2De::sptr Bi2De::Create(unsigned int _size)
 {
 	return sptr(new Bi2De(_size));
 }
-Bi2De::~Bi2De()
+void Bi2De::Decode(const int *iptr, int *optr, int no, int dec)
 {
+	for (int n = 0; n < no; n++)
+	{
+		*optr++ = LayoutVLC::bi2dec((int *)iptr, dec);
+		iptr += dec;
+	}
 }
 int Bi2De::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
 	unsigned int dec = decimation();
 	const int *iptr = (const int *)_i[0];
 	int *optr = (int *)_o[0];
-	for (int n = 0; n < no; n++)
-	{
-		*optr++ = LayoutVLC::bi2dec((int *)iptr, dec);
-		iptr += dec;
-	}
+	Decode(iptr, optr, no, dec);
 	return no;
 }
