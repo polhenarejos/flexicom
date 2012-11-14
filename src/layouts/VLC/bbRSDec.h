@@ -26,6 +26,8 @@ class bbRSDec : public gr_block
 		void forecast(int, gr_vector_int &);
 		int out_rs_dec; /**< [out] indicates the length in bits of the output of the bbRSDec block*/
 		~bbRSDec();
+		static void Decode(const int *, int *, int, int, int, int, int, int, int);
+		static int OutRS(int, int, int, int);
 	
 	private:
 		bbRSDec(unsigned int, unsigned int, unsigned int, int, int);

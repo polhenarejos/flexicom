@@ -13,22 +13,7 @@ bbCCDec::bbCCDec( int _N, int _K, int *_poly, int _length, int _data_rate):
 {
 	vlc_cc = new vlc_convolutional_coding(N, K, poly, length, data_rate);
 	//printf("Valor de N:%d, de K:%d, de poly[1]:%d, length:%d, data_rate:%d\n", N,K,poly[1],length, data_rate);
-	switch (data_rate)
-	{
-		case 0:
-			out_cc_dec = length/4 - (K-1);
-			break;
-		case 1: 
-			out_cc_dec = length/3 - (K-1);
-			break;
-		case 2:
-			out_cc_dec = (length*2/3) - (K-1);
-			break;
-		default:
-			printf("This configuration for the convolutional encoder is not correct\n");
-			exit(-1);
-			break;				
-	}
+	out_cc_dec = OutCC(length, K, data_rate);
 	//printf("El valor de out_cc_dec:%d\n", out_cc_dec);
 	set_output_multiple(out_cc_dec);	
 }
@@ -41,7 +26,16 @@ bbCCDec::~bbCCDec()
 		vlc_cc = 0;
 	}
 }
-
+int bbCCDec::OutCC(int length, int K, int data_rate)
+{
+	if (data_rate == 0)
+		return length/4-(K-1);
+	else if (data_rate == 1)
+		return length/3-(K-1);
+	else if (data_rate == 2)
+		return length*2/3-(K-1);
+	return 0;
+}
 bbCCDec::sptr bbCCDec::Create(int _N, int _K, int *_poly, int _length, int _data_rate)
 {
 	return sptr(new bbCCDec(_N, _K, _poly, _length, _data_rate));

@@ -110,6 +110,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				//printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
 				cpd = copy;
 				o = idx%corr;
+				add_item_tag(0, nitems_written(0)+o+siz*vppm, pmt::pmt_string_to_symbol("SyncPeak"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
 				strike = false;
 				ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=green>Ok!</font></b>"));
 			}

@@ -599,3 +599,92 @@ void LayoutVLC::SendReport()
 		);
 	system(buf);
 }
+int LayoutVLC::GetModulatedResources(PHYType phy_type, Modulation mod, int rate, int raw_length)
+{
+	int length = 0, rs_bits = raw_length, cc_bits = 0;
+	int rs_in = 0, cc_in = 0, rs_out = 0, cc_out = 0, gf = 0;
+	if (phy_type == PHY_I)
+	{
+		gf = 4;
+		if ((rate < 4 && mod == OOK) || (rate < 3 && mod == VPPM))
+		{
+			rs_out = 15;
+			if (mod == OOK)
+			{
+				if (rate == 0)
+					rs_in = 7;
+				else 
+					rs_in = 11;
+			}
+			else if (mod == VPPM)
+			{
+				if (rate == 0)
+					rs_in = 2;
+				else if (rate == 1)
+					rs_in = 4;
+				else if (rate == 2)
+					rs_in = 7;
+			}
+		}
+		if (mod == OOK)
+		{
+			if (rate == 0)
+			{
+				cc_in = 1;
+				cc_out = 4;
+			}
+			else if (rate == 1)
+			{
+				cc_in = 1;
+				cc_out = 3;
+			}
+			else if (rate == 2)
+			{
+				cc_in = 2;
+				cc_out = 3;
+			}
+		}
+	}
+	else if (phy_type == PHY_II)
+	{
+		gf = 8;
+		if (rate == 0 || rate == 2 || rate == 4 || rate == 6)
+		{
+			rs_in = 32;
+			rs_out = 64;
+		}
+		else if (rate == 1 || rate == 3 || rate == 5 || rate == 7)
+		{
+			rs_in = 128;
+			rs_out = 160;
+		}
+	}
+	if (rs_in)
+	{
+		int GF_words = ceil(((double)raw_length/gf));
+		if (!(GF_words%rs_in))
+			rs_bits = (GF_words/rs_in)*rs_out*gf;
+		else
+			rs_bits = ((GF_words/rs_in)*rs_out+ GF_words%rs_in + (rs_out-rs_in))*gf;		
+	}
+	if (cc_in)
+		cc_bits= ((rs_bits + 6)*cc_out)/cc_in;
+	else
+		cc_bits = rs_bits;
+	if (phy_type == PHY_I)
+	{
+		if (mod == OOK)
+			length = cc_bits*2;
+		else if (mod == VPPM)
+			length = cc_bits*6/4;
+	}
+	else if (phy_type == PHY_II)
+	{
+		if (mod == OOK)
+			length = cc_bits*10/8;
+		else if (mod == VPPM)
+			length = cc_bits*6/4;
+	}
+
+	return length;
+}

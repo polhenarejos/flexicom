@@ -29,7 +29,6 @@ class RxVLC : public gr_hier_block2
 		RxVLC(LayoutVLC *);
 		LayoutVLC *ly;
 		void init_var();
-		int get_modulated_resources(int,int,int,int,int,int,int,int); //returns the number of bits after modulation
 		unsigned int PHR_modulated_length; //length of the PHR after all the modulating chain
 		unsigned int PSDU_modulated_length; //length of the PSDU after all the modulating chain
 };

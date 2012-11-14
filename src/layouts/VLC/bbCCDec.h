@@ -28,6 +28,7 @@ class bbCCDec : public gr_block
 		void forecast(int, gr_vector_int &);
 		~bbCCDec();
 		int out_cc_dec; /**< [out] indicates the length in bits of the output of the bbCCDec block*/
+		static int OutCC(int, int, int);
 	
 	private:
 		bbCCDec(int, int, int *, int, int);

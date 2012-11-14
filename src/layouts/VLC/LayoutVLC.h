@@ -12,6 +12,18 @@
 #include <QSettings>
 #include <QTimer>
 #include <QMutex>
+#include "compat.h"
+
+PACK(
+struct
+{
+	unsigned B:1;
+	unsigned CN:3;
+	unsigned MCS:6;
+	unsigned PL:16;
+	unsigned DO:1;
+	unsigned rvd:5;
+} , PHYHdr );
 
 class uhd_usrp_source;
 class uhd_usrp_sink;
@@ -96,6 +108,9 @@ class LayoutVLC : public QObject , public LayoutFactory
 		unsigned int bits;
 		QMutex mtx;
 		void SendReport();
+		typedef enum { OOK = 0, VPPM = 1 } Modulation;
+		typedef enum { PHY_I = 0, PHY_II = 1 } PHYType;
+		static int GetModulatedResources(PHYType, Modulation, int, int); //returns the number of bits after modulation
 		
 	public slots:
 		void RadioPressed(bool);

@@ -27,6 +27,9 @@
 #include "BER.h"
 #include <gr_null_source.h>
 #include "NoOverflow.h"
+#include "PHRDecoder.h"
+#include "bbCCDec.h"
+#include "bbRSDec.h"
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -64,7 +67,9 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
 	BER::sptr ber = BER::Create(sizeof(int), 1, vlc_var_rx.PSDU_raw_length-56, vlc_var_rx.PSDU_raw_length, 40);
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
+	//PHRDecoder::sptr phr_dec = PHRDecoder::Create((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type);
 	connect(tim,0,phr,0);
+	//connect(phr_dec, 0, phr, 0);
 	connect(tim,0,psdu,0);
 	connect(phr, 0, phr_dem, 0);
 	connect(psdu, 0, psdu_dem, 0);
@@ -285,66 +290,10 @@ void RxVLC::init_var()
 			}
 			break;
 	}
-	PHR_modulated_length= get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.pre_rs_in, vlc_var_rx._rs_code.pre_rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.pre_cc_in, vlc_var_rx._cc_code.pre_cc_out, vlc_var_rx.PHR_raw_length);
-	PSDU_modulated_length = get_modulated_resources(vlc_var_rx.phy_type, vlc_var_rx.mod_type, vlc_var_rx._rs_code.rs_in, vlc_var_rx._rs_code.rs_out, vlc_var_rx.GF, vlc_var_rx._cc_code.cc_in, vlc_var_rx._cc_code.cc_out, vlc_var_rx.PSDU_raw_length);
+	PHR_modulated_length = LayoutVLC::GetModulatedResources((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type, 0, vlc_var_rx.PHR_raw_length);
+	PSDU_modulated_length = LayoutVLC::GetModulatedResources((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type, vlc_var_rx.operating_mode, vlc_var_rx.PSDU_raw_length);
 	vlc_var_rx.count++;
 }
-
-int RxVLC::get_modulated_resources(int phy_type, int phy_modulation, int rs_in, int rs_out, int gf, int cc_in, int cc_out, int raw_length)
-{
-	int length = 0, rs_bits = 0, cc_bits = 0;
-	if (rs_in !=0)
-	{
-		int GF_words= ceil(((double)raw_length/gf));
-		int tmp = GF_words%rs_in;
-		if (tmp==0)
-			rs_bits= (GF_words/rs_in)*rs_out*gf;
-		else
-		{
-			rs_bits= ((GF_words/rs_in)*rs_out+ tmp + (rs_out-rs_in))*gf;		
-		}
-	}
-	else
-	{
-		rs_bits = raw_length;
-	}
-	
-	if (cc_in!=0)
-	{
-		cc_bits= ((rs_bits + 6)*cc_out)/cc_in;
-	}
-	else
-		cc_bits = rs_bits;
-		
-	switch(phy_type)
-	{
-		case 0:
-			switch(phy_modulation)
-			{
-				case 0:
-					length = cc_bits*2;
-					break;
-				case 1:
-					length = cc_bits*6/4;
-					break;
-			}
-			break;
-		case 1:
-			switch(phy_modulation)
-			{
-				case 0: //OOK
-					length = cc_bits *10/8;
-					break;
-				case 1: //VPPM
-					length = cc_bits*6/4;
-					break;
-			}
-			break;				
-	}		
-	return length;
-}
-
-
 RxVLC::~RxVLC()
 {
 	stop();
