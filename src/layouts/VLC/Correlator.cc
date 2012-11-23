@@ -98,6 +98,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			{
 				strike = true;
 				consume_each(idx%no);
+				free16Align(C);
 				return 0;
 			}
 			else
@@ -136,12 +137,13 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	//Grab SNR tags
 	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;
-	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
+	/*get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
 	if (tags.size())
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g', 3));
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("power"));
 	if (tags.size())
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g'));
+		*/
 	static bool freset = false;
 	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("rx_time"));
 	if (tags.size())

@@ -26,7 +26,7 @@ class bbRSDec : public gr_block
 		void forecast(int, gr_vector_int &);
 		int out_rs_dec; /**< [out] indicates the length in bits of the output of the bbRSDec block*/
 		~bbRSDec();
-		static void Decode(const int *, int *, int, int, int, int, int, int, int);
+		static void Decode(const int *, int *, int, int, int, int, int, int, int, vlc_reed_solomon *);
 		static int OutRS(int, int, int, int);
 	
 	private:
@@ -37,7 +37,6 @@ class bbRSDec : public gr_block
 		int phy_type;
 		int pre_length; //length in units of the input data from the previous block (deinterleaver)
 		vlc_reed_solomon *vlc_rs;
-		int rs_out_elements();
 };
 
 #endif //_INC_BBRSDEC_H

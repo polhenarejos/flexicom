@@ -28,8 +28,7 @@
 #include <gr_null_source.h>
 #include "NoOverflow.h"
 #include "PHRDecoder.h"
-#include "bbCCDec.h"
-#include "bbRSDec.h"
+#include "PSDUDecoder.h"
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
@@ -67,9 +66,14 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
 	BER::sptr ber = BER::Create(sizeof(int), 1, vlc_var_rx.PSDU_raw_length-56, vlc_var_rx.PSDU_raw_length, 40);
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
-	//PHRDecoder::sptr phr_dec = PHRDecoder::Create((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type);
-	connect(tim,0,phr,0);
-	//connect(phr_dec, 0, phr, 0);
+	PHRDecoder::sptr phr_dec = PHRDecoder::Create((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type);
+	PSDUDecoder::sptr psdu_dec = PSDUDecoder::Create();
+		
+	connect(tim,0,phr_dec,0);
+	connect(phr_dec, 0, psdu_dec, 0);
+	connect(psdu_dec, 0, psdu_parser, 0);
+	/*
+	connect(tim, 0, phr, 0);
 	connect(tim,0,psdu,0);
 	connect(phr, 0, phr_dem, 0);
 	connect(psdu, 0, psdu_dem, 0);
@@ -79,6 +83,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(psdu_dem, 0, ber, 0);
 	connect(ber, 0, psdu_header_dem, 0);
 	connect(psdu_header_dem, 0, psdu_parser, 0);
+	*/
 	if (media)
 		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 5005), 0);
 }

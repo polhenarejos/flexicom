@@ -14,7 +14,7 @@ bbCCDec::bbCCDec( int _N, int _K, int *_poly, int _length, int _data_rate):
 	vlc_cc = new vlc_convolutional_coding(N, K, poly, length, data_rate);
 	//printf("Valor de N:%d, de K:%d, de poly[1]:%d, length:%d, data_rate:%d\n", N,K,poly[1],length, data_rate);
 	out_cc_dec = OutCC(length, K, data_rate);
-	//printf("El valor de out_cc_dec:%d\n", out_cc_dec);
+	//printf("El valor de out_cc_dec:%d %d %d %d\n", out_cc_dec,data_rate,K,length);
 	set_output_multiple(out_cc_dec);	
 }
 

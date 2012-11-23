@@ -6,6 +6,7 @@
 #include <gr_sync_block.h>
 #include "LayoutVLC.h"
 class vlc_convolutional_coding;
+class vlc_reed_solomon;
 
 class PHRDecoder : public gr_sync_block
 {
@@ -24,6 +25,7 @@ class PHRDecoder : public gr_sync_block
 		LayoutVLC::Modulation mod;
 		int *idec, *ibi, *iilv, *irs, *ipld;
 		vlc_convolutional_coding *CC;
+		vlc_reed_solomon *RS[2];
 		std::vector<unsigned int> ivector[2];
 		int offPSDU; //where PHR began
 };
