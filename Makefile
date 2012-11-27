@@ -121,7 +121,7 @@ MOD_FILES=$(OBJ_DIR)/QtBlock.obj $(OBJ_DIR)/QtBlock_moc.obj $(OBJ_DIR)/bbMatlab.
 LAYOUTS=$(OBJ_DIR)/Layout80211b.obj $(OBJ_DIR)/Layout80211b_moc.obj $(OBJ_DIR)/LayoutVLC.obj $(OBJ_DIR)/LayoutVLC_moc.obj \
 		$(OBJ_DIR)/Rx80211b.obj  $(OBJ_DIR)/TxVLC.obj $(OBJ_DIR)/RxVLC.obj \
 		$(OBJ_DIR)/BBN_Slicer.obj $(OBJ_DIR)/BBN_DPSKDemod.obj $(OBJ_DIR)/BBN_PLCP.obj \
-        $(OBJ_DIR)/bbManchesterEnc.obj $(OBJ_DIR)/bbManchesterDec.obj $(OBJ_DIR)/bb4b6bEnc.obj $(OBJ_DIR)/bb4b6bDec.obj $(OBJ_DIR)/bb8b10bEnc.obj $(OBJ_DIR)/bb8b10bDec.obj \
+        $(OBJ_DIR)/bbManchesterEnc.obj $(OBJ_DIR)/bbManchesterDec.obj $(OBJ_DIR)/bbManchesterDec_2.obj $(OBJ_DIR)/bb4b6bEnc.obj $(OBJ_DIR)/bb4b6bDec.obj $(OBJ_DIR)/bb8b10bEnc.obj $(OBJ_DIR)/bb8b10bDec.obj \
         $(OBJ_DIR)/vlc_reed_solomon.obj $(OBJ_DIR)/bbRSEnc.obj $(OBJ_DIR)/InterPunct.obj $(OBJ_DIR)/bbVLC_info_assembler.obj $(OBJ_DIR)/bbVLC_Frame_Generator.obj \
         $(OBJ_DIR)/vlc_convolutional_coding.obj $(OBJ_DIR)/bbCCEnc.obj $(OBJ_DIR)/PHY_I_modulator.obj  $(OBJ_DIR)/PHY_II_modulator.obj $(OBJ_DIR)/PHY_I_demodulator.obj $(OBJ_DIR)/PHY_II_demodulator.obj \
         $(OBJ_DIR)/bbPHR_generation.obj $(OBJ_DIR)/bbPSDU_generation.obj $(OBJ_DIR)/bbRSDec.obj $(OBJ_DIR)/bbCCDec.obj $(OBJ_DIR)/TxTagger.obj \

@@ -7,7 +7,7 @@
 #include <gnuradio/malloc16.h>
 
 Timing::Timing(unsigned int _decim, unsigned int _syms) :
-	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int)), _decim),
+	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float)), _decim),
 	syms(_syms)
 {
 	set_output_multiple(syms);
@@ -23,10 +23,10 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 	int *optr = (int *)_o[0];
 	unsigned int decim = decimation();
 	float *E = (float *)malloc16Align(sizeof(float)*no*decim), *Ey = E;
-	if (is_unaligned())
+	//if (is_unaligned())
 		volk_32f_x2_multiply_32f_u(E, iptr, iptr, no*decim);
-	else
-		volk_32f_x2_multiply_32f_a(E, iptr, iptr, no*decim);
+	//else
+		//volk_32f_x2_multiply_32f_a(E, iptr, iptr, no*decim);
 	for (int n = 0; n < no; n += syms)
 	{
 		float mx = 0;
@@ -42,8 +42,11 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 				idx = i;
 			}
 		}
+		mx = sqrt((mx*2)/syms); //the energy gives half the expected value!!
+		//printf("El valor de mx = %f\n",mx);
 		for (int i = 0; i < syms; i++)
-			*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
+			//*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
+			*optr++ = iptr[i*decim+idx]/mx;
 		iptr += syms*decim;
 		Ey += syms*decim;
 	}

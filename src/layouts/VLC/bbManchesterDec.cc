@@ -8,7 +8,7 @@ bbManchesterDec::~bbManchesterDec()
 {
 }
 bbManchesterDec::bbManchesterDec(int mode, int flag_cc):
-	gr_sync_decimator("bbManchesterDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)), 2),
+	gr_sync_decimator("bbManchesterDec", gr_make_io_signature (1,1, sizeof(float)), gr_make_io_signature (1,1, sizeof(int)), 2),
 	d_mode(mode), d_flag_cc(flag_cc)
 {
 }
@@ -18,10 +18,18 @@ bbManchesterDec::sptr bbManchesterDec::Create(int mode, int flag_cc)
 }
 void bbManchesterDec::Decode(const int *iptr, int *optr, int no, int d_mode, int d_flag_cc)
 {
-	for (int n = 0; n < no; n++)
+	float dist_with_0,dist_with_1;
+	int n,symbol;
+	for (n = 0; n < no; n++)
 	{
-		*optr++ = (*iptr+d_mode)&0x1;
-		if (d_flag_cc)
+		dist_with_0= (*iptr-(-1))^2 + (*(iptr+1)-(1))^2;
+        dist_with_1= (*iptr-(1))^2 + (*(iptr+1)-(-1))^2;
+        if (dist_with_0 > dist_with_1)
+        	symbol=1;
+        else
+        	symbol=0;
+        *optr++ = (symbol+d_mode)&0x1;
+        if (d_flag_cc)
 			*(optr-1) = 2-4**(optr-1);
 		iptr += 2;
 	}
