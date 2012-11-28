@@ -18,13 +18,9 @@ int bbManchesterEnc::work(int no, gr_vector_const_void_star &input_items, gr_vec
 	int *optr = (int *)output_items[0];
 	for (int n = 0; n < no/2; n++)
 	{
-		//we force the output to be between 1,-1 for debug purposes
 		*optr++ = (*iptr+d_mode)&0x1;
-		*(optr-1) = 2**(optr-1)-1;
-		//printf("El valor de entrada es %d y el de salida_0 es %d en instante %d\n", *iptr, *(optr-1), n);
 		*optr++ = (*iptr+++1+d_mode)&0x1;
-		*(optr-1) = 2**(optr-1)-1;
-		//printf("El valor de entrada es %d y el de salida_1 es %d en instante %d\n", *(iptr-1), *(optr-1), n);
+		
 	}
 	return no;
 }

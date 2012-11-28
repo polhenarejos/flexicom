@@ -15,7 +15,7 @@
 #include <gr_io_signature.h>
 
 PSDUDecoder::PSDUDecoder() :
-	gr_block("PSDUDecoder", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
+	gr_block("PSDUDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
 	cpd(0), buf(NULL)
 {
 }
@@ -54,28 +54,19 @@ int PSDUDecoder::ProcessPSDU()
 	}
 	else //ook
 	{
-		int omhlen , icclen, occlen;
-		if (rate!=0)
-		{	
-			bbManchesterDec::Decode((const int *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
-			omhlen = len/2, icclen = omhlen, occlen = omhlen;
-		}
-		else
-		{
-			bbManchesterDec_2::Decode((const int *)buf, idec, len/4);
-			omhlen = len/4, icclen = omhlen, occlen = omhlen;
-		}
+		bbManchesterDec::Decode((const int *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
+		int omhlen = len/2, icclen = omhlen, occlen = omhlen;
 		if (rate >= 0 && rate <= 2)
 		{
 			int poly[] = { 0133, 0171, 0165 };
 			vlc_convolutional_coding CC(3, 7, poly, icclen, rate);
 			occlen = bbCCDec::OutCC(icclen, 7, rate);
-			/*if (rate == 0)
+			if (rate == 0)
 			{
 				for (int i = 0; i < len/4; i++)
 					idec[i] = idec[i*2];
 				icclen /= 2;
-			}*/
+			}
 			CC.decode_punct(idec, ibi, occlen, 7, 3, CC.no_states, CC.output_reverse_int, icclen, CC.ones, 2, CC.punct_matrix);
 		}
 		else

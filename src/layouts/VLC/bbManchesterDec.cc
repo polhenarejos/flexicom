@@ -18,18 +18,10 @@ bbManchesterDec::sptr bbManchesterDec::Create(int mode, int flag_cc)
 }
 void bbManchesterDec::Decode(const int *iptr, int *optr, int no, int d_mode, int d_flag_cc)
 {
-	float dist_with_0,dist_with_1;
-	int n,symbol;
-	for (n = 0; n < no; n++)
+	for (int n = 0; n < no; n++)
 	{
-		dist_with_0= (*iptr-(-1))^2 + (*(iptr+1)-(1))^2;
-        dist_with_1= (*iptr-(1))^2 + (*(iptr+1)-(-1))^2;
-        if (dist_with_0 > dist_with_1)
-        	symbol=1;
-        else
-        	symbol=0;
-        *optr++ = (symbol+d_mode)&0x1;
-        if (d_flag_cc)
+		*optr++ = (*iptr+d_mode)&0x1;
+		if (d_flag_cc)
 			*(optr-1) = 2-4**(optr-1);
 		iptr += 2;
 	}

@@ -7,7 +7,7 @@
 #include <gnuradio/malloc16.h>
 
 Timing::Timing(unsigned int _decim, unsigned int _syms) :
-	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float)), _decim),
+	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int)), _decim),
 	syms(_syms)
 {
 	set_output_multiple(syms);
@@ -42,10 +42,7 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 				idx = i;
 			}
 		}
-		mx = sqrt((mx*2)/syms); //the energy gives half the expected value!!
-		//printf("El valor de mx = %f\n",mx);
 		for (int i = 0; i < syms; i++)
-			//*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
 			*optr++ = iptr[i*decim+idx]/mx;
 		iptr += syms*decim;
 		Ey += syms*decim;

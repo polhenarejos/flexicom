@@ -64,12 +64,10 @@ bool PHRDecoder::ProcessPHR(PHYHdr *ph)
 	}
 	else //ook
 	{
-		//bbManchesterDec::Decode((const int *)buf, idec, 944, 0, 1);
-		bbManchesterDec_2::Decode((const int *)buf, idec, 944);
-		//for (int i = 0; i < 236; i++)
-			//idec[i] = idec[i*2];
+		bbManchesterDec::Decode((const int *)buf, idec, 944, 0, 1);
+		for (int i = 0; i < 236; i++)
+			idec[i] = idec[i*2];
 		CC->decode_punct(idec, ibi, 112, 7, 3, CC->no_states, CC->output_reverse_int, 236, CC->ones, 2, CC->punct_matrix);
-		//vlc_cc->decode_punct(tmp,tmp2, out_cc_dec, K, N, vlc_cc->no_states, vlc_cc->output_reverse_int, size, vlc_cc->ones,2,vlc_cc->punct_matrix);
 		Bi2De::Decode((const int *)ibi, iilv, 112, 4);
 		Interleaver::Decode((const int *)iilv, irs, 28, 28, ivector[0], Interleaver::DEINTERLEAVING);
 		bbRSDec::Decode((const int *)irs, ipld, 48, 28, 48, 15, 7, 4, phy_type, RS[0]);
