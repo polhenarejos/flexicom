@@ -15,7 +15,7 @@ bbManchesterDec_2::sptr bbManchesterDec_2::Create()
 {
 	return sptr(new bbManchesterDec_2());
 }
-void bbManchesterDec_2::Decode(const int *iptr, int *optr, int no)
+void bbManchesterDec_2::Decode(const float *iptr, int *optr, int no)
 {
 	float dist[4];
 	float minimum_distance;
@@ -24,10 +24,10 @@ void bbManchesterDec_2::Decode(const int *iptr, int *optr, int no)
 	{
 		minimum_distance= 1e9;
 		//the idea is to select the most likelihood bit of the 4 incoming bits A0.00,A0.01,A0.10,A0.11
-		dist[0]= (*(iptr)-(-1))^2 + (*(iptr+1)-(1))^2;
-		dist[1]= (*(iptr)-(1))^2  +  (*(iptr+1)-(-1))^2;
-		dist[2]= (*(iptr+2)-(-1))^2 + (*(iptr+3)-(1))^2;
-		dist[3]= (*(iptr+2)-(1))^2  + (*(iptr+3)-(-1))^2;
+		dist[0]= (*(iptr)-(-1))*(*(iptr)-(-1)) + (*(iptr+1)-(1))*(*(iptr+1)-(1));
+		dist[1]= (*(iptr)-(1))*(*(iptr)-(1))  +  (*(iptr+1)-(-1))*(*(iptr+1)-(-1));
+		dist[2]= (*(iptr+2)-(-1))*(*(iptr+2)-(-1)) + (*(iptr+3)-(1))*(*(iptr+3)-(1));
+		dist[3]= (*(iptr+2)-(1))*(*(iptr+2)-(1))  + (*(iptr+3)-(-1))*(*(iptr+3)-(-1));
 				
 		for (i=0; i<4;i++)
 		{
@@ -46,7 +46,7 @@ void bbManchesterDec_2::Decode(const int *iptr, int *optr, int no)
 }
 int bbManchesterDec_2::work(int no, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	const int *iptr = (const int *)input_items[0];
+	const float *iptr = (const float *)input_items[0];
 	int *optr = (int *)output_items[0];
 	Decode(iptr, optr, no);
 	return no;

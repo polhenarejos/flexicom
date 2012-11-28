@@ -5,9 +5,10 @@
 #include <gr_io_signature.h>
 #include <volk/volk.h>
 #include <gnuradio/malloc16.h>
+#include <stdio.h>
 
 Timing::Timing(unsigned int _decim, unsigned int _syms) :
-	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(int)), _decim),
+	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float)), _decim),
 	syms(_syms)
 {
 	set_output_multiple(syms);
@@ -20,7 +21,7 @@ Timing::sptr Timing::Create(unsigned int _decim, unsigned int _syms)
 int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
 	const float *iptr = (const float *)_i[0];
-	int *optr = (int *)_o[0];
+	float *optr = (float *)_o[0];
 	unsigned int decim = decimation();
 	float *E = (float *)malloc16Align(sizeof(float)*no*decim), *Ey = E;
 	//if (is_unaligned())
@@ -42,8 +43,12 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 				idx = i;
 			}
 		}
+		mx = sqrt((mx)/syms); 
 		for (int i = 0; i < syms; i++)
+		{
+			//*optr++ = iptr[i*decim+idx] > 0 ? 1 : 0;
 			*optr++ = iptr[i*decim+idx]/mx;
+		}
 		iptr += syms*decim;
 		Ey += syms*decim;
 	}

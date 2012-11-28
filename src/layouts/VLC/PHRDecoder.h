@@ -18,8 +18,8 @@ class PHRDecoder : public gr_sync_block
 		
 	private:
 		PHRDecoder(LayoutVLC::PHYType, LayoutVLC::Modulation);
-		int *buf, *b;
-		float *buf_bis;
+		int *buf_bis;
+		float *b, *buf;
 		int cpd;
 		bool ProcessPHR(PHYHdr *);
 		LayoutVLC::PHYType phy_type;

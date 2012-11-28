@@ -16,19 +16,28 @@ bbManchesterDec::sptr bbManchesterDec::Create(int mode, int flag_cc)
 {
 	return sptr(new bbManchesterDec(mode, flag_cc));
 }
-void bbManchesterDec::Decode(const int *iptr, int *optr, int no, int d_mode, int d_flag_cc)
+void bbManchesterDec::Decode(const float *iptr, int *optr, int no, int d_mode, int d_flag_cc)
 {
-	for (int n = 0; n < no; n++)
+	float dist_with_0,dist_with_1;
+	int n,symbol;
+	for (n = 0; n < no; n++)
 	{
-		*optr++ = (*iptr+d_mode)&0x1;
-		if (d_flag_cc)
+		//printf("El valor en Manchester Dec de iptr = %f\n", *iptr);
+		dist_with_0= (*iptr-(-1))*(*iptr-(-1)) + (*(iptr+1)-(1))*(*(iptr+1)-(1));
+        dist_with_1= (*iptr-(1))*(*iptr-(1)) + (*(iptr+1)-(-1))*(*(iptr+1)-(-1));
+        if (dist_with_0 > dist_with_1)
+        	symbol=1;
+        else
+        	symbol=0;
+        *optr++ = (symbol+d_mode)&0x1;
+        if (d_flag_cc)
 			*(optr-1) = 2-4**(optr-1);
 		iptr += 2;
 	}
 }
 int bbManchesterDec::work(int no, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
 {
-	const int *iptr = (const int *)input_items[0];
+	const float *iptr = (const float *)input_items[0];
 	int *optr = (int *)output_items[0];
 	Decode(iptr, optr, no, d_mode, d_flag_cc);
 	return no;

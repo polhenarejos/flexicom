@@ -2,7 +2,6 @@
 
 #include "PSDUDecoder.h"
 #include "bbManchesterDec.h"
-#include "bbManchesterDec_2.h"
 #include "bb4b6bDec.h"
 #include "Bi2De.h"
 #include "vlc_convolutional_coding.h"
@@ -30,7 +29,7 @@ int PSDUDecoder::ProcessPSDU()
 	int pldlen = ph.PL*8, len = LayoutVLC::GetModulatedResources(phy_type, mod, rate, pldlen), *iibi = ibi, *iipld = ipld;
 	if (mod == LayoutVLC::VPPM)
 	{
-		bbManchesterDec::Decode((const int *)buf, idec, len, 1, 0);
+		bbManchesterDec::Decode((const float *)buf, idec, len, 1, 0);
 		bb4b6bDec::Decode((const int *)idec, ibi, len*2/3);
 		if (rate < 3)
 		{
@@ -54,7 +53,7 @@ int PSDUDecoder::ProcessPSDU()
 	}
 	else //ook
 	{
-		bbManchesterDec::Decode((const int *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
+		bbManchesterDec::Decode((const float *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
 		int omhlen = len/2, icclen = omhlen, occlen = omhlen;
 		if (rate >= 0 && rate <= 2)
 		{
@@ -103,7 +102,7 @@ int PSDUDecoder::ProcessPSDU()
 }
 int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
 {
-	const int *iptr = (const int *)_i[0];
+	const float *iptr = (const float *)_i[0];
 	unsigned char *optr = (unsigned char *)_o[0];
 	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;
@@ -111,7 +110,7 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 	if (cpd) //previous
 	{
 		int c = std::min(cpd, no);
-		memcpy(b, iptr, sizeof(int)*c);
+		memcpy(b, iptr, sizeof(float)*c);
 		b += c;	cpd -= c;
 		if (!cpd)
 		{
@@ -156,7 +155,7 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 		SetBuffer(cpd, phy_type, mod, rate);
 		int off = tags[t].offset-nread;
 		int c = std::min(cpd, no-off);
-		memcpy(b, iptr+off, sizeof(int)*c);
+		memcpy(b, iptr+off, sizeof(float)*c);
 		b += c;	cpd -= c;
 		if (!cpd) //everything is copied, go!
 		{
@@ -194,6 +193,8 @@ void PSDUDecoder::SetBuffer(int len, LayoutVLC::PHYType phy_type, LayoutVLC::Mod
 {
 	if (buf)
 		delete [] buf;
+	if (buf_bis)
+		delete [] buf_bis;
 	if (phy_type == LayoutVLC::PHY_I)
 	{
 		if (mod == LayoutVLC::OOK)
@@ -214,8 +215,10 @@ void PSDUDecoder::SetBuffer(int len, LayoutVLC::PHYType phy_type, LayoutVLC::Mod
 				ors = bbRSDec::OutRS(len/8, 15, 11, 4);
 				occ = len/2;
 			}
-			b = buf = new int[len+len/2+occ+occ/4+occ/4+ors];
-			idec = buf+len;
+			b = buf = new float[len];
+			buf_bis = new int[len/2+occ+occ/4+occ/4+ors];
+			//idec = buf+len;
+			idec = buf_bis;
 			ibi = idec+len/2;
 			iilv = ibi+occ;
 			irs = iilv+occ/4;
@@ -230,8 +233,10 @@ void PSDUDecoder::SetBuffer(int len, LayoutVLC::PHYType phy_type, LayoutVLC::Mod
 				ors = bbRSDec::OutRS(occ/4, 15, 4, 4);
 			else if (rate == 2)
 				ors = bbRSDec::OutRS(occ/4, 15, 7, 4);
-			b = buf = new int[len+len/2+occ+occ/4+occ/4+ors];
-			idec = buf+len;
+			b = buf = new float[len];
+			buf_bis = new int[len/2+occ+occ/4+occ/4+ors];
+			//idec = buf+len;
+			idec = buf_bis;
 			ibi = idec+len/2;
 			iilv = ibi+occ;
 			irs = iilv+occ/4;

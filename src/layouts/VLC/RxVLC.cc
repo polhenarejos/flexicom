@@ -5,7 +5,6 @@
 #include <gr_io_signature.h>
 #include <gr_file_source.h>
 #include <gr_float_to_int.h>
-//#include <digital_clock_recovery_mm_ff.h>
 #include "bbManchesterDec.h"
 #include "bbVLC_Frame_Extractor.h"
 #include "PHY_I_demodulator.h"
@@ -42,7 +41,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	bbVLC_Frame_Extractor::sptr psdu = bbVLC_Frame_Extractor::Create(1,vlc_var_rx.tx_mode, vlc_var_rx.mod_type, PHR_modulated_length, PSDU_modulated_length, vlc_var_rx.psdu_units);
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(phr->length_sequence, ov, ly);
-	Timing::sptr tim = Timing::Create(ov);
+	Timing::sptr tim = Timing::Create(ov,50);
 	SNR::sptr snr = SNR::Create();
 	connect(self(), 0, snr, 0);
 	connect(snr, 0, c2f, 0);
@@ -68,8 +67,10 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
 	PHRDecoder::sptr phr_dec = PHRDecoder::Create((LayoutVLC::PHYType)vlc_var_rx.phy_type, (LayoutVLC::Modulation)vlc_var_rx.mod_type);
 	PSDUDecoder::sptr psdu_dec = PSDUDecoder::Create();
-		
+	//gr_null_sink_sptr null_sink_mod = gr_make_null_sink(sizeof(int));	
+	
 	connect(tim,0,phr_dec,0);
+	//connect(phr_dec,0, null_sink_mod ,0);
 	connect(phr_dec, 0, psdu_dec, 0);
 	connect(psdu_dec, 0, psdu_parser, 0);
 	/*

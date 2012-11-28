@@ -16,7 +16,8 @@ class PSDUDecoder : public gr_block
 	private:
 		PSDUDecoder();
 		int cpd;
-		int *buf, *b;
+		float *buf, *b;
+		int *buf_bis;
 		void SetBuffer(int, LayoutVLC::PHYType, LayoutVLC::Modulation, int);
 		int *idec, *ibi, *iilv, *irs, *ipld;
 		int ProcessPSDU();
