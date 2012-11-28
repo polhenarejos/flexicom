@@ -2,6 +2,7 @@
 
 #include "PSDUDecoder.h"
 #include "bbManchesterDec.h"
+#include "bbManchesterDec_2.h"
 #include "bb4b6bDec.h"
 #include "Bi2De.h"
 #include "vlc_convolutional_coding.h"
@@ -53,19 +54,22 @@ int PSDUDecoder::ProcessPSDU()
 	}
 	else //ook
 	{
-		bbManchesterDec::Decode((const float *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
-		int omhlen = len/2, icclen = omhlen, occlen = omhlen;
+		int omhlen, icclen, occlen;
+		if (rate !=0)
+		{
+			bbManchesterDec::Decode((const float *)buf, idec, len/2, 0, (rate > 2 ? 0 : 1));
+			omhlen = len/2, icclen = omhlen, occlen = omhlen;
+		}
+		else //rate == 0
+		{
+			bbManchesterDec_2::Decode((const float *)buf, idec, len/4);
+			omhlen = len/4, icclen = omhlen, occlen = omhlen;
+		}
 		if (rate >= 0 && rate <= 2)
 		{
 			int poly[] = { 0133, 0171, 0165 };
 			vlc_convolutional_coding CC(3, 7, poly, icclen, rate);
 			occlen = bbCCDec::OutCC(icclen, 7, rate);
-			if (rate == 0)
-			{
-				for (int i = 0; i < len/4; i++)
-					idec[i] = idec[i*2];
-				icclen /= 2;
-			}
 			CC.decode_punct(idec, ibi, occlen, 7, 3, CC.no_states, CC.output_reverse_int, icclen, CC.ones, 2, CC.punct_matrix);
 		}
 		else
@@ -202,7 +206,8 @@ void PSDUDecoder::SetBuffer(int len, LayoutVLC::PHYType phy_type, LayoutVLC::Mod
 			int ors = 0, occ = 0;
 			if (rate == 0)
 			{
-				occ = bbCCDec::OutCC(len/2, 7, rate);
+				//occ = bbCCDec::OutCC(len/2, 7, rate);
+				occ = bbCCDec::OutCC(len/4, 7, rate); //!!!!!!!!!!!!!!!!!
 				ors = bbRSDec::OutRS(occ/4, 15, 7, 4);
 			}
 			else if (rate == 1 || rate == 2)

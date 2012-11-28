@@ -68,9 +68,7 @@ bool PHRDecoder::ProcessPHR(PHYHdr *ph)
 	}
 	else //ook
 	{
-		bbManchesterDec::Decode((const float *)buf, idec, 944, 0, 1);
-		for (int i = 0; i < 236; i++)
-			idec[i] = idec[i*2];
+		bbManchesterDec_2::Decode((const float *)buf, idec, 944/2);
 		CC->decode_punct(idec, ibi, 112, 7, 3, CC->no_states, CC->output_reverse_int, 236, CC->ones, 2, CC->punct_matrix);
 		Bi2De::Decode((const int *)ibi, iilv, 112, 4);
 		Interleaver::Decode((const int *)iilv, irs, 28, 28, ivector[0], Interleaver::DEINTERLEAVING);

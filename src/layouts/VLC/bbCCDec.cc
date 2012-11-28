@@ -29,7 +29,7 @@ bbCCDec::~bbCCDec()
 int bbCCDec::OutCC(int length, int K, int data_rate)
 {
 	if (data_rate == 0)
-		return length/4-(K-1);
+		return length/2-(K-1);
 	else if (data_rate == 1)
 		return length/3-(K-1);
 	else if (data_rate == 2)
@@ -65,43 +65,10 @@ int bbCCDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	while (blocks_to_process>0)
 	{
 		memset(tmp2,0,sizeof(int)*out_cc_dec);
-		if(data_rate ==0)
-		{
-			tmp = new int[length/2];
-			size = length/2;
-			for (i=0; i<length/2;i++)
-			{
-				/*switch(iptr[0])
-				{
-					case 0:
-						tmp[i]=1*amp;
-						break;
-					case 1:
-						tmp[i]=-1*amp;
-				}*/
-				tmp[i]= iptr[0];
-				iptr = iptr + 2;
-			}
-		}
-		else
-		{
-			tmp = new int[length];
-			size= length;
-			/*for (i=0; i<length;i++)
-			{
-				switch(iptr[0])
-				{
-					case 0:
-						tmp[i]=1*amp;
-						break;
-					case 1:
-						tmp[i]=-1*amp;
-				}
-				iptr++;
-			}*/
-			memcpy(tmp, iptr, sizeof(int)*length);
-			iptr = iptr + length;
-		}
+		tmp = new int[length];
+		size= length;
+		memcpy(tmp, iptr, sizeof(int)*length);
+		iptr = iptr + length;
 		vlc_cc->decode_punct(tmp,tmp2, out_cc_dec, K, N, vlc_cc->no_states, vlc_cc->output_reverse_int, size, vlc_cc->ones,2,vlc_cc->punct_matrix);
 		memcpy(optr, tmp2, sizeof(int)*out_cc_dec);
 		optr = optr + out_cc_dec;

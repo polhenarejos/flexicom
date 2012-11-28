@@ -38,9 +38,9 @@ void bbManchesterDec_2::Decode(const float *iptr, int *optr, int no)
 			}
 		}
 		if (symbol==1 || symbol==3) //it seems a 1 bit
-			*optr++ = 2; //convolutional decoding after
+			*optr++ = -2; //convolutional decoding after
 		else //it seems a 0 bit
-			*optr++ = -2;
+			*optr++ = 2;
 		iptr += 4;
 	}
 }
