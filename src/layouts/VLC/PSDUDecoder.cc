@@ -206,8 +206,7 @@ void PSDUDecoder::SetBuffer(int len, LayoutVLC::PHYType phy_type, LayoutVLC::Mod
 			int ors = 0, occ = 0;
 			if (rate == 0)
 			{
-				//occ = bbCCDec::OutCC(len/2, 7, rate);
-				occ = bbCCDec::OutCC(len/4, 7, rate); //!!!!!!!!!!!!!!!!!
+				occ = bbCCDec::OutCC(len/4, 7, rate); 
 				ors = bbRSDec::OutRS(occ/4, 15, 7, 4);
 			}
 			else if (rate == 1 || rate == 2)
