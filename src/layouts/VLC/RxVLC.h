@@ -4,7 +4,6 @@
 
 #include <gr_hier_block2.h>
 #include <gr_msg_queue.h>
-#include "TxVLC.h"
 
 class LayoutVLC;
 
@@ -22,7 +21,6 @@ class RxVLC : public gr_hier_block2
 		static sptr Create(LayoutVLC *);
 		~RxVLC();
 		void stop();
-		VLCvar vlc_var_rx;
 		
 	private:
 		int poly[3];

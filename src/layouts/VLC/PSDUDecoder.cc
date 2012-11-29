@@ -14,17 +14,16 @@
 #include "Parser.h"
 #include <gr_io_signature.h>
 
-PSDUDecoder::PSDUDecoder() :
+PSDUDecoder::PSDUDecoder(LayoutVLC *_ly) :
 	gr_block("PSDUDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
-	cpd(0), buf(NULL)
+	cpd(0), buf(NULL), CRCok(0), CRCnok(0), ly(_ly)
 {
+	set_tag_propagation_policy(TPP_DONT);
 }
-PSDUDecoder::sptr PSDUDecoder::Create()
+PSDUDecoder::sptr PSDUDecoder::Create(LayoutVLC *_ly)
 {
-	return sptr(new PSDUDecoder());
+	return sptr(new PSDUDecoder(_ly));
 }
-#include <QMutex>
-extern QMutex mtx;
 int PSDUDecoder::ProcessPSDU()
 {
 	int pldlen = ph.PL*8, len = LayoutVLC::GetModulatedResources(phy_type, mod, rate, pldlen), *iibi = ibi, *iipld = ipld;
@@ -97,11 +96,13 @@ int PSDUDecoder::ProcessPSDU()
 			data.push_back((unsigned char)LayoutVLC::bi2dec(iipld+n, 8));
 		//printf("PSDU OK!\n");
 		//Parser::PSDUParser(&data[0]);
+		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(4,1)->widget(), QString::number(++CRCok));
 		payloads.push_back(data);
+		phys.push_back(ph);
 		return data.size();
 	}
 	else
-		printf("PSDU NOK\n");
+		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(4,3)->widget(), QString::number(++CRCnok));
 	return 0;
 }
 int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
@@ -167,11 +168,17 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 		}
 	}
 	int ocpd = no, rtd = 0;
+	const uint64_t nwrit = nitems_written(0);
 	while (ocpd)
 	{
 		if (!payloads.size())
 			break;
 		std::vector<unsigned char> pld = payloads[0];
+		if (phys[0].PL)
+		{
+			add_item_tag(0, nwrit+no-ocpd, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(phys[0]), pmt::pmt_string_to_symbol(name()));
+			phys[0].PL = 0;
+		}
 		if (pld.size() <= ocpd) //pop and thats all
 		{
 			memcpy(optr, &pld[0], sizeof(unsigned char)*pld.size());
@@ -179,6 +186,7 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 			rtd += pld.size();
 			ocpd -= pld.size();
 			payloads.erase(payloads.begin());
+			phys.erase(phys.begin());
 		}
 		else
 		{

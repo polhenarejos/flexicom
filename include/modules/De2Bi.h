@@ -11,11 +11,10 @@ class De2Bi : public gr_sync_interpolator
 		typedef boost::shared_ptr<De2Bi> sptr;
 		static sptr Create(unsigned int);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
-		~De2Bi();
+		static void Encode(const int *, int *, int, int);
 		
 	private:
 		De2Bi(unsigned int);
-		int *t;
 };
 
 #endif //_INC_DE2BI_H_

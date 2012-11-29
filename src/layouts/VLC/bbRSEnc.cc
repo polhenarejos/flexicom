@@ -28,7 +28,8 @@ void bbRSEnc::ctor(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned 
 		delete vlc_rs;
 	vlc_rs=new vlc_reed_solomon(GF, (phy_type == 0 ? 0x13 : 0x11d), 1, 1,(N-K));
 		//for PHY II coincides the fact that the possible rates (n,k) -> 160-128=64-32=255-223
-	out_rs=rs_out_elements()/GF;
+	out_rs = OutRS(length, GF, N, K, phy_type);
+	//printf("out_rs %d %d\n",out_rs,length);
 	set_output_multiple(out_rs);
 	//set_relative_rate((double)out_rs/length);
 }
@@ -48,25 +49,19 @@ bbRSEnc::sptr bbRSEnc::Create(unsigned int *_GF, unsigned int *_N, unsigned int 
 	return sptr(new bbRSEnc(_GF, _N, _K, _phy_type, _length));
 }
 
-int bbRSEnc::rs_out_elements()
+int bbRSEnc::OutRS(int length, int GF, int N, int K, int phy_type)
 {
-	//if there is not RS encoding, this block will not be instantiated
-	int GF_words,tmp, rs_output_bits;
-	GF_words = ceil(((double)length/GF));
-	//printf("GF_words:%d\n", GF_words);
-	tmp = GF_words%K;
-	if (tmp==0)
-		rs_output_bits = (GF_words/K)*N*GF;
+	int GF_words = ceil(((double)length/GF)), tmp = GF_words%K;
+	if (tmp == 0)
+		return (GF_words/K)*N;
 	else
 	{
-		if (phy_type==0)
-			//if is not integer, the padded zeros will be removed by the interleaver block
-			rs_output_bits = ((int)ceil(((double)GF_words/K))*N)*GF;
+		if (phy_type == 0) //if is not integer, the padded zeros will be removed by the interleaver block
+			return ((int)ceil(((double)GF_words/K))*N);
 		else
-			rs_output_bits = ((GF_words/K)*N+ tmp + (N-K))*GF;		
+			return ((GF_words/K)*N+ tmp + (N-K));		
 	}	
-	return rs_output_bits;
-	//if all divisions were exact, there will not need to do that
+	return 0;
 }
 void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required) 
 {
@@ -75,11 +70,8 @@ void bbRSEnc::forecast(int noutput_items, gr_vector_int &ninput_items_required)
 		ninput_items_required[i]= (noutput_items/out_rs)*length;
 	
 }
-int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
+int bbRSEnc::Encode(const int *iptr, int *optr, int noutput_items, int length, int out_rs, int GF, int N, int K, int phy_type, vlc_reed_solomon *vlc_rs)
 {
-	const int *iptr= (const int *)input_items[0];
-	//unsigned char *optr= (unsigned char *)output_items[0];
-	int *optr= (int *)output_items[0];
 	unsigned int blocks_to_process = (noutput_items/out_rs), GF_words = (int) ceil(((double)length/GF)), RS_words = GF_words/K;
 	int *samples_block = new int[length+length%GF];
 	unsigned char *tmp;
@@ -177,6 +169,14 @@ int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vec
 	delete [] tmp2;
 	delete [] tmp3;
 	delete [] samples_block;
+	return ci;
+}
+int bbRSEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
+{
+	const int *iptr= (const int *)input_items[0];
+	//unsigned char *optr= (unsigned char *)output_items[0];
+	int *optr= (int *)output_items[0];
+	int ci = Encode(iptr, optr, noutput_items, length, out_rs, GF, N, K, phy_type, vlc_rs);
 	consume_each((noutput_items/out_rs)*length);
 	return ci;
 	

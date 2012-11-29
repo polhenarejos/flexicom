@@ -30,6 +30,8 @@ class bbRSEnc : public gr_block
 		void forecast(int, gr_vector_int &);
 		int out_rs; /**< [out] indicates the length in bits of the output of the bbRSEnc block*/
 		~bbRSEnc();
+		static int OutRS(int, int, int, int, int);
+		static int Encode(const int *, int *, int, int, int, int, int, int, int, vlc_reed_solomon *);
 	
 	private:
 		bbRSEnc(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *);

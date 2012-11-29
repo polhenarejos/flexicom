@@ -5,14 +5,14 @@
 #include <QTextEdit>
 #include <gr_io_signature.h>
 
-Parser::Parser(Type _type, LayoutVLC *_ly, int _psdu_len) :
+Parser::Parser(Type _type, LayoutVLC *_ly) :
 	gr_block("Parser", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 1, sizeof(unsigned char))),
-	ic(0), type(_type), PHRData(0x0), psdu_len(_psdu_len/(sizeof(unsigned char)*8)), ly(_ly), per(0), total(0), prevreset(false), cpd(0)
+	ic(0), type(_type), PHRData(0x0), ly(_ly), per(0), total(0), prevreset(false), cpd(0)
 {
 }
-Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly, int _psdu_len)
+Parser::sptr Parser::Create(Type _type, LayoutVLC *_ly)
 {
-	return sptr(new Parser(_type, _ly, _psdu_len));
+	return sptr(new Parser(_type, _ly));
 }
 void Parser::PHRParser(unsigned int PHRData)
 {
@@ -59,10 +59,19 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 	}
 	else if (type == PSDU)
 	{
+		const uint64_t nread = nitems_read(0);
+		std::vector<gr_tag_t> tags;
+		get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("PSDU"));
 		for (int n = 0; n < no; n++)
 		{
 			if (ic < 5)
 			{
+				if (ic == 0)
+				{
+					PHYHdr ph = boost::any_cast<PHYHdr>(pmt::pmt_any_ref(tags[0].value));
+					psdu_len = ph.PL-2; //minus CRC
+					tags.erase(tags.begin());
+				}
 				MHR[ic] = *iptr;
 				//if (ic == 4)
 				//	PSDUParser(MHR);
@@ -81,6 +90,7 @@ int Parser::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_
 					else
 						prevreset = true;
 					//if (MHR[2] != (unsigned char)(prevSeq+1))
+					if (per || total)
 					{
 						double PER = (double)per/total;
 						ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(1, 1)->widget(), QString::number(PER));

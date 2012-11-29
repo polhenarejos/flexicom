@@ -36,13 +36,13 @@ class Parser : public gr_block
 	public:
 		typedef enum { PHR , PSDU } Type;
 		typedef boost::shared_ptr<Parser> sptr;
-		static sptr Create(Type, LayoutVLC * = NULL, int = 0);
+		static sptr Create(Type, LayoutVLC * = NULL);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		static void PHRParser(unsigned int);
 		static void PSDUParser(unsigned char *);
 		
 	private:
-		Parser(Type, LayoutVLC *, int);
+		Parser(Type, LayoutVLC *);
 		unsigned int ic;
 		Type type;
 		unsigned int PHRData;

@@ -13,9 +13,10 @@
 #include "Parser.h"
 #include <gr_io_signature.h>
 
-PHRDecoder::PHRDecoder(LayoutVLC::PHYType _phy_type, LayoutVLC::Modulation _mod) :
+PHRDecoder::PHRDecoder(LayoutVLC *_ly) :
 	gr_sync_block("PHRDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	cpd(0), phy_type(_phy_type), mod(_mod)
+	cpd(0), phy_type((LayoutVLC::PHYType)_ly->vlc_var.phy_type), mod((LayoutVLC::Modulation)_ly->vlc_var.mod_type), ly(_ly),
+	CRCok(0), CRCnok(0)
 {
 	//reserver memory as a single memory page
 	b = buf = new float[1080]; // with OOK 944
@@ -50,9 +51,9 @@ PHRDecoder::~PHRDecoder()
 	if (phy_type == LayoutVLC::PHY_I)
 		delete RS[1];
 }
-PHRDecoder::sptr PHRDecoder::Create(LayoutVLC::PHYType _phy_type, LayoutVLC::Modulation _mod)
+PHRDecoder::sptr PHRDecoder::Create(LayoutVLC *_ly)
 {
-	return sptr(new PHRDecoder(_phy_type, _mod));
+	return sptr(new PHRDecoder(_ly));
 }
 bool PHRDecoder::ProcessPHR(PHYHdr *ph)
 {
@@ -81,9 +82,12 @@ bool PHRDecoder::ProcessPHR(PHYHdr *ph)
 			data[n/8] = (unsigned char)LayoutVLC::bi2dec(ipld+n, 8);
 		unsigned int d = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 		memcpy(ph, &d, sizeof(PHYHdr));
+		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(3,1)->widget(), QString::number(++CRCok));
 		//Parser::PHRParser(d);
 		return true;
 	}
+	else
+		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(3,3)->widget(), QString::number(++CRCnok));
 	return false;
 }
 int PHRDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 

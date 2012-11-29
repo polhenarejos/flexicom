@@ -12,12 +12,12 @@ class PHRDecoder : public gr_sync_block
 {
 	public:
 		typedef boost::shared_ptr<PHRDecoder> sptr;
-		static sptr Create(LayoutVLC::PHYType, LayoutVLC::Modulation);
+		static sptr Create(LayoutVLC *);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
 		~PHRDecoder();
 		
 	private:
-		PHRDecoder(LayoutVLC::PHYType, LayoutVLC::Modulation);
+		PHRDecoder(LayoutVLC *);
 		int *buf_bis;
 		float *b, *buf;
 		int cpd;
@@ -29,6 +29,8 @@ class PHRDecoder : public gr_sync_block
 		vlc_reed_solomon *RS[2];
 		std::vector<unsigned int> ivector[2];
 		int offPSDU; //where PHR began
+		LayoutVLC *ly;
+		unsigned int CRCok, CRCnok;
 };
 
 #endif //_INC_PHRDECODER_H_

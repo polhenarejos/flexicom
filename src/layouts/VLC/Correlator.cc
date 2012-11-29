@@ -6,9 +6,9 @@
 #include <gnuradio/malloc16.h>
 #include <gr_io_signature.h>
 
-Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
+Correlator::Correlator(unsigned int _ov, LayoutVLC *_ly, float _th) :
 	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
-	pattern(-1), copy(_copy), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly), idle(0)
+	pattern(-1), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
 					  { -1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,1,-1,1,1,1,-1,1,1,1,1,1,1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1 },
@@ -16,6 +16,7 @@ Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
    					  { -1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1 } };
 	//ov = 4; //oversampler factor
 	siz = 60*ov;
+	copy = 944;
 	copy *= ov;
 	for (int t = 0; t < 2; t++)
 	{
@@ -31,9 +32,9 @@ Correlator::Correlator(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th) :
 	set_output_multiple(siz);
 	//set_tag_propagation_policy(TPP_DONT);
 }
-Correlator::sptr Correlator::Create(int _copy, unsigned int _ov, LayoutVLC *_ly, float _th)
+Correlator::sptr Correlator::Create(unsigned int _ov, LayoutVLC *_ly, float _th)
 {
-	return sptr(new Correlator(_copy, _ov, _ly, _th));
+	return sptr(new Correlator(_ov, _ly, _th));
 }
 Correlator::~Correlator()
 {
@@ -98,8 +99,9 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			{
 				strike = true;
 				consume_each(idx%no);
+				memcpy(optr, iptr, sizeof(float)*(idx%no));
 				free16Align(C);
-				return 0;
+				return idx%no;
 			}
 			else
 			{
@@ -113,26 +115,21 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				o = idx%corr;
 				add_item_tag(0, nitems_written(0)+o+siz*vppm, pmt::pmt_string_to_symbol("SyncPeak"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
 				strike = false;
-				ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=green>Ok!</font></b>"));
+				ly->mtx.lock();
+				ly->syncs++;
+				ly->mtx.unlock();
 			}
 		}
 		else
 			strike = false;
 		free16Align(C);
 	}
+	memcpy(optr, iptr, sizeof(float)*no);
 	if (cpd)
 	{
 		rtd = std::min(cpd, no-o);
-		memcpy(optr, iptr+o, sizeof(float)*rtd);
+		//memcpy(optr, iptr+o, sizeof(float)*rtd);
 		cpd -= rtd;
-		if (!cpd)
-			idle = siz*3;
-	}
-	else if (!strike)
-	{
-		if (idle < 0)
-			ly->EmitChangeMetric((QLabel *)ly->gridLink->itemAtPosition(0, 1)->widget(), QString("<b><font color=red>Fail</font></b>"));
-		idle -= no;
 	}
 	//Grab SNR tags
 	const uint64_t nread = nitems_read(0);
@@ -156,9 +153,6 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			freset = true;
 	}
-	if (o+rtd)
-		consume_each(o+rtd);
-	else //didnt found anything
-		consume_each(no);
-	return rtd;
+	consume_each(no);
+	return no;
 }

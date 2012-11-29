@@ -17,10 +17,11 @@ class bb4b6bEnc : public gr_block
 		static sptr Create();
 		int general_work(int, gr_vector_int &,gr_vector_const_void_star&, gr_vector_void_star&);
 		void forecast(int, gr_vector_int &);
+		static void Encode(const int *, int *, int);
 	
 	private:
 		bb4b6bEnc();
-		int outputTable6b[6*16];
+		static const int table[];
 };
 
 #endif //_INC_BB4B6BENC_H_

@@ -7,8 +7,10 @@
 #include <stdlib.h>
 
 vlc_convolutional_coding::vlc_convolutional_coding(int _N, int _K, int *_poly,int _length, int _data_rate):
-	N(_N),K(_K),poly(_poly), length(_length), data_rate(_data_rate)
+	N(_N),K(_K),length(_length), data_rate(_data_rate)
 {
+	poly = new int[3];
+	memcpy(poly, _poly, sizeof(int)*3);
 	no_states= powf(2, (K-1));
 	//printf("K:%d\n", K);
 	int a = powf(2,K);

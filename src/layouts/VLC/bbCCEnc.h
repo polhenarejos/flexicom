@@ -29,6 +29,7 @@ class bbCCEnc : public gr_block
 		void forecast(int, gr_vector_int &);
 		~bbCCEnc();
 		int out_cc; /**< [out] indicates the length in bits of the output of the bbCCEnc block*/
+		static int OutCC(int, int);
 	
 	private:
 		bbCCEnc(int, int, int *, int, int);

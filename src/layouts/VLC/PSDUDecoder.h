@@ -10,11 +10,11 @@ class PSDUDecoder : public gr_block
 {
 	public:
 		typedef boost::shared_ptr<PSDUDecoder> sptr;
-		static sptr Create();
+		static sptr Create(LayoutVLC *);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 	
 	private:
-		PSDUDecoder();
+		PSDUDecoder(LayoutVLC *);
 		int cpd;
 		float *buf, *b;
 		int *buf_bis;
@@ -26,6 +26,9 @@ class PSDUDecoder : public gr_block
 		LayoutVLC::Modulation mod;
 		int rate;
 		std::vector<std::vector<unsigned char> > payloads;
+		std::vector<PHYHdr> phys;
+		unsigned int CRCok, CRCnok;
+		LayoutVLC *ly;
 };
 
 #endif //_INC_PSDUDECODER_H

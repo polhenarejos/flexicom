@@ -65,6 +65,9 @@ typedef struct
 	QCheckBox *ch_media;
 }VarVLC;
 
+//For simplicity, a struct which contains all the variables is created
+
+
 /*! \brief The class where the layout of the VLC communication system is defined
 
 * In this class, the TXVLC or the RXVLC is connected to the usrp class object to stablish the stream of samples
@@ -94,6 +97,25 @@ class LayoutVLC : public QObject , public LayoutFactory
 		const char *Name();
 		static LayoutFactory::sptr Create(MainWindow *, int);
 		VarVLC *varVLC;
+		typedef enum { OOK = 0, VPPM = 1 } Modulation;
+		typedef enum { PHY_I = 0, PHY_II = 1 } PHYType;
+		typedef enum { SINGLE = 0, PACKED = 1, BURST = 2 } TXMode;
+		struct
+		{
+			PHYType phy_type;
+			Modulation mod_type;
+			int clock_rate;
+			TXMode tx_mode;
+			unsigned int psdu_units;
+			int operating_mode;
+			unsigned int frame_size;
+			unsigned int PHR_raw_length; //raw length prior to modulation
+			unsigned int PSDU_raw_length; //raw length prior to modulation
+			int MCSID[6]; //field for the PHR preamble
+			int flp_length;
+			uint64_t count;
+			unsigned int dMCSID;
+		}vlc_var;
 		void Run();
 		void Stop();
 		static unsigned int bi2dec(int *, unsigned int);
@@ -106,10 +128,9 @@ class LayoutVLC : public QObject , public LayoutFactory
 		QGridLayout *gridMeas;
 		void EmitChangeMetric(QLabel *, QString);
 		unsigned int bits;
+		unsigned int syncs;
 		QMutex mtx;
 		void SendReport();
-		typedef enum { OOK = 0, VPPM = 1 } Modulation;
-		typedef enum { PHY_I = 0, PHY_II = 1 } PHYType;
 		static int GetModulatedResources(PHYType, Modulation, int, int); //returns the number of bits after modulation
 		
 	public slots:

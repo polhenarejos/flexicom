@@ -28,23 +28,10 @@ PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modul
 		{
 			bbCCEnc::sptr cc_enc = bbCCEnc::Create(3, 7, poly, intlv->out, data_rate);
 			connect(intlv, 0, cc_enc, 0);
-			if (phy_modulation == 0)
-			{
-				bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(bbManchesterEnc::OOK);
-				out_PHY_I_mod = cc_enc->out_cc*2;
-				connect(cc_enc,0,RLL,0);
-				connect(RLL,0,self(), 0);
-			}
-			else
-			{
-				bb4b6bEnc::sptr RLL = bb4b6bEnc::Create();
-				bbManchesterEnc::sptr RLL2 = bbManchesterEnc::Create(bbManchesterEnc::VPPM);
-				out_PHY_I_mod= (cc_enc->out_cc/4*6)*2;
-				connect(cc_enc,0,RLL,0);
-				connect(RLL,0, RLL2,0);
-				connect(RLL2,0,self(), 0);
-			}
-				
+			bbManchesterEnc::sptr RLL = bbManchesterEnc::Create(bbManchesterEnc::OOK);
+			out_PHY_I_mod = cc_enc->out_cc*2;
+			connect(cc_enc,0,RLL,0);
+			connect(RLL,0,self(), 0);				
 		}
 		else
 		{

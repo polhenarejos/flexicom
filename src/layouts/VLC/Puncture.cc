@@ -24,17 +24,22 @@ Puncture::sptr Puncture::Create(unsigned int _GF, unsigned int _N, unsigned int 
 {
 	return sptr(new Puncture(_GF, _N, _K, _raw_length, _rs_length));
 }
+//returns p, hence the output is OutRS()-OutPunct()
+int Puncture::OutPunct(int _raw_length, int _GF, int _N, int _K)
+{
+	unsigned int S_frame = ceil((double)_raw_length/_GF);
+	unsigned int S = _N * ceil((double)S_frame/_K) -  (_K- (S_frame%_K));
+	unsigned int D = ceil(((double)S/_N));
+	unsigned int p = _N - (S%_N);
+	return (p < _K ? p : 0);
+}
 void Puncture::forecast(int no, gr_vector_int &ni)
 {
 	for (int n = 0; n < ni.size(); n++)
 		ni[n] = (no/out)*(out+pvector.size());
 }
-#include <QMutex>
-extern QMutex mtx;
-int Puncture::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+int Puncture::Encode(const int *iptr, int *optr, int no, int rs_length, std::vector<unsigned int> &pvector, unsigned int &ic)
 {
-	const int *iptr = (const int *)_i[0];
-	int *optr = (int *)_o[0];
 	int csmd = 0;
 	for (int n = 0; n < no; n++)
 	{
@@ -46,6 +51,15 @@ int Puncture::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star 
 		*optr++ = *(iptr+csmd++);
 		ic = (ic+1)%rs_length;
 	}
+	return csmd;
+}
+#include <QMutex>
+extern QMutex mtx;
+int Puncture::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
+{
+	const int *iptr = (const int *)_i[0];
+	int *optr = (int *)_o[0];
+	int csmd = Encode(iptr, optr, no, rs_length, pvector, ic);
 	consume_each(csmd);
 	return no;
 }

@@ -19,6 +19,7 @@ class bbManchesterEnc : public gr_sync_interpolator
        */
 		static sptr Create(ModType);
 		int work(int, gr_vector_const_void_star &, gr_vector_void_star &);
+		static void Encode(const int *, int *, int, int);
 	
 	private:
 		bbManchesterEnc(ModType);

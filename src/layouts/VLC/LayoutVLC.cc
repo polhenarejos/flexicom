@@ -71,7 +71,7 @@ void LayoutVLC::Run()
 		tx = TxVLC::Create(this);
 		grTop->connect(tx, 0, Sink(), 0);
 	}
-	secs = bits = 0;
+	secs = bits = syncs = 0;
 	timer->start(1000);
 	grTop->start();
 }
@@ -553,7 +553,8 @@ unsigned short LayoutVLC::GenerateCRC(int *in, int *out, int size)
 	}
 	if (out)
 	{
-		memcpy(out, in, sizeof(int)*size);
+		if (in != out)
+			memcpy(out, in, sizeof(int)*size);
 		out += size;
 		for (int i = 0; i < CRC_LENGTH; i++)
 			*out++ = (crc>>i)&0x1;
@@ -581,6 +582,11 @@ void LayoutVLC::UpdateSpeed()
 {
 	mtx.lock();
 	((QLabel *)gridLink->itemAtPosition(1,1)->widget())->setText(QString::number((double)bits/(++secs*1024),'g',4));
+	if (syncs)
+		((QLabel *)gridLink->itemAtPosition(0, 1)->widget())->setText(QString("<b><font color=green>Ok!</font></b>"));
+	else
+		((QLabel *)gridLink->itemAtPosition(0, 1)->widget())->setText(QString("<b><font color=red>Fail</font></b>"));
+	syncs = 0;
 	mtx.unlock();
 }
 void LayoutVLC::SendReport()

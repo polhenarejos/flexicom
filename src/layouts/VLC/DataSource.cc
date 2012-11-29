@@ -4,20 +4,20 @@
 #include "LayoutVLC.h"
 #include <gr_io_signature.h>
 
-DataSource::DataSource(int _len, bool _voip) :
+DataSource::DataSource(int _len, LayoutVLC *_ly, bool _voip) :
 	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(unsigned char)), gr_make_io_signature(1, 1, sizeof(int))),
-	len(_len*8), ic(0), pend(false), voip(_voip), prevreset(false)
+	len(_len*8), ic(0), pend(false), voip(_voip), prevreset(false), ly(_ly)
 {
 }
-DataSource::sptr DataSource::Create(int _len, bool _voip)
+DataSource::sptr DataSource::Create(int _len, LayoutVLC *_ly, bool _voip)
 {
-	return sptr(new DataSource(_len, _voip));
+	return sptr(new DataSource(_len, _ly, _voip));
 }
 int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 {
 	const unsigned char *iptr = (voip ? (const unsigned char *)_i[0] : NULL);
 	int *optr = (int *)_o[0];
-	int ci = 0;
+	int ci = 0, nwrit = nitems_written(0);
 	for (int n = 0; n < no; n++)
 	{
 		int mid = ic%8;
@@ -31,6 +31,8 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				assert(!pend);
 				if (data.size())
 					pend = true;
+				PHYHdr ph = { 0 }; ph.PL = len/8; ph.MCS = ly->vlc_var.dMCSID;
+				add_item_tag(0, nwrit+n, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(ph), pmt::pmt_string_to_symbol(name()));
 			}
 			else if (pend)
 			{
