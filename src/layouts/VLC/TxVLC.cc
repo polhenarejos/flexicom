@@ -20,6 +20,7 @@
 #include "DataSource.h"
 #include "PSDUEncoder.h"
 #include "PHREncoder.h"
+#include "De2Bi.h"
 #include <gr_file_source.h>
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
@@ -113,7 +114,7 @@ void TxVLC::init_var()
 				ly->vlc_var.clock_rate=7.5e6;
 		}
 	}
-	LayoutVLC::dec2bi(ly->vlc_var.dMCSID, 6, ly->vlc_var.MCSID);
+	De2Bi::dec2bi(ly->vlc_var.dMCSID, 6, ly->vlc_var.MCSID);
 	ly->vlc_var.count++;
 }
 

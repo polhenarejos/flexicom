@@ -2,6 +2,7 @@
 
 #include "DataSource.h"
 #include "LayoutVLC.h"
+#include "De2Bi.h"
 #include <gr_io_signature.h>
 
 DataSource::DataSource(int _len, LayoutVLC *_ly, bool _voip) :
@@ -39,28 +40,28 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				if (pic == 1) //Lower len byte
 				{
 					//printf("Writing %d at %X (%X) [%d]\n",data[0].size & 0xff,optr,_o[0],(optr-_o[0])/4);
-					LayoutVLC::dec2bi((int)(data[0].size & 0xff), 8, databyte);
+					De2Bi::dec2bi((int)(data[0].size & 0xff), 8, databyte);
 					if (voip)
 						dataoff = len/8-data[0].size-3;
 					else
 						dataoff = 0;
 				}
 				else if (pic == 2) //Upper len byte
-					LayoutVLC::dec2bi((int)((data[0].size >> 0x8) & 0xff), 8, databyte);
+					De2Bi::dec2bi((int)((data[0].size >> 0x8) & 0xff), 8, databyte);
 				else
 				{
 					pic -= 3;
 					if (voip)
 					{
 						if (pic < dataoff)
-							LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+							De2Bi::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 						else
-							LayoutVLC::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
+							De2Bi::dec2bi((int)(data[0].data[pic-dataoff]), 8, databyte);
 					}
 					else
 					{
 						if (pic < data[0].size)
-							LayoutVLC::dec2bi((int)(data[0].data[pic]), 8, databyte);
+							De2Bi::dec2bi((int)(data[0].data[pic]), 8, databyte);
 						else
 							memset(databyte, 0, sizeof(databyte));
 					}
@@ -82,7 +83,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 					if (pic == 1 || pic == 2) //data_len
 						memset(databyte, 0, sizeof(databyte));
 					else
-						LayoutVLC::dec2bi((unsigned int)iptr[ci++], 8, databyte);
+						De2Bi::dec2bi((unsigned int)iptr[ci++], 8, databyte);
 				}
 				else
 					memset(databyte, 0, sizeof(databyte));

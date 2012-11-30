@@ -1,6 +1,8 @@
 // $Id$
+
 #include "bb8b10bEnc.h"
 #include "LayoutVLC.h"
+#include "Bi2De.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -56,13 +58,13 @@ int bb8b10bEnc::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 	{
 		if (RD == 0)
 		{
-			memcpy(optr, bits_3_RD_negative+LayoutVLC::bi2dec((int *)iptr, 3)*4, sizeof(int)*4);
-			memcpy(optr+4, bits_5_RD_negative+LayoutVLC::bi2dec((int *)iptr+3, 5)*6, sizeof(int)*6);
+			memcpy(optr, bits_3_RD_negative+Bi2De::bi2dec((int *)iptr, 3)*4, sizeof(int)*4);
+			memcpy(optr+4, bits_5_RD_negative+Bi2De::bi2dec((int *)iptr+3, 5)*6, sizeof(int)*6);
 		}
 		else
 		{
-			memcpy(optr, bits_3_RD_positive+LayoutVLC::bi2dec((int *)iptr, 3)*4, sizeof(int)*4);
-			memcpy(optr+4, bits_5_RD_positive+LayoutVLC::bi2dec((int *)iptr+3, 5)*6, sizeof(int)*6);
+			memcpy(optr, bits_3_RD_positive+Bi2De::bi2dec((int *)iptr, 3)*4, sizeof(int)*4);
+			memcpy(optr+4, bits_5_RD_positive+Bi2De::bi2dec((int *)iptr+3, 5)*6, sizeof(int)*6);
 		}
 		int u = 0;
 		for (int j = 0; j < 10; j++)

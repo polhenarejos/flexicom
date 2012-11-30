@@ -93,7 +93,7 @@ int PSDUDecoder::ProcessPSDU()
 	{
 		std::vector<unsigned char> data;
 		for (int n = 0; n < pldlen-LayoutVLC::CRC_LENGTH; n += 8)
-			data.push_back((unsigned char)LayoutVLC::bi2dec(iipld+n, 8));
+			data.push_back((unsigned char)Bi2De::bi2dec(iipld+n, 8));
 		//printf("PSDU OK!\n");
 		//Parser::PSDUParser(&data[0]);
 		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(4,1)->widget(), QString::number(++CRCok));

@@ -2,6 +2,7 @@
 
 #include "bb4b6bDec.h"
 #include "LayoutVLC.h"
+#include "De2Bi.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -44,7 +45,7 @@ void bb4b6bDec::Decode(const int *iptr, int *optr, int noutput_items)
 {
 	for (int i = 0; i < noutput_items/4; i++)
 	{
-		LayoutVLC::dec2bi(distance((int *)iptr), 4, optr);
+		De2Bi::dec2bi(distance((int *)iptr), 4, optr);
 		iptr += 6;
 		optr += 4;
 	}

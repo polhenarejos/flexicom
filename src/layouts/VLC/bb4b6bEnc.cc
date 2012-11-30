@@ -1,6 +1,8 @@
 // $Id$
+
 #include "bb4b6bEnc.h"
 #include "LayoutVLC.h"
+#include "Bi2De.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -27,7 +29,7 @@ void bb4b6bEnc::Encode(const int *iptr, int *optr, int no)
 {
 	for (int i = 0; i < no/6; i++)
 	{
-		memcpy(optr, table+LayoutVLC::bi2dec((int *)iptr, 4)*6, sizeof(int)*6);
+		memcpy(optr, table+Bi2De::bi2dec((int *)iptr, 4)*6, sizeof(int)*6);
 		iptr += 4;
 		optr += 6;
 	}

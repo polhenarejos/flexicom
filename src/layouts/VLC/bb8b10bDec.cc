@@ -2,6 +2,7 @@
 
 #include "bb8b10bDec.h"
 #include "LayoutVLC.h"
+#include "De2Bi.h"
 #include <gr_io_signature.h>
 #include <math.h>
 
@@ -70,8 +71,8 @@ int bb8b10bDec::general_work(int noutput_items, gr_vector_int &ninput_items, gr_
 	int *optr = (int *)output_items[0];
 	for (int i = 0; i < noutput_items/8; i++)
 	{
-		LayoutVLC::dec2bi(distance((int *)iptr, RD, 4), 3, optr);
-		LayoutVLC::dec2bi(distance((int *)iptr+4, RD, 6), 5, optr+3);
+		De2Bi::dec2bi(distance((int *)iptr, RD, 4), 3, optr);
+		De2Bi::dec2bi(distance((int *)iptr+4, RD, 6), 5, optr+3);
 		int u = 0;
 		for (int j = 0; j < 10; j++)
 			u += iptr[j];

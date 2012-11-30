@@ -79,7 +79,7 @@ bool PHRDecoder::ProcessPHR(PHYHdr *ph)
 	{
 		//printf("CRC OK!!\n");
 		for (int n = 0; n < 48-LayoutVLC::CRC_LENGTH; n += 8)
-			data[n/8] = (unsigned char)LayoutVLC::bi2dec(ipld+n, 8);
+			data[n/8] = (unsigned char)Bi2De::bi2dec(ipld+n, 8);
 		unsigned int d = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 		memcpy(ph, &d, sizeof(PHYHdr));
 		ly->EmitChangeMetric((QLabel *)ly->gridErrors->itemAtPosition(3,1)->widget(), QString::number(++CRCok));

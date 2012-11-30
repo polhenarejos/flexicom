@@ -12,12 +12,18 @@ De2Bi::sptr De2Bi::Create(unsigned int _size)
 {
 	return sptr(new De2Bi(_size));
 }
+void De2Bi::dec2bi(unsigned int number, unsigned int GF, int *bin_number)
+{
+	for (int i = 0; i < GF; i++)
+		*bin_number++ = (number >> i) & 0x1;
+    return;       
+}
 void De2Bi::Encode(const int *iptr, int *optr, int no, int pol)
 {
 	int *t = new int[pol];
 	for (int n = 0; n < no/pol; n++)
 	{
-		LayoutVLC::dec2bi(*iptr++, pol, t);
+		dec2bi(*iptr++, pol, t);
 		for (unsigned int p = 0; p < pol; p++)
 			*optr++ = t[p];
 	}

@@ -492,20 +492,6 @@ void LayoutVLC::TrackChanges()
 	if (tx)
 		tx->UIChanged();	
 }
-//Binary functions must be encoded as left-lsb
-unsigned int LayoutVLC::bi2dec(int *in, unsigned int GF)
-{
-	unsigned int o = 0;
-	for (unsigned int i = 0; i < GF; i++)
-		o |= *in++<<i;
-	return o;
-}
-void LayoutVLC::dec2bi(unsigned int number, unsigned int GF, int *bin_number)
-{
-	for (int i = 0; i < GF; i++)
-		*bin_number++ = (number >> i) & 0x1;
-    return;       
-}
 void LayoutVLC::StateLayout(MainWindow::StatesLayout s)
 {
 	if (s == MainWindow::STOPPING)

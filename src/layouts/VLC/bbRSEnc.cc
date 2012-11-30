@@ -1,10 +1,12 @@
 // $Id$
+
 #include "bbRSEnc.h"
 #include <gr_io_signature.h>
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
 #include "LayoutVLC.h"
+#include "Bi2De.h"
 
 bbRSEnc::bbRSEnc(unsigned int *_GF, unsigned int *_N, unsigned int *_K, unsigned int *_phy_type, unsigned int *_length):
 	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
@@ -106,7 +108,7 @@ int bbRSEnc::Encode(const int *iptr, int *optr, int noutput_items, int length, i
 					
 			for (unsigned int i=0; i<K; i++)
 			{
-				tmp[i]=LayoutVLC::bi2dec(&samples_block[(idx*K*GF)+i*GF],GF);
+				tmp[i]=Bi2De::bi2dec(&samples_block[(idx*K*GF)+i*GF],GF);
 				//printf("%d",tmp[i]);
 				//iptr=iptr+GF;
 			}
@@ -138,7 +140,7 @@ int bbRSEnc::Encode(const int *iptr, int *optr, int noutput_items, int length, i
 				memset(tmp,0,sizeof(unsigned char)*223);
 			for (unsigned int i=0; i<K; i++)
 			{
-				tmp[i]=LayoutVLC::bi2dec(&tmp2[i*GF],GF);
+				tmp[i]=Bi2De::bi2dec(&tmp2[i*GF],GF);
 			//	printf("El clandemor tmp[%d]=%d\n",i,tmp[i]);
 			}
 			vlc_rs->encode(tmp3,tmp); // the result is in tmp3

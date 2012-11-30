@@ -1,10 +1,12 @@
 // $Id$
+
 #include "bbRSDec.h"
 #include <gr_io_signature.h>
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
 #include "LayoutVLC.h"
+#include "De2Bi.h"
 
 bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
 	gr_block("bbRSDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
@@ -71,7 +73,7 @@ void bbRSDec::Decode(const int *iptr, int *optr, int noutput_items, int pre_leng
 				vlc_rs->decode(tmp2,tmp);
 				for (j=0; j< K; j++)
 				{
-					LayoutVLC::dec2bi(tmp2[j], GF,optr);
+					De2Bi::dec2bi(tmp2[j], GF,optr);
 					optr = optr + GF;
 				}
 				//iptr = iptr + N;
@@ -95,7 +97,7 @@ void bbRSDec::Decode(const int *iptr, int *optr, int noutput_items, int pre_leng
 				vlc_rs->decode(tmp2,tmp);
 				for (i=0; i< remaining_words; i++)
 				{
-					LayoutVLC::dec2bi(tmp2[i],GF,optr);
+					De2Bi::dec2bi(tmp2[i],GF,optr);
 					optr = optr + GF;
 				}
 				//iptr = iptr + (pre_length%N);
@@ -123,7 +125,7 @@ void bbRSDec::Decode(const int *iptr, int *optr, int noutput_items, int pre_leng
 				vlc_rs->decode(tmp2,tmp);
 				for (j=0; j< K; j++)
 				{
-					LayoutVLC::dec2bi(tmp2[j], GF,optr);
+					De2Bi::dec2bi(tmp2[j], GF,optr);
 					optr = optr + GF;
 				}
 				//iptr = iptr + N;
@@ -147,7 +149,7 @@ void bbRSDec::Decode(const int *iptr, int *optr, int noutput_items, int pre_leng
 				vlc_rs->decode(tmp2,tmp);
 				for (i=0; i< remaining_words; i++)
 				{
-					LayoutVLC::dec2bi(tmp2[i],GF,optr);
+					De2Bi::dec2bi(tmp2[i],GF,optr);
 					optr = optr + GF;
 				}
 				//iptr = iptr + (pre_length%N);
