@@ -16,7 +16,7 @@
 
 PSDUDecoder::PSDUDecoder(LayoutVLC *_ly) :
 	gr_block("PSDUDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
-	cpd(0), buf(NULL), CRCok(0), CRCnok(0), ly(_ly)
+	cpd(0), buf(NULL), buf_bis(NULL), CRCok(0), CRCnok(0), ly(_ly)
 {
 	set_tag_propagation_policy(TPP_DONT);
 }
