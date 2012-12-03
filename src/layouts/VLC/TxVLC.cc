@@ -9,13 +9,7 @@
 #include <iostream>
 #include <gr_int_to_float.h>
 #include <gr_float_to_complex.h>
-#include "bbPHR_generation.h"
-#include "bbPSDU_generation.h"
-#include "PHY_I_modulator.h"
-#include "PHY_II_modulator.h"
-#include "bbVLC_info_assembler.h"
 #include "bbVLC_Frame_Generator.h"
-#include "TxTagger.h"
 #include "bbMatlab.h"
 #include "DataSource.h"
 #include "PSDUEncoder.h"
