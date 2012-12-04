@@ -166,10 +166,10 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 	{
 		const uint64_t nread = nitems_read(0);
 		std::vector<gr_tag_t> tags;
-		get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("PSDU"));
+		get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("PSDU"));
 		if (cpd) //previous
 		{
-			int c = std::min(cpd, ni[0]);
+			int c = std::min(cpd, no);
 			memcpy(b, iptr, sizeof(int)*c);
 			b += c;	cpd -= c;
 			if (!cpd)
@@ -212,7 +212,7 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 			cpd = ph.PL*8;
 			SetBuffer(cpd, phy_type, mod, rate);
 			int off = tags[t].offset-nread;
-			int c = std::min(cpd, ni[0]-off);
+			int c = std::min(cpd, no-off);
 			memcpy(b, iptr+off, sizeof(int)*c);
 			b += c;	cpd -= c;
 			if (!cpd) //everything is copied, go!
@@ -220,7 +220,7 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 				ProcessPSDU();
 			}
 		}
-		consume_each(ni[0]);
+		consume_each(no);
 	}
 	return rtd;
 }
