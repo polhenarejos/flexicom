@@ -16,7 +16,7 @@ Correlator::Correlator(unsigned int _ov, LayoutVLC *_ly, float _th) :
    					  { -1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,-1,-1,-1,-1,1,1,-1,1,-1,-1,1,-1,1,1,-1,1,1,1,1,-1,-1,1,-1,1,1,-1,1,-1 } };
 	//ov = 4; //oversampler factor
 	siz = 60*ov;
-	copy = 944;
+	copy = 60+1008;
 	copy *= ov;
 	for (int t = 0; t < 2; t++)
 	{
@@ -29,7 +29,7 @@ Correlator::Correlator(unsigned int _ov, LayoutVLC *_ly, float _th) :
 		}
 	}
 	//set_alignment(volk_get_alignment()/sizeof(float));
-	set_output_multiple(siz);
+	//set_output_multiple(siz);
 	//set_tag_propagation_policy(TPP_DONT);
 }
 Correlator::sptr Correlator::Create(unsigned int _ov, LayoutVLC *_ly, float _th)
@@ -73,9 +73,11 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	const float *iptr = (const float *)_i[0]; 
 	float *optr = (float *)_o[0];
 	unsigned int o = 0, rtd = 0;
+	if (no > siz*2)
+		no = siz*2;
 	if (!cpd)
 	{
-		unsigned int idx = 0, corr = (strike ? siz : no);
+		unsigned int idx = 0, corr = no;
 		float *C = (float *)malloc16Align(sizeof(float)*corr*(pattern == -1 ? 8 : 1));
 		if (pattern == -1)
 		{
@@ -124,13 +126,15 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 			strike = false;
 		free16Align(C);
 	}
-	memcpy(optr, iptr, sizeof(float)*no);
+	//memcpy(optr, iptr, sizeof(float)*no);
 	if (cpd)
 	{
-		rtd = std::min(cpd, no-o);
-		//memcpy(optr, iptr+o, sizeof(float)*rtd);
+		rtd = std::min(cpd, (unsigned int)no);
 		cpd -= rtd;
 	}
+	else
+		rtd = no;
+	memcpy(optr, iptr, sizeof(float)*rtd);
 	//Grab SNR tags
 	const uint64_t nread = nitems_read(0);
 	std::vector<gr_tag_t> tags;
@@ -142,7 +146,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g'));
 		*/
 	static bool freset = false;
-	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("rx_time"));
+	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("rx_time"));
 	if (tags.size())
 	{
 		if (freset)
@@ -153,6 +157,6 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		else
 			freset = true;
 	}
-	consume_each(no);
-	return no;
+	consume_each(rtd);
+	return rtd;
 }

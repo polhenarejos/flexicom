@@ -30,7 +30,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(ov, ly);
-	Timing::sptr tim = Timing::Create(ov,50);
+	Timing::sptr tim = Timing::Create(ov);
 	//SNR::sptr snr = SNR::Create();
 	connect(self(), 0, c2f, 0);
 	//connect(snr, 0, c2f, 0);
