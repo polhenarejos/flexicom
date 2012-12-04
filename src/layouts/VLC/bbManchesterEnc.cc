@@ -16,10 +16,10 @@ void bbManchesterEnc::Encode(const int *iptr, int *optr, int no, int d_mode)
 	for (int n = 0; n < no/2; n++)
 	{
 		//we force the output to be between 1,-1 for debug purposes (if USRP is selected, this has not to be applied)
-		*optr++ = (*iptr+d_mode)&0x1;
-		*(optr-1) = 2**(optr-1)-1;
-		*optr++ = (*iptr+++1+d_mode)&0x1;
-		*(optr-1) = 2**(optr-1)-1;
+		*optr++ = 2*((*iptr+d_mode)&0x1)-1;
+		//*(optr-1) = 2**(optr-1)-1;
+		*optr++ = 2*((*iptr+++1+d_mode)&0x1)-1;
+		//*(optr-1) = 2**(optr-1)-1;
 	}
 }
 int bbManchesterEnc::work(int no, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) 
