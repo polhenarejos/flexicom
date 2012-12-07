@@ -371,7 +371,12 @@ bool MainWindow::closeProject()
 }
 void MainWindow::aboutHelp()
 {
-	QMessageBox::about(this, "About", "This is the dialog");
+	const char *txt = "FlexiCom.\n"
+						"All rights reserved.\n\n"
+						"Developed by Pol Henarejos (pol.henarejos@cttc.es)\n"
+						"and Jordi Baranda (jordi.baranda@cttc.es)\n"
+						"at Centre Tecnologic de Telecomunicacions de Catalunya (CTTC) facilities.";
+	QMessageBox::about(this, "About", txt);
 }
 void MainWindow::SetSignalModified()
 {
