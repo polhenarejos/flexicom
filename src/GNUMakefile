@@ -5,15 +5,15 @@ TESTS=test.cc test_example.cc
 LAYOUTS=BBN_PLCP.cc BBN_Slicer.cc BBN_DPSKDemod.cc Layout80211b.cc Rx80211b.cc \
 				Layout80211b_moc.cc
 LAYOUTS+=bb4b6bEnc.cc bb8b10bEnc.cc bbCCEnc.cc bbManchesterDec.cc bbManchesterEnc.cc \
-					bbPHR_generation.cc bbPSDU_generation.cc bbRSEnc.cc bbVLC_Frame_Generator.cc \
-					bbVLC_info_assembler.cc InterPunct.cc De2Bi.cc Bi2De.cc LayoutVLC.cc PHY_I_modulator.cc \
-					PHY_II_modulator.cc RxVLC.cc TxVLC.cc vlc_convolutional_coding.cc \
-					vlc_reed_solomon.cc LayoutVLC_moc.cc bbCCDec.cc TxTagger.cc Parser.cc\
-					bb_bit_removal.cc bbVLC_Frame_Extractor.cc PHY_I_demodulator.cc bb_Header_cp.cc  \
-					PHY_II_demodulator.cc bbRSDec.cc bb4b6bDec.cc bb8b10bDec.cc Interleaver.cc Puncture.cc \
-					Correlator.cc Timing.cc DataSource.cc
+					bbRSEnc.cc bbVLC_Frame_Generator.cc \
+					InterPunct.cc De2Bi.cc Bi2De.cc LayoutVLC.cc \
+					RxVLC.cc TxVLC.cc vlc_convolutional_coding.cc \
+					vlc_reed_solomon.cc LayoutVLC_moc.cc bbCCDec.cc Parser.cc\
+					bbRSDec.cc bb4b6bDec.cc bb8b10bDec.cc Interleaver.cc Puncture.cc \
+					Correlator.cc Timing.cc DataSource.cc PHREncoder.cc PHRDecoder.cc \
+					PSDUEncoder.cc PSDUDecoder.cc bbManchesterDec_2.cc
 TESTS+=test_CC.cc test_RLL.cc test_RS.cc test_VLCInterleaver.cc
-MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc Tcp.cc Oversampler.cc Audio.cc Vocoder.cc SNR.cc \
+MODULES=bbMatlab.cc QtBlock.cc QtBlock_moc.cc MSE.cc Tcp.cc Oversampler.cc SNR.cc \
 				BER.cc NoOverflow.cc
 VPATH=layouts/80211b:layouts/VLC:modules:layouts/VLC/test:../test
 CFLAGS_LAYOUTS=-Ilayouts/VLC -Ilayouts/80211b
@@ -42,7 +42,7 @@ MAKE=make $(MAKEARGS)
 all: build
 
 build: $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o
-	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o $(LDFLAGS) GSM.a
+	$(CC) $(CFLAGS) -o $(OUTDIR)/$(TARGET) $(OBJS) $(LAYOBJS) $(MODOBJS) $(OUTDIR)/main.o $(LDFLAGS) 
 	@$(CP) $(OUTDIR)/$(TARGET) ../$(TARGET)
 
 $(OUTDIR)/MainWindow.o: MainWindow.cc $(INCLUDES)
