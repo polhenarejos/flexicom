@@ -1,10 +1,10 @@
 // $Id$
 #include "BBN_DPSKDemod.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <QtGlobal>
 
 BBN_DPSKDemod::BBN_DPSKDemod() :
-	gr_block("BBN_DPSKDemod", gr_make_io_signature (1, 1, sizeof (gr_complex)), gr_make_io_signature (1, 2, sizeof (ushort))),
+	gr::block("BBN_DPSKDemod", gr::io_signature::make (1, 1, sizeof (gr_complex)), gr::io_signature::make (1, 2, sizeof (ushort))),
 	d_e_squared(0), d_sample_count(0), d_rssi(0), d_prev(gr_complex(0,0))
 {
 	set_relative_rate(1.f/8);

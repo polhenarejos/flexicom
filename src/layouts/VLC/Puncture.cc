@@ -1,10 +1,10 @@
 // $Id$
 
 #include "Puncture.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 Puncture::Puncture(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length) :
-	gr_block("Interleaver", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr::block("Interleaver", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int))),
 	rs_length(_rs_length), ic(0)
 {
 	unsigned int S_frame = ceil((double)_raw_length/_GF);

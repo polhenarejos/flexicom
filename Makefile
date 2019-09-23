@@ -25,35 +25,35 @@ PREF=x32
 !endif
 
 ## QT
-QT_DIR=deps\Qt
+QT_DIR=C:\Qt5.11\5.11.1\msvc2017_64
 QT_INC_DIR=$(QT_DIR)\include
-QT_LIB_DIR=$(QT_DIR)\lib\$(PREF)
-QT_BIN_DIR=$(QT_DIR)\bin\$(PREF)
-MOC=deps\Qt\bin\$(PREF)\moc.exe
+QT_LIB_DIR=$(QT_DIR)\lib
+QT_BIN_DIR=$(QT_DIR)\bin
+MOC=$(QT_DIR)\bin\moc.exe
 ## QWT
-QWT_DIR=deps\Qwt
-QWT_INC_DIR=$(QWT_DIR)\include
-QWT_LIB_DIR=$(QWT_DIR)\lib\$(PREF)
-QWT_BIN_DIR=$(QWT_DIR)\bin\$(PREF)
+QWT_DIR=C:\CTTC\qwt-6.1.3
+QWT_INC_DIR=$(QWT_DIR)\src
+QWT_LIB_DIR=$(QWT_DIR)\lib
+QWT_BIN_DIR=$(QWT_DIR)\lib
 ## Boost
-BOOST_DIR=deps\boost
-BOOST_INC_DIR=$(BOOST_DIR)\include
-BOOST_LIB_DIR=$(BOOST_DIR)\lib\$(PREF)
-BOOST_BIN_DIR=$(BOOST_DIR)\bin\$(PREF)
+BOOST_DIR=C:\CTTC\boost_1_68_0
+BOOST_INC_DIR=$(BOOST_DIR)
+BOOST_LIB_DIR=$(BOOST_DIR)\lib64-msvc-14.1
+BOOST_BIN_DIR=$(BOOST_DIR)\lib64-msvc-14.1
 ## Gnuradio
-GR_DIR=deps\gnuradio
+GR_DIR=C:\CTTC\gnuradio
 GR_INC_DIR=$(GR_DIR)\include
-GR_LIB_DIR=$(GR_DIR)\lib\$(PREF)
-GR_BIN_DIR=$(GR_DIR)\bin\$(PREF)
+GR_LIB_DIR=$(GR_DIR)\lib
+GR_BIN_DIR=$(GR_DIR)\bin
 ## UHD
-UHD_DIR=deps\UHD
+UHD_DIR=C:\CTTC\UHD
 UHD_INC_DIR=$(UHD_DIR)\include
-UHD_LIB_DIR=$(UHD_DIR)\lib\$(PREF)
-UHD_BIN_DIR=$(UHD_DIR)\bin\$(PREF)
+UHD_LIB_DIR=$(UHD_DIR)\lib
+UHD_BIN_DIR=$(UHD_DIR)\bin
 ## CPPUNIT
-CPPUNIT_DIR=deps\cppunit
+CPPUNIT_DIR=C:\CTTC\cppunit
 CPPUNIT_INC_DIR=$(CPPUNIT_DIR)\include
-CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib\$(PREF)
+CPPUNIT_LIB_DIR=$(CPPUNIT_DIR)\lib
 ## NaturalDocs
 DOC_DIR=deps\doxygen\bin\$(PREF)
 DOC_BIN=$(DOC_DIR)\doxygen
@@ -70,10 +70,8 @@ LAYOUT_INC=/I $(LAYOUT_DIR)/80211b /I $(LAYOUT_DIR)/VLC /I $(INC_DIR)/$(MOD_DIR)
 TARGET=flexicom
 TEST_DIR=test
 
-QT_CORE_DIR=$(QT_INC_DIR)\QtCore
-QT_GUI_DIR=$(QT_INC_DIR)\QtGui
-QT_INC=/I $(QT_CORE_DIR) /I $(QT_GUI_DIR) /I $(QT_INC_DIR) 
-QT_LIB=/LIBPATH:$(QT_LIB_DIR) QtCore4.lib QtGui4.lib 
+QT_INC=/I $(QT_INC_DIR) /I $(QT_INC_DIR)/QtCore /I $(QT_INC_DIR)/QtGui /I $(QT_INC_DIR)/QtWidgets 
+QT_LIB=/LIBPATH:$(QT_LIB_DIR) Qt5Core.lib Qt5Gui.lib Qt5Widgets.lib Qt5WinExtras.lib
 QWT_INC=/I $(QWT_INC_DIR)
 QWT_LIB=/LIBPATH:$(QWT_LIB_DIR) qwt.lib
 !if $(CMDLINE) == 0
@@ -83,8 +81,8 @@ CMDLINE_CFLAG=/D CMDLINE
 !endif
 BOOST_INC=/I $(BOOST_INC_DIR)
 BOOST_LIB=/LIBPATH:$(BOOST_LIB_DIR)
-GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/gnuradio /I $(GR_INC_DIR)/volk
-GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-core.lib gnuradio-uhd.lib gnuradio-filter.lib gnuradio-digital.lib volk.lib gruel.lib
+GR_INC=/I $(GR_INC_DIR) /I $(GR_INC_DIR)/volk /I $(GR_INC_DIR)/../../log4cpp/include
+GR_LIB=/LIBPATH:$(GR_LIB_DIR) gnuradio-runtime.lib gnuradio-uhd.lib gnuradio-filter.lib gnuradio-digital.lib gnuradio-blocks.lib gnuradio-fec.lib gnuradio-pmt.lib volk.lib
 UHD_INC=/I $(UHD_INC_DIR)
 UHD_LIB=/LIBPATH:$(UHD_LIB_DIR) uhd.lib
 CPPUNIT_INC=/I $(CPPUNIT_INC_DIR)
@@ -92,7 +90,7 @@ CPPUNIT_LIB=/LIBPATH:$(CPPUNIT_LIB_DIR) cppunit.lib
 
 INC_FILES = /I $(INC_DIR) $(QT_INC) $(QWT_INC) $(BOOST_INC) $(LAYOUT_INC) $(GR_INC) $(UHD_INC)
 EXECFLAGS=$(DBGCFLAG) $(CFLAGS) $(INC_FILES) /Fo$(OBJ_DIR)/
-CFLAGS=/J /D NOMINMAX /D _WIN /D _WINDOWS /D _CRT_NONSTDC_NO_DEPRECATE /D _CRT_SECURE_NO_DEPRECATE /nologo /EHsc /c $(CMDLINE_CFLAG) 
+CFLAGS=/J /D ASSUMESTDTYPES /D NOMINMAX /D _USE_MATH_DEFINES /D _WIN /D _WINDOWS /D _CRT_NONSTDC_NO_DEPRECATE /D _CRT_SECURE_NO_DEPRECATE /nologo /EHsc /c $(CMDLINE_CFLAG) 
 LFLAGS=$(DBGLFLAG) /LIBPATH:$(OBJ_DIR) user32.lib kernel32.lib ws2_32.lib /nologo $(CMDLINE_LFLAG) $(QT_LIB) $(QWT_LIB) $(BOOST_LIB) $(GR_LIB) $(UHD_LIB) \
 	/INCREMENTAL:NO /MANIFEST 
 
@@ -132,7 +130,7 @@ TEST_LAYOUTS= $(OBJ_DIR)/test_RLL.obj  $(OBJ_DIR)/test_PHY_I_mod.obj $(OBJ_DIR)/
 
 TEST_FILES=$(OBJ_DIR)/test.obj $(OBJ_DIR)/test_example.obj
 
-all: $(TARGET).exe install_deps
+all: $(TARGET).exe 
 	$(RM) Makefile.auto Is64.exe
 	
 install_deps:

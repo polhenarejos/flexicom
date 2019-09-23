@@ -58,7 +58,7 @@ LayoutFactory::sptr LayoutVLC::Create(MainWindow *_mw, int _radioID)
 
 void LayoutVLC::Run()
 {
-	grTop = gr_make_top_block(std::string(name));
+	grTop = gr::make_top_block(std::string(name));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
 		rx = RxVLC::Create(this);
@@ -505,7 +505,7 @@ void LayoutVLC::ChatClicked()
 	if (tx && size)
 	{
 		unsigned char *t = new unsigned char[size+1];
-		memcpy(t, (unsigned char *)varVLC->le_chat->text().toAscii().data(), sizeof(unsigned char)*(size+1));
+		memcpy(t, (unsigned char *)varVLC->le_chat->text().toStdString().c_str(), sizeof(unsigned char)*(size+1));
 		t[size] = '\0';
 		tx->SendPacket(t, size+1);
 		varVLC->tx_chat->setPlainText(varVLC->tx_chat->toPlainText().append(varVLC->le_chat->text().append('\n')));

@@ -1,11 +1,11 @@
 // $Id$
 #include "BBN_PLCP.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 #define PLCP_DEBUG 0
 
-BBN_PLCP::BBN_PLCP(gr_msg_queue_sptr target_queue, bool check_crc) :
-	gr_block ("BBN_PLCP", gr_make_io_signature (1, 2, sizeof (ushort)), gr_make_io_signature(0,0,0)),
+BBN_PLCP::BBN_PLCP(gr::msg_queue::sptr target_queue, bool check_crc) :
+	gr::block ("BBN_PLCP", gr::io_signature::make (1, 2, sizeof (ushort)), gr::io_signature::make(0,0,0)),
 	d_symbol_count(0), d_packet_rx_time(0), d_packet_rate(0), d_target_queue(target_queue), d_state(PLCP_STATE_SEARCH_PREAMBLE), crc_table_initialized(false),
 	d_data(0), d_byte_count(0), d_pdu_len(0), d_rate(PLCP_RATE_1MBPS), d_data1_in(0), d_data2_in(0), d_check_crc(check_crc), d_scrambler_seed(0x62) 
 {
@@ -26,7 +26,7 @@ BBN_PLCP::~BBN_PLCP()
 	if (d_table) 
 		delete d_table;
 }
-BBN_PLCP::sptr BBN_PLCP::Create(gr_msg_queue_sptr target_queue, bool check)
+BBN_PLCP::sptr BBN_PLCP::Create(gr::msg_queue::sptr target_queue, bool check)
 {
 	return sptr(new BBN_PLCP(target_queue, check));
 }
@@ -348,7 +348,7 @@ int BBN_PLCP::general_work(int noutput_items, gr_vector_int &ninput_items, gr_ve
 						}
 						d_pdu_len -= 4; /* Strip the crc from the payload */
 					}
-					gr_message_sptr msg = gr_make_message(0, 0, 0, d_pdu_len + sizeof(oob_hdr_t));
+					gr::message::sptr msg = gr::message::make(0, 0, 0, d_pdu_len + sizeof(oob_hdr_t));
 					memcpy(msg->msg() + sizeof(oob_hdr_t), d_pkt_data, d_pdu_len);
 					oob = (oob_hdr_t *)msg->msg();
 					oob->timestamp = d_packet_rx_time; /* Relative time in microseconds */

@@ -1,6 +1,6 @@
 // $Id$
 #include "bbManchesterDec_2.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 typedef unsigned int uint;
 
@@ -8,7 +8,7 @@ bbManchesterDec_2::~bbManchesterDec_2()
 {
 }
 bbManchesterDec_2::bbManchesterDec_2():
-	gr_sync_decimator("bbManchesterDec_2", gr_make_io_signature (1,1, sizeof(float)), gr_make_io_signature (1,1, sizeof(int)), 4)
+	gr::sync_decimator("bbManchesterDec_2", gr::io_signature::make (1,1, sizeof(float)), gr::io_signature::make (1,1, sizeof(int)), 4)
 {
 }
 bbManchesterDec_2::sptr bbManchesterDec_2::Create()

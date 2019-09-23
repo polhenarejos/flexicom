@@ -3,10 +3,10 @@
 #ifndef _INC_PSDUDECODER_H
 #define _INC_PSDUDECODER_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "LayoutVLC.h"
 
-class PSDUDecoder : public gr_block
+class PSDUDecoder : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<PSDUDecoder> sptr;

@@ -2,23 +2,23 @@
 
 #include "compat.h"
 #include "TxVLC.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "LayoutVLC.h"
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
-#include <gr_int_to_float.h>
-#include <gr_float_to_complex.h>
+#include <gnuradio/blocks/int_to_float.h>
+#include <gnuradio/blocks/float_to_complex.h>
 #include "bbVLC_Frame_Generator.h"
 #include "bbMatlab.h"
 #include "DataSource.h"
 #include "PSDUEncoder.h"
 #include "PHREncoder.h"
 #include "De2Bi.h"
-#include <gr_file_source.h>
+#include <gnuradio/blocks/file_source.h>
 
 TxVLC::TxVLC(LayoutVLC * _ly) :
-	gr_hier_block2("TxVLC", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(gr_complex))),
+	gr::hier_block2("TxVLC", gr::io_signature::make(0, 0, 0), gr::io_signature::make(1, 1, sizeof(gr_complex))),
 	ly(_ly)
 {
 	//variable initialization, to make easier the pass of parameters. 
@@ -30,9 +30,9 @@ TxVLC::TxVLC(LayoutVLC * _ly) :
 	PSDUEncoder::sptr psdu_enc = PSDUEncoder::Create();
 	PHREncoder::sptr phr_enc = PHREncoder::Create();
 	if (media)
-		connect(gr_make_file_source(sizeof(unsigned char), "tx.ts", false), 0, data_source, 0);
+		connect(gr::blocks::file_source::make(sizeof(unsigned char), "tx.ts", false), 0, data_source, 0);
 	connect(data_source, 0, psdu_enc, 0);
-	gr_float_to_complex_sptr f2c = gr_make_float_to_complex();
+	gr::blocks::float_to_complex::sptr f2c = gr::blocks::float_to_complex::make();
 	//PHY I
 	int phr_mod = LayoutVLC::GetModulatedResources((LayoutVLC::PHYType)ly->vlc_var.phy_type, (LayoutVLC::Modulation)ly->vlc_var.mod_type, 0, ly->vlc_var.PHR_raw_length);
 	int psdu_mod = LayoutVLC::GetModulatedResources((LayoutVLC::PHYType)ly->vlc_var.phy_type, (LayoutVLC::Modulation)ly->vlc_var.mod_type, ly->vlc_var.operating_mode, ly->vlc_var.PSDU_raw_length);

@@ -1,8 +1,8 @@
 // $Id$
 #include "BBN_Slicer.h"
-#include <gr_io_signature.h>
-#include <gr_expj.h>
-#include <gr_sincos.h>
+#include <gnuradio/io_signature.h>
+#include <gnuradio/expj.h>
+#include <gnuradio/sincos.h>
 #include <math.h>
 #include <QtGlobal>
 
@@ -21,7 +21,7 @@ BBN_Slicer::~BBN_Slicer()
 	}
 }
 BBN_Slicer::BBN_Slicer(int samples_per_symbol, int num_symbols) :
-	gr_block ("BBN_Slicer", gr_make_io_signature (1, 1, sizeof (gr_complex)), gr_make_io_signature (1, 1, sizeof (gr_complex))),
+	gr::block ("BBN_Slicer", gr::io_signature::make (1, 1, sizeof (gr_complex)), gr::io_signature::make (1, 1, sizeof (gr_complex))),
 	d_samples_per_symbol(samples_per_symbol) 
 {
 	int i;

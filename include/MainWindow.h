@@ -3,21 +3,21 @@
 #ifndef _INC_MAINWINDOW_H_
 #define _INC_MAINWINDOW_H_
 
-#include <qmainwindow.h>
+#include <QtWidgets/QMainWindow>
 #include <vector>
-#include <QRadioButton>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QLabel>
-#include <QCloseEvent>
-#include <QSettings>
-#include <QGridLayout>
-#include <QMenu>
-#include <QAction>
-#include <QFileInfo>
-#include <QCheckBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLabel>
+#include <QtGui/QCloseEvent>
+#include <QtCore/QSettings>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
+#include <QtCore/QFileInfo>
+#include <QtWidgets/QCheckBox>
 #include "LayoutFactory.h"
 
 class Panel;

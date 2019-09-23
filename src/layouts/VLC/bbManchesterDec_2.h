@@ -2,7 +2,7 @@
 #ifndef _INC_BBMANCHESTERDEC_2_H_
 #define _INC_BBMANCHESTERDEC_2_H_
 
-#include <gr_sync_decimator.h>
+#include <gnuradio/sync_decimator.h>
 
 /*! \brief BBMANCHESTERDEC_2 performs the Manchester decoding of the operation specified in section 10.5.2 of IEEE 802.15.7
 
@@ -10,7 +10,7 @@
 Used with the OOK modulation in PHY I operating mode.
 */
 
-class bbManchesterDec_2 : public gr_sync_decimator
+class bbManchesterDec_2 : public gr::sync_decimator
 {
 	public:
 		typedef boost::shared_ptr<bbManchesterDec_2> sptr;

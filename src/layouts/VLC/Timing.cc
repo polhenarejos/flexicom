@@ -2,13 +2,12 @@
 
 #include "Timing.h"
 #include "compat.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <volk/volk.h>
-#include <gnuradio/malloc16.h>
 #include <stdio.h>
 
 Timing::Timing(unsigned int _decim, unsigned int _syms) :
-	gr_sync_decimator("Timing", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float)), _decim),
+	gr::sync_decimator("Timing", gr::io_signature::make(1, 1, sizeof(float)), gr::io_signature::make(1, 1, sizeof(float)), _decim),
 	syms(_syms)
 {
 	set_output_multiple(syms);
@@ -23,7 +22,7 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 	const float *iptr = (const float *)_i[0];
 	float *optr = (float *)_o[0];
 	unsigned int decim = decimation();
-	float *E = (float *)malloc16Align(sizeof(float)*no*decim), *Ey = E;
+	float *E = (float *)volk_malloc(sizeof(float)*no*decim, 16), *Ey = E;
 	//if (is_unaligned())
 		volk_32f_x2_multiply_32f_u(E, iptr, iptr, no*decim);
 	//else
@@ -52,6 +51,6 @@ int Timing::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 		iptr += syms*decim;
 		Ey += syms*decim;
 	}
-	free16Align(E);
+	volk_free(E);
 	return no;
 }

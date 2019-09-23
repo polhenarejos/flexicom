@@ -12,10 +12,10 @@
 #include "bbCCDec.h"
 #include "LayoutVLC.h"
 #include "Parser.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 PSDUDecoder::PSDUDecoder(LayoutVLC *_ly) :
-	gr_block("PSDUDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(unsigned char))),
+	gr::block("PSDUDecoder", gr::io_signature::make(1, 1, sizeof(float)), gr::io_signature::make(1, 1, sizeof(unsigned char))),
 	cpd(0), buf(NULL), buf_bis(NULL), CRCok(0), CRCnok(0), ly(_ly)
 {
 	set_tag_propagation_policy(TPP_DONT);
@@ -110,8 +110,8 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 	const float *iptr = (const float *)_i[0];
 	unsigned char *optr = (unsigned char *)_o[0];
 	const uint64_t nread = nitems_read(0);
-	std::vector<gr_tag_t> tags;
-	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("PSDU"));
+	std::vector<gr::tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+no, pmt::string_to_symbol("PSDU"));
 	if (cpd) //previous
 	{
 		int c = std::min(cpd, no);
@@ -124,7 +124,7 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 	}
 	for (int t = 0; t < tags.size(); t++)
 	{
-		ph = boost::any_cast<PHYHdr>(pmt::pmt_any_ref(tags[t].value));
+		ph = boost::any_cast<PHYHdr>(pmt::any_ref(tags[t].value));
 		int MCSID = ph.MCS;
 		if (MCSID <= 8)
 		{
@@ -176,7 +176,7 @@ int PSDUDecoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 		std::vector<unsigned char> pld = payloads[0];
 		if (phys[0].PL)
 		{
-			add_item_tag(0, nwrit+no-ocpd, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(phys[0]), pmt::pmt_string_to_symbol(name()));
+			add_item_tag(0, nwrit+no-ocpd, pmt::string_to_symbol("PSDU"), pmt::make_any(phys[0]), pmt::string_to_symbol(name()));
 			phys[0].PL = 0;
 		}
 		if (pld.size() <= ocpd) //pop and thats all

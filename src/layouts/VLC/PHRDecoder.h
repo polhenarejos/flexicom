@@ -3,12 +3,12 @@
 #ifndef _INC_PHRDECODER_H_
 #define _INC_PHRDECODER_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 #include "LayoutVLC.h"
 class vlc_convolutional_coding;
 class vlc_reed_solomon;
 
-class PHRDecoder : public gr_sync_block
+class PHRDecoder : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<PHRDecoder> sptr;

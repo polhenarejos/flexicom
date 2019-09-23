@@ -3,7 +3,7 @@
 #include "bb8b10bEnc.h"
 #include "LayoutVLC.h"
 #include "Bi2De.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <math.h>
 
 typedef unsigned int uint;
@@ -33,7 +33,7 @@ int bits_5_RD_positive[] = { 0,0,0,1,1,0, 0,1,0,0,0,1, 0,1,0,0,1,0, 1,0,0,0,1,1,
                          0,1,1,1,0,0, 1,0,0,0,1,0, 1,0,0,0,0,1, 0,0,1,0,1,0};   
 
 bb8b10bEnc::bb8b10bEnc(int _mod_length):
-	gr_block("bb8b10bEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
+	gr::block("bb8b10bEnc", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int)))
 {
 	RD = 0;
 	words_processed = 0;

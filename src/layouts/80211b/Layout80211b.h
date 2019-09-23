@@ -4,12 +4,12 @@
 
 #include "LayoutFactory.h"
 #include "Rx80211b.h"
-#include <qwt/qwt_plot.h>
-#include <gr_top_block.h>
-#include <QObject>
-#include <QComboBox>
-#include <QSettings>
-class uhd_usrp_source;
+#include <qwt_plot.h>
+#include <gnuradio/top_block.h>
+#include <QtCore/QObject>
+#include <QtWidgets/QComboBox>
+#include <QtCore/QSettings>
+#include <gnuradio/uhd/usrp_source.h>
 class MainWindow;
 
 class Layout80211b : public QObject, public LayoutFactory
@@ -18,10 +18,10 @@ class Layout80211b : public QObject, public LayoutFactory
 	
 	private:
 		static const char *name;
-		gr_top_block_sptr grTop;
+		gr::top_block_sptr grTop;
 		Rx80211b::sptr rx;
 		//Tx80211b::sptr tx;
-		boost::shared_ptr<uhd_usrp_source> usrp;
+		gr::uhd::usrp_source::sptr usrp;
 		QWidget *CreateTabOpts();
 		QComboBox *cb_chans;
 		void ReadSettings(QSettings *);

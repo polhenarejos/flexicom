@@ -3,9 +3,9 @@
 #ifndef _INC_AUDIO_H_
 #define _INC_AUDIO_H_
 
-#include <gr_hier_block2.h>
+#include <gnuradio/hier_block2.h>
 
-class AudioSource : public gr_hier_block2
+class AudioSource : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<AudioSource> sptr;
@@ -15,7 +15,7 @@ class AudioSource : public gr_hier_block2
 		AudioSource(unsigned int);
 };
 
-class AudioSink : public gr_hier_block2
+class AudioSink : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<AudioSink> sptr;

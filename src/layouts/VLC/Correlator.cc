@@ -3,11 +3,10 @@
 #include "Correlator.h"
 #include "LayoutVLC.h"
 #include <volk/volk.h>
-#include <gnuradio/malloc16.h>
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 Correlator::Correlator(unsigned int _ov, LayoutVLC *_ly, float _th) :
-	gr_block("Correlator", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
+	gr::block("Correlator", gr::io_signature::make(1, 1, sizeof(float)), gr::io_signature::make(1, 1, sizeof(float))),
 	pattern(-1), cpd(0), th(_th), ov(_ov), strike(false), ly(_ly)
 {
 	float _TDP[4][60] = { { 1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,1,1,-1,1,1,1 },
@@ -23,7 +22,7 @@ Correlator::Correlator(unsigned int _ov, LayoutVLC *_ly, float _th) :
 		for (int i = 0; i < 4; i++)
 		{
 			int s = ov*(t+1);
-			TDP[i+t*4] = (float *)malloc16Align(sizeof(float)*60*s);
+			TDP[i+t*4] = (float *)volk_malloc(sizeof(float)*60*s,16);
 			for (int j = 0; j < 60; j++)
 				std::fill_n(TDP[i+t*4]+j*s, s, _TDP[i][j]);
 		}
@@ -39,7 +38,7 @@ Correlator::sptr Correlator::Create(unsigned int _ov, LayoutVLC *_ly, float _th)
 Correlator::~Correlator()
 {
 	for (int i = 0; i < 8; i++)
-		free16Align(TDP[i]);
+		volk_free(TDP[i]);
 }
 void Correlator::forecast(int no, gr_vector_int &ni)
 {
@@ -47,7 +46,7 @@ void Correlator::forecast(int no, gr_vector_int &ni)
 }
 void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int v)
 {
-	float *tN = (float *)malloc16Align(sizeof(float)*no);
+	float *tN = (float *)volk_malloc(sizeof(float)*no,16);
 	//if (is_unaligned()) 
 	{
 		volk_32f_x2_dot_prod_32f_u(tC, iptr, tD, siz*v);
@@ -66,7 +65,7 @@ void Correlator::Correlate(const float *iptr, float *tD, float *tC, int no, int 
 	volk_32f_x2_multiply_32f_a(tC, tC, tC, no);
 	volk_32f_s32f_multiply_32f_a(tN, tN, siz*v/2, no);
 	volk_32f_x2_divide_32f_a(tC, tC, tN, no);
-	free16Align(tN);
+	volk_free(tN);
 }
 int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_star &_i, gr_vector_void_star &_o) 
 {
@@ -78,23 +77,23 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	if (!cpd)
 	{
 		unsigned int idx = 0, corr = no;
-		float *C = (float *)malloc16Align(sizeof(float)*corr*(pattern == -1 ? 8 : 1));
+		float *C = (float *)volk_malloc(sizeof(float)*corr*(pattern == -1 ? 8 : 1),16);
 		if (pattern == -1)
 		{
 			for (int t = 0; t < 2; t++)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					float *tC = (float *)malloc16Align(sizeof(float)*corr);
+					float *tC = (float *)volk_malloc(sizeof(float)*corr,16);
 					Correlate(iptr, TDP[t*4+i], tC, corr, t+1);
 					memcpy(C+(t*4+i)*corr, tC, sizeof(float)*corr);
-					free16Align(tC);
+					volk_free(tC);
 				}
 			}
 		}
 		else
 			Correlate(iptr, TDP[pattern], C, corr, vppm);
-		volk_32f_index_max_16u_a(&idx, C, (pattern == -1 ? corr*8 : corr));
+		volk_32f_index_max_16u_a((uint16_t *)&idx, C, (pattern == -1 ? corr*8 : corr));
 		if ((C[idx] > 1 && C[idx] > th*2) || (C[idx] <= 1 && C[idx] > th))
 		{
 			if (!strike)
@@ -102,7 +101,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				strike = true;
 				consume_each(idx%no);
 				memcpy(optr, iptr, sizeof(float)*(idx%no));
-				free16Align(C);
+				volk_free(C);
 				return idx%no;
 			}
 			else
@@ -115,7 +114,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				//printf("Found sample %f at %d (%d) [%s]\n", C[idx], idx%no, pattern, vppm == 1 ? "OOK" : "VPPM");
 				cpd = copy;
 				o = idx%corr;
-				add_item_tag(0, nitems_written(0)+o+siz*vppm, pmt::pmt_string_to_symbol("SyncPeak"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
+				add_item_tag(0, nitems_written(0)+o+siz*vppm, pmt::string_to_symbol("SyncPeak"), pmt::PMT_T, pmt::string_to_symbol(name()));
 				strike = false;
 				ly->mtx.lock();
 				ly->syncs++;
@@ -124,7 +123,7 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		}
 		else
 			strike = false;
-		free16Align(C);
+		volk_free(C);
 	}
 	//memcpy(optr, iptr, sizeof(float)*no);
 	if (cpd)
@@ -137,16 +136,16 @@ int Correlator::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	memcpy(optr, iptr, sizeof(float)*rtd);
 	//Grab SNR tags
 	const uint64_t nread = nitems_read(0);
-	std::vector<gr_tag_t> tags;
-	/*get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("snr"));
+	std::vector<gr::tag_t> tags;
+	/*get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::string_to_symbol("snr"));
 	if (tags.size())
-		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g', 3));
-	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::pmt_string_to_symbol("power"));
+		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(0, 1)->widget(), QString::number(pmt::to_double(tags[0].value), 'g', 3));
+	get_tags_in_range(tags, 0, nread, nread+ni[0], pmt::string_to_symbol("power"));
 	if (tags.size())
-		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::pmt_to_double(tags[0].value), 'g'));
+		ly->EmitChangeMetric((QLabel *)ly->gridMeas->itemAtPosition(1, 1)->widget(), QString::number(pmt::to_double(tags[0].value), 'g'));
 		*/
 	static bool freset = false;
-	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("rx_time"));
+	get_tags_in_range(tags, 0, nread, nread+no, pmt::string_to_symbol("rx_time"));
 	if (tags.size())
 	{
 		if (freset)

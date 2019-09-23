@@ -2,7 +2,7 @@
 #ifndef _INC_BBCCENC_H
 #define _INC_BBCCENC_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "vlc_convolutional_coding.h"
 
 /*! \brief bbCCEnc class manages the block in charge to perform the Convolutional Encoding process as defined in section 10.4 of IEEE 802.15.7
@@ -12,7 +12,7 @@
    according to the schemes found in section  10.4.1, 10.4.2 and 10.4.3 of IEEE 802.15.7
 */
 
-class bbCCEnc : public gr_block
+class bbCCEnc : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bbCCEnc> sptr;

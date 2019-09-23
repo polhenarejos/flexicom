@@ -1,6 +1,6 @@
 // $Id$
 #include "bbVLC_Frame_Generator.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <math.h>
 
 
@@ -17,7 +17,7 @@ float visibility_patterns[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 
                             
 bbVLC_Frame_Generator::bbVLC_Frame_Generator(int _d_mode, int _FLP, int _tx_mode, int _PSDU_units, int _length_PHR, int _length_data_payload, int _length_burst):
-	gr_block("bbVLC_Frame_Generator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(float))), d_mode(_d_mode), FLP_length(_FLP), tx_mode(_tx_mode), 
+	gr::block("bbVLC_Frame_Generator", gr::io_signature::make(1,1,sizeof(int)), gr::io_signature::make(1,1,sizeof(float))), d_mode(_d_mode), FLP_length(_FLP), tx_mode(_tx_mode), 
 	PSDU_units(_PSDU_units), length_PHR(_length_PHR), length_data_payload(_length_data_payload), length_burst(_length_burst)
 {
 	assert (FLP_length%2==0);

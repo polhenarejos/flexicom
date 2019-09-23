@@ -2,14 +2,14 @@
 #ifndef _INC_BBRSDEC_H
 #define _INC_BBRSDEC_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "vlc_reed_solomon.h"
 
 /*! \brief bbRSDec is the block in charge to perform the Reed Solomon decoding according to the input parameters 
 
 */
 
-class bbRSDec : public gr_block
+class bbRSDec : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bbRSDec> sptr;

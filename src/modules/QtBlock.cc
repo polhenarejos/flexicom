@@ -3,7 +3,6 @@
 #include "QtBlock.h"
 #include "compat.h"
 #include <volk/volk.h>
-#include <gnuradio/malloc16.h>
 #ifdef _WIN
 #include <windows.h>
 #else
@@ -11,8 +10,8 @@
 #include <stdlib.h>
 #endif
 
-QtBlock::QtBlock(QwtPlot *_qp, std::string _s, gr_io_signature_sptr _io) :
-	gr_block(_s, _io, gr_make_io_signature(0, 0, 0)), qp(_qp)
+QtBlock::QtBlock(QwtPlot *_qp, std::string _s, gr::io_signature::sptr _io) :
+	gr::block(_s, _io, gr::io_signature::make(0, 0, 0)), qp(_qp)
 {
 	QObject::connect(this, SIGNAL(Replot()), this, SLOT(DrawPlot()), Qt::BlockingQueuedConnection);
 }
@@ -42,7 +41,7 @@ Qt1D::sptr Qt1D::Create(QwtPlot *_qp, int _acc)
 	return sptr(new Qt1D(_qp, _acc));
 }
 Qt1D::Qt1D(QwtPlot *_qp, int _acc) :
-	QtBlock(_qp, std::string("Qt1D"), gr_make_io_signature(1, maxCurves, sizeof(float))), acc(_acc)
+	QtBlock(_qp, std::string("Qt1D"), gr::io_signature::make(1, maxCurves, sizeof(float))), acc(_acc)
 {
 	//float *xfval = (float *)_aligned_malloc(sizeof(float)*maxXval, 16);
 	//__m128 *pxfval = (__m128 *)xval;
@@ -57,7 +56,7 @@ Qt1D::Qt1D(QwtPlot *_qp, int _acc) :
 	{
 		qc[i] = new QwtPlotCurve("C");
 		qc[i]->attach(qp);
-		yval[i] = (double *)malloc16Align(sizeof(double)*8192*2);
+		yval[i] = (double *)volk_malloc(sizeof(double)*8192*2, 16);
 	}
 	
 }

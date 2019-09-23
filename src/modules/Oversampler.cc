@@ -1,11 +1,11 @@
 // $Id$
 
 #include "Oversampler.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 template <class T>
 Oversampler<T>::Oversampler(unsigned int pol) :
-	gr_sync_interpolator("Oversampler", gr_make_io_signature(1, gr_io_signature::IO_INFINITE, sizeof(T)), gr_make_io_signature(1, gr_io_signature::IO_INFINITE, sizeof(T)), pol)
+	gr::sync_interpolator("Oversampler", gr::io_signature::make(1, gr::io_signature::IO_INFINITE, sizeof(T)), gr::io_signature::make(1, gr::io_signature::IO_INFINITE, sizeof(T)), pol)
 {
 }
 template <class T>

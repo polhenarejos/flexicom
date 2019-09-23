@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string.h>
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <complex>
 #include "bbMatlab.h"
 #ifdef _WIN
@@ -24,7 +24,7 @@ bbMatlab::sptr bbMatlab::Create(std::string f, size_t s)
 	return sptr(new bbMatlab(f, s));
 }
 bbMatlab::bbMatlab(std::string f, size_t _s) : 
-	gr_sync_block("bbMatlab", gr_make_io_signature(1, gr_io_signature::IO_INFINITE, _s), gr_make_io_signature(0, 0, 0)),
+	gr::sync_block("bbMatlab", gr::io_signature::make(1, gr::io_signature::IO_INFINITE, _s), gr::io_signature::make(0, 0, 0)),
 	s(_s)
 {
 	int fd;

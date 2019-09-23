@@ -3,9 +3,9 @@
 #ifndef _INC_DE2BI_H_
 #define _INC_DE2BI_H_
 
-#include <gr_sync_interpolator.h>
+#include <gnuradio/sync_interpolator.h>
 
-class De2Bi : public gr_sync_interpolator
+class De2Bi : public gr::sync_interpolator
 {
 	public:
 		typedef boost::shared_ptr<De2Bi> sptr;

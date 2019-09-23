@@ -1,6 +1,6 @@
 // $Id$
 #include "Layout80211b.h"
-#include <gr_uhd_usrp_source.h>
+#include <gnuradio/uhd/usrp_source.h>
 #include "Rx80211b.h"
 #include "MainWindow.h"
 #include <QGroupBox>
@@ -32,13 +32,13 @@ LayoutFactory::sptr Layout80211b::Create(MainWindow *_mw, int _radioID)
 }
 void Layout80211b::Run()
 {
-	grTop = gr_make_top_block(std::string(name));
+	grTop = gr::make_top_block(std::string(name));
 	QString addr = QString("addr0=%1").arg(mw->panel->le_ip[0]->text().remove(' '));
 	for (int i = 1; i < mw->panel->sp_devs->value(); i++)
 		addr.append(",addr%1=%2").arg(i).arg(mw->panel->le_ip[i]->text().remove(' '));
 	if (mw->panel->rb_chain[RB_RX]->isChecked())
 	{
-		usrp = uhd_make_usrp_source(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
+		usrp = gr::uhd::usrp_source::make(addr.toStdString(), uhd::stream_args_t("fc32","sc8"));
 		usrp->set_samp_rate(10e6);
 		usrp->set_center_freq(channels[cb_chans->currentIndex()]*1e6);
 		usrp->set_gain(mw->panel->sp_gain->value());

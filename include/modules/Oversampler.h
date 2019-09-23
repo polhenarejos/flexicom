@@ -3,10 +3,10 @@
 #ifndef _INC_OVERSAMPLER_H_
 #define _INC_OVERSAMPLER_H_
 
-#include <gr_sync_interpolator.h>
+#include <gnuradio/sync_interpolator.h>
 
 template <class T>
-class Oversampler : public gr_sync_interpolator
+class Oversampler : public gr::sync_interpolator
 {
 	public:
 		typedef boost::shared_ptr<Oversampler<T> > sptr;

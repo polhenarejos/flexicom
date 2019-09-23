@@ -1,7 +1,7 @@
 // $Id$
 
 #include "bbRSEnc.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #include "Bi2De.h"
 
 bbRSEnc::bbRSEnc(unsigned int *_GF, unsigned int *_N, unsigned int *_K, unsigned int *_phy_type, unsigned int *_length):
-	gr_block("bbRSEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
+	gr::block("bbRSEnc", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int))),
 	pGF(_GF),pN(_N),pK(_K), pphy_type(_phy_type), plength(_length)
 {
 	vlc_rs = NULL;

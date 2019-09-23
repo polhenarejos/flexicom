@@ -3,9 +3,9 @@
 #ifndef _INC_BER_H_
 #define _INC_BER_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 
-class BER : public gr_sync_block
+class BER : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<BER> sptr;

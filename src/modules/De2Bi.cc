@@ -2,10 +2,10 @@
 
 #include "De2Bi.h"
 #include "LayoutVLC.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 De2Bi::De2Bi(unsigned int _size) :
-	gr_sync_interpolator("De2Bi", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int)), _size)
+	gr::sync_interpolator("De2Bi", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int)), _size)
 {
 }
 De2Bi::sptr De2Bi::Create(unsigned int _size)

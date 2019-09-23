@@ -2,10 +2,10 @@
 
 #include "Bi2De.h"
 #include "LayoutVLC.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 Bi2De::Bi2De(unsigned int _size) :
-	gr_sync_decimator("Bi2De", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int)), _size)
+	gr::sync_decimator("Bi2De", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int)), _size)
 {
 }
 Bi2De::sptr Bi2De::Create(unsigned int _size)

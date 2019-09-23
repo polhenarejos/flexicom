@@ -3,7 +3,7 @@
 #ifndef _INC_SHM_H_
 #define _INC_SHM_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -18,7 +18,7 @@ struct SHMMemory
 	_T data[Size];
 };
 template <class _T>
-class SHMSource : public gr_sync_block
+class SHMSource : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<SHMSource<_T> > sptr;
@@ -35,7 +35,7 @@ class SHMSource : public gr_sync_block
 };
 
 template <class _T>
-class SHMSink : public gr_sync_block
+class SHMSink : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<SHMSink<_T> > sptr;

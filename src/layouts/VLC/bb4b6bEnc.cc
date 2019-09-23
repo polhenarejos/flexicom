@@ -3,7 +3,7 @@
 #include "bb4b6bEnc.h"
 #include "LayoutVLC.h"
 #include "Bi2De.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <math.h>
 
 const int bb4b6bEnc::table[] = {  0,0,1,1,1,0, 0,0,1,1,0,1, 0,1,0,0,1,1, 0,1,0,1,1,0,
@@ -11,7 +11,7 @@ const int bb4b6bEnc::table[] = {  0,0,1,1,1,0, 0,0,1,1,0,1, 0,1,0,0,1,1, 0,1,0,1
 			         0,1,1,0,0,1, 0,1,1,0,1,0, 0,1,1,1,0,0, 1,1,0,0,0,1,
 			         1,1,0,0,1,0, 1,0,1,0,0,1, 1,0,1,0,1,0, 1,0,1,1,0,0};
 bb4b6bEnc::bb4b6bEnc():
-	gr_block("bb4b6bEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
+	gr::block("bb4b6bEnc", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int)))
 {
 	set_output_multiple(6); //the number of outputs has to be a multiple of 6
 }

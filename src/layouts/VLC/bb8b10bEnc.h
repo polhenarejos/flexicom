@@ -2,7 +2,7 @@
 #ifndef _INC_BB8B10BENC_H_
 #define _INC_BB8B10BENC_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 /*! \brief bb8b10bEnc class defines the RLL encoding process defined in IEEE 802.15.7.
 
@@ -11,7 +11,7 @@
   selected as reference: http://www.latticesemi.com/lit/docs/refdesigns/rd1012.pdf?jsessionid=f030dc40700e304b612a7c7d361735751137
 */
 
-class bb8b10bEnc : public gr_block
+class bb8b10bEnc : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bb8b10bEnc> sptr;

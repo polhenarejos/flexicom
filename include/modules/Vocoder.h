@@ -3,10 +3,10 @@
 #ifndef _INC_VOCODER_H_
 #define _INC_VOCODER_H_
 
-#include <gr_sync_decimator.h>
-#include <gr_sync_interpolator.h>
+#include <gnuradio/sync_decimator.h>
+#include <gnuradio/sync_interpolator.h>
 
-class VocoderEncoder : public gr_sync_decimator 
+class VocoderEncoder : public gr::sync_decimator 
 {
 	public:
 		typedef boost::shared_ptr<VocoderEncoder> sptr;
@@ -20,7 +20,7 @@ class VocoderEncoder : public gr_sync_decimator
 		int reset;
 };
 
-class VocoderDecoder : public gr_sync_interpolator
+class VocoderDecoder : public gr::sync_interpolator
 {
 	public:
 		typedef boost::shared_ptr<VocoderDecoder> sptr;

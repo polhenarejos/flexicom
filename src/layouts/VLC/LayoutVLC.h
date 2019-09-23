@@ -6,12 +6,12 @@
 #include "RxVLC.h"
 #include "TxVLC.h"
 #include "MainWindow.h"
-#include <gr_top_block.h>
-#include <QObject>
-#include <QComboBox>
-#include <QSettings>
-#include <QTimer>
-#include <QMutex>
+#include <gnuradio/top_block.h>
+#include <QtCore/QObject>
+#include <QtWidgets/QComboBox>
+#include <QtCore/QSettings>
+#include <QtCore/QTimer>
+#include <QtCore/QMutex>
 #include "compat.h"
 
 PACK(
@@ -81,7 +81,7 @@ class LayoutVLC : public QObject , public LayoutFactory
 	
 	private:
 		static const char *name;
-		gr_top_block_sptr grTop;
+		gr::top_block_sptr grTop;
 		RxVLC::sptr rx;
 		TxVLC::sptr tx;
 		QWidget *CreateTabOpts();

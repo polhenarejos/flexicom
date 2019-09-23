@@ -1,12 +1,12 @@
 // $Id$
 
 #include "SHM.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 //Source
 template <class T>
 SHMSource<T>::SHMSource(const char *_name) :
-	gr_sync_block("SHMSource", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(T))),
+	gr::sync_block("SHMSource", gr::io_signature::make(0, 0, 0), gr::io_signature::make(1, 1, sizeof(T))),
 	name(_name)
 {
 	//boost::interprocess::shared_memory_object::remove(name);
@@ -46,7 +46,7 @@ int SHMSource<T>::work(int no, gr_vector_const_void_star &_i, gr_vector_void_sta
 //Sink
 template <class T>
 SHMSink<T>::SHMSink(const char *_name) :
-	gr_sync_block("SHMSink", gr_make_io_signature(1, 1, sizeof(T)), gr_make_io_signature(0, 0, 0)),
+	gr::sync_block("SHMSink", gr::io_signature::make(1, 1, sizeof(T)), gr::io_signature::make(0, 0, 0)),
 	name(_name)
 {
 	boost::interprocess::shared_memory_object::remove(name);

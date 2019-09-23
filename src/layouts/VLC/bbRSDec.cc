@@ -1,7 +1,7 @@
 // $Id$
 
 #include "bbRSDec.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "vlc_reed_solomon.h"
 #include <math.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #include "De2Bi.h"
 
 bbRSDec::bbRSDec(unsigned int _GF, unsigned int _N, unsigned int _K, int _phy_type, int _length):
-	gr_block("bbRSDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
+	gr::block("bbRSDec", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int))),
 	GF(_GF),N(_N),K(_K), phy_type(_phy_type), pre_length(_length)
 {
 	unsigned int poly = 0x0;

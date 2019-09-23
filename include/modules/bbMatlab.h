@@ -2,12 +2,12 @@
 #ifndef _INC_BBMATLAB_H_
 #define _INC_BBMATLAB_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 #include <complex>
 
 /*! \brief bbMatlab class is used to extract data from the system chain to post-process it in Matlab
 */
-class bbMatlab : public gr_sync_block
+class bbMatlab : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<bbMatlab> sptr;

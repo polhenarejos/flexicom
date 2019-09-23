@@ -2,9 +2,9 @@
 #ifndef _INC_BBN_SLICER_H_
 #define _INC_BBN_SLICER_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
-class BBN_Slicer : public gr_block
+class BBN_Slicer : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<BBN_Slicer> sptr;

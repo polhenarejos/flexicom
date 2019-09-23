@@ -3,12 +3,12 @@
 #ifndef _INC_PHRENCODER_H
 #define _INC_PHRENCODER_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "LayoutVLC.h"
 class vlc_convolutional_coding;
 class vlc_reed_solomon;
 
-class PHREncoder : public gr_block
+class PHREncoder : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<PHREncoder> sptr;

@@ -1,6 +1,6 @@
 // $Id$
 #include "bbCCEnc.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "vlc_convolutional_coding.h"
 #include <math.h>
 #include <stdio.h>
@@ -8,7 +8,7 @@
 
 
 bbCCEnc::bbCCEnc( int _N, int _K, int *_poly, int _length, int _data_rate):
-	gr_block("bbCCEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int))),
+	gr::block("bbCCEnc", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int))),
 	N(_N), K(_K), poly(_poly),length(_length), data_rate(_data_rate)
 {
 	vlc_cc = new vlc_convolutional_coding(N, K, poly, length, data_rate);

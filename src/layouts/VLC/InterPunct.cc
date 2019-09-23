@@ -5,10 +5,10 @@
 #include "Puncture.h"
 #include "De2Bi.h"
 #include "Bi2De.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 InterPunct::InterPunct(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length, Mode _mode) :
-	gr_hier_block2("InterPunct", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int)))
+	gr::hier_block2("InterPunct", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int)))
 {
 	Interleaver::sptr ilv = Interleaver::Create(_GF, _N, _K, _raw_length, _rs_length, (_mode == INTERPUNCT ? Interleaver::INTERLEAVING : Interleaver::DEINTERLEAVING));
 	if (_mode == INTERPUNCT)

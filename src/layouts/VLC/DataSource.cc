@@ -3,10 +3,10 @@
 #include "DataSource.h"
 #include "LayoutVLC.h"
 #include "De2Bi.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 DataSource::DataSource(int _len, LayoutVLC *_ly, bool _voip) :
-	gr_block("DataSource", gr_make_io_signature(0, 1, sizeof(unsigned char)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr::block("DataSource", gr::io_signature::make(0, 1, sizeof(unsigned char)), gr::io_signature::make(1, 1, sizeof(int))),
 	len(_len*8), ic(0), pend(false), voip(_voip), prevreset(false), ly(_ly)
 {
 }
@@ -33,7 +33,7 @@ int DataSource::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 				if (data.size())
 					pend = true;
 				PHYHdr ph = { 0 }; ph.PL = len/8; ph.MCS = ly->vlc_var.dMCSID;
-				add_item_tag(0, nwrit+n, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(ph), pmt::pmt_string_to_symbol(name()));
+				add_item_tag(0, nwrit+n, pmt::string_to_symbol("PSDU"), pmt::make_any(ph), pmt::string_to_symbol(name()));
 			}
 			else if (pend)
 			{

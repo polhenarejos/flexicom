@@ -2,7 +2,7 @@
 #ifndef _INC_BBCCDEC_H
 #define _INC_BBCCDEC_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "vlc_convolutional_coding.h"
 
 /*! \brief bbCCDec block manages the Convolutional Decoding according to the input parameters
@@ -11,7 +11,7 @@
    generator polynomial g0 = 133; g1 = 171; g2 = 165 (octal values) has been used. 
 */
 
-class bbCCDec : public gr_block
+class bbCCDec : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bbCCDec> sptr;

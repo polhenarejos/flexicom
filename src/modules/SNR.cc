@@ -3,12 +3,11 @@
 // Y. Chen, N. C. Beaulieu, IEEE Comm. Let., vol. 9, no. 6, 2005
  
 #include "SNR.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <volk/volk.h>
-#include <gnuradio/malloc16.h>
 
 SNR::SNR() :
-	gr_sync_block("SNR", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(1, 1, sizeof(gr_complex))),
+	gr::sync_block("SNR", gr::io_signature::make(1, 1, sizeof(gr_complex)), gr::io_signature::make(1, 1, sizeof(gr_complex))),
 	snrs(0), times(0)
 {
 }
@@ -23,7 +22,7 @@ int SNR::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 	gr_complex *optr = (gr_complex *)_o[0];
 	if (no > 1)
 	{
-		float *tN = (float *)malloc16Align(sizeof(float)*no);
+		float *tN = (float *)volk_malloc(sizeof(float)*no, 16);
 		//if (is_unaligned())
 			volk_32fc_magnitude_32f_u(tN, iptr, no);
 		//else
@@ -37,9 +36,9 @@ int SNR::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 		times++;
 		float power = denA/no;
 		snrs = 10.*log10((power-7e-9)/7e-9);
-		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("power"), pmt::pmt_from_double((double)10.*log10(denA/no)), pmt::pmt_string_to_symbol(name()));
-		add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("snr"), pmt::pmt_from_double((double)snrs), pmt::pmt_string_to_symbol(name()));
-		free16Align(tN);
+		add_item_tag(0, nitems_written(0), pmt::string_to_symbol("power"), pmt::from_double((double)10.*log10(denA/no)), pmt::string_to_symbol(name()));
+		add_item_tag(0, nitems_written(0), pmt::string_to_symbol("snr"), pmt::from_double((double)snrs), pmt::string_to_symbol(name()));
+		volk_free(tN);
 	}
 	memcpy(optr, iptr, sizeof(gr_complex)*no);
 	return no;

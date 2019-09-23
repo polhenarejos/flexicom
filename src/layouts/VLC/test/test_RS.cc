@@ -3,14 +3,14 @@
 #include "bbRSEnc.h"
 #include "bbRSDec.h"
 #include "bb_bit_removal.h"
-#include <gr_file_source.h>
-#include <gr_top_block.h>
-#include <gr_vector_sink_f.h>
-#include <gr_float_to_complex.h>
+#include <gnuradio/file_source.h>
+#include <gnuradio/top_block.h>
+#include <gnuradio/vector_sink_f.h>
+#include <gnuradio/float_to_complex.h>
 #include <vector>
-#include <gr_float_to_int.h>
-#include <gr_char_to_float.h>
-#include <gr_int_to_float.h>
+#include <gnuradio/float_to_int.h>
+#include <gnuradio/char_to_float.h>
+#include <gnuradio/int_to_float.h>
 #include "MSE.h"
 #include "bbMatlab.h"
 

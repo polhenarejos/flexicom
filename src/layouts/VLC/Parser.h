@@ -3,7 +3,7 @@
 #ifndef _INC_PARSER_H_
 #define _INC_PARSER_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "compat.h"
 #include <QString>
 
@@ -31,7 +31,7 @@ struct
 	unsigned rvd:5;
 } , PhyHdr );
 class LayoutVLC;
-class Parser : public gr_block
+class Parser : public gr::block
 {
 	public:
 		typedef enum { PHR , PSDU } Type;

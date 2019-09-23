@@ -2,23 +2,23 @@
 #ifndef _INC_QT_H_
 #define _INC_QT_H_
 
-#include <gr_block.h>
-#include <gr_io_signature.h>
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_directpainter.h>
-#include <QObject>
-#include <QMutex>
+#include <gnuradio/block.h>
+#include <gnuradio/io_signature.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_directpainter.h>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 /*! \brief Qtblock class is the base definition of a plot object to be inserted in the GUI
 */
 
-class QtBlock : public QObject, public gr_block
+class QtBlock : public QObject, public gr::block
 {
 	Q_OBJECT
 	
 	protected:
-		QtBlock(QwtPlot *, std::string , gr_io_signature_sptr);
+		QtBlock(QwtPlot *, std::string , gr::io_signature::sptr);
 		QwtPlot *qp;
 		QwtPlotCurve **qc;
 		QMutex mutex;

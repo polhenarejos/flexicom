@@ -25,7 +25,7 @@
 #ifndef INCLUDED_GR_SYMBOLS_TO_CHUNKS_CB_H
 #define INCLUDED_GR_SYMBOLS_TO_CHUNKS_CB_H
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 
 class gr_symbols_to_chunks_cb;
 typedef boost::shared_ptr<gr_symbols_to_chunks_cb> gr_symbols_to_chunks_cb_sptr;
@@ -51,7 +51,7 @@ gr_symbols_to_chunks_cb_sptr gr_make_symbols_to_chunks_cb (const std::vector<gr_
  * \sa gr_chunks_to_symbols_sf, gr_chunks_to_symbols_sc.
  */
 
-class gr_symbols_to_chunks_cb : public gr_sync_block
+class gr_symbols_to_chunks_cb : public gr::sync_block
 {
   friend gr_symbols_to_chunks_cb_sptr gr_make_symbols_to_chunks_cb (const std::vector<gr_complex> &symbol_table);
 

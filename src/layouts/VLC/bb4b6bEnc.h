@@ -2,7 +2,7 @@
 #ifndef _INC_BB4B6BENC_H_
 #define _INC_BB4B6BENC_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 /*! \brief bb4b6bEnc class defines the RLL encoding process defined in section 10.5.1 of IEEE 802.15.7.
 
@@ -10,7 +10,7 @@
   DC balance.
 */
 
-class bb4b6bEnc : public gr_block
+class bb4b6bEnc : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bb4b6bEnc> sptr;

@@ -3,7 +3,7 @@
 #ifndef _INC_TIMING_H_
 #define _INC_TIMING_H_
 
-#include <gr_sync_decimator.h>
+#include <gnuradio/sync_decimator.h>
 
 /*! \brief Timing block performs a maximum likelihood timing synchronization operation
 
@@ -12,7 +12,7 @@
 *  sequence {y(iT + tau)}.
 */
                                                                
-class Timing : public gr_sync_decimator
+class Timing : public gr::sync_decimator
 {
 	public:
 		typedef boost::shared_ptr<Timing> sptr;

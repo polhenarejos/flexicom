@@ -1,15 +1,21 @@
 // $Id$
 #include <QApplication>
 #include "MainWindow.h"
-#include <gr_top_block.h>
-#include <gr_uhd_usrp_source.h>
-#include <gr_null_sink.h>
+#include <gnuradio/top_block.h>
+#include <gnuradio/uhd/usrp_source.h>
+#include <gnuradio/blocks/null_sink.h>
 #include <QtGui>
+
+#ifdef _WIN
+#include <windows.h>
+#include <objidl.h>
+#include <QtWinExtras/QtWinExtras>
+#endif
 
 class App : public QApplication
 {
 	public:
-		App(int argc, char **argv, QApplication::Type t) : QApplication(argc, argv, t) {}
+		App(int argc, char **argv) : QApplication(argc, argv) {}
 		virtual ~App() {}
 		virtual bool notify(QObject * receiver, QEvent * event) 
 		{
@@ -37,9 +43,6 @@ class App : public QApplication
 \image html VLC.jpg "Flexicom GUI and VLC configuration tab"
 */
 
-#ifdef _WIN
-#include <windows.h>
-#endif
 #if defined(_WIN) && !defined(CMDLINE)
 #include <QStringList>
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -54,14 +57,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 int main(int argc, char **argv)
 {
 #endif
-	App app(argc, argv, QApplication::GuiClient);
+	App app(argc, argv);
 	app.setOrganizationName(QString("FlexiCom"));
     app.setOrganizationDomain(QString("flexicom.com"));
     app.setApplicationName(QString("FlexiCom"));
     QIcon ico;
 #ifdef _WIN
     HICON hIcon = (HICON)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(100), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADTRANSPARENT );
-    ico = QIcon(QPixmap::fromWinHICON(hIcon));
+    ico = QIcon(QtWin::fromHICON(hIcon));
     ::DestroyIcon(hIcon);
 #else
 	ico = QIcon("./src/res/image200.png");

@@ -2,8 +2,8 @@
 #ifndef _INC_RXVLC_H_
 #define _INC_RXVLC_H_
 
-#include <gr_hier_block2.h>
-#include <gr_msg_queue.h>
+#include <gnuradio/hier_block2.h>
+#include <gnuradio/msg_queue.h>
 
 class LayoutVLC;
 
@@ -14,7 +14,7 @@ class LayoutVLC;
 
 */
 
-class RxVLC : public gr_hier_block2
+class RxVLC : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<RxVLC> sptr;

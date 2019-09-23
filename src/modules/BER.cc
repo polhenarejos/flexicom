@@ -1,10 +1,10 @@
 // $Id$
 
 #include "BER.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 BER::BER(size_t _s, unsigned int _bps, unsigned int _sps, unsigned int _chunk, unsigned int _off) :
-	gr_sync_block("BER", gr_make_io_signature(2, 2, _s), gr_make_io_signature(1, 1, _s)),
+	gr::sync_block("BER", gr::io_signature::make(2, 2, _s), gr::io_signature::make(1, 1, _s)),
 	bits(0), diff(0), s(_s), bps(_bps), sps((_sps+_off)*_s), chunk(_chunk*_s), off(_off*_s), pos(0)
 {
 }
@@ -27,7 +27,7 @@ int BER::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star &_o)
 		pos = (pos+1)%chunk;
 	}
 	bits += no;
-	add_item_tag(0, nitems_written(0), pmt::pmt_string_to_symbol("BER"), pmt::pmt_from_double((double)diff/bits), pmt::pmt_string_to_symbol(name()));
+	add_item_tag(0, nitems_written(0), pmt::string_to_symbol("BER"), pmt::from_double((double)diff/bits), pmt::string_to_symbol(name()));
 	memcpy(optr, iptr0, s*no);
 	return no;
 }

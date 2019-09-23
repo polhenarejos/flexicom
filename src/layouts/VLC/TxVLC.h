@@ -2,11 +2,11 @@
 #ifndef _INC_TXVLC_H_
 #define _INC_TXVLC_H_
 
-#include <gr_hier_block2.h>
+#include <gnuradio/hier_block2.h>
 #include <boost/thread.hpp>
 #include "DataSource.h"
 
-//#include <gr_msg_queue.h>
+//#include <gnuradio/msg_queue.h>
 //#include <QThread>
 
 /*class TxVLCThread : public QThread
@@ -28,7 +28,7 @@ class LayoutVLC;
 
 */
 
-class TxVLC : public gr_hier_block2
+class TxVLC : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<TxVLC> sptr;

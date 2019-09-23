@@ -2,13 +2,13 @@
 #ifndef _INC_TCP_H_
 #define _INC_TCP_H_
 
-#include <gr_hier_block2.h>
-#include <gr_io_signature.h>
+#include <gnuradio/hier_block2.h>
+#include <gnuradio/io_signature.h>
 
-class TcpIO : public gr_hier_block2
+class TcpIO : public gr::hier_block2
 {
 	protected:
-		TcpIO(const char *, unsigned short port, bool, gr_io_signature_sptr, gr_io_signature_sptr);
+		TcpIO(const char *, unsigned short port, bool, gr::io_signature::sptr, gr::io_signature::sptr);
 		~TcpIO();
 		int svfd;
 		int fd;

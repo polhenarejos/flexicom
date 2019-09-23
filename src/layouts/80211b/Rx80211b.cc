@@ -6,18 +6,18 @@
 #include "BBN_Slicer.h"
 #include "QtBlock.h"
 #include "Layout80211b.h"
-#include <gr_io_signature.h>
-#include <filter/firdes.h>
-#include <filter/pfb_arb_resampler_ccf.h>
-#include <filter/fir_filter_ccf.h>
+#include <gnuradio/io_signature.h>
+#include <gnuradio/filter/firdes.h>
+#include <gnuradio/filter/pfb_arb_resampler_ccf.h>
+#include <gnuradio/filter/fir_filter_blk.h>
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
-#include <gr_complex_to_xxx.h>
+#include <gnuradio/blocks/complex_to_real.h>
 
 #include "bbMatlab.h"
 
-Rx80211bThread::Rx80211bThread(gr_msg_queue_sptr _queue) :
+Rx80211bThread::Rx80211bThread(gr::msg_queue::sptr _queue) :
 	queue(_queue)
 {
 }
@@ -57,7 +57,7 @@ void Rx80211bThread::run()
 {
 	while (1)
 	{
-		gr_message_sptr mesg = queue->delete_head();
+		gr::message::sptr mesg = queue->delete_head();
 		if (mesg)
 		{
 			uint size = sizeof(oob_hdr_t);
@@ -96,10 +96,10 @@ void Rx80211bThread::run()
 }
 
 Rx80211b::Rx80211b(Layout80211b *_ly) :
-	gr_hier_block2("Rx80211b", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)), 
+	gr::hier_block2("Rx80211b", gr::io_signature::make(1, 1, sizeof(gr_complex)), gr::io_signature::make(0, 0, 0)), 
 	ly(_ly)
 {
-	msgq = gr_make_msg_queue();
+	msgq = gr::msg_queue::make();
 	rxth = new Rx80211bThread(msgq);
 	rxth->start();
 	uint chip_rate = 10e6, interpolate_rate = 11, decimation_rate = 10;
@@ -113,7 +113,7 @@ Rx80211b::Rx80211b(Layout80211b *_ly) :
 	BBN_DPSKDemod::sptr dpsk = BBN_DPSKDemod::Create();
 	BBN_PLCP::sptr plcp = BBN_PLCP::Create(msgq);
 	Qt1D::sptr qt1d = Qt1D::Create(ly->pl_osc);
-	gr_complex_to_real_sptr re = gr_make_complex_to_real();
+	gr::blocks::complex_to_real::sptr re = gr::blocks::complex_to_real::make();
 	connect(self(), 0, resampler, 0);
 	connect(resampler, 0, filter, 0);
 	connect(filter, 0, slicer, 0);

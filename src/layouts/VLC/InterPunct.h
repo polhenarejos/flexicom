@@ -3,9 +3,9 @@
 #ifndef _INC_INTERPUNCT_H_
 #define _INC_INTERPUNCT_H_
 
-#include <gr_hier_block2.h>
+#include <gnuradio/hier_block2.h>
 
-class InterPunct : public gr_hier_block2
+class InterPunct : public gr::hier_block2
 {
 	public:
 		typedef enum { INTERPUNCT, DEINTERPUNCT } Mode;

@@ -3,13 +3,13 @@
 #ifndef _INC_LAYOUTFACTORY_H_
 #define _INC_LAYOUTFACTORY_H_
 
-#include <gr_hier_block2.h>
+#include <gnuradio/hier_block2.h>
 #include <boost/noncopyable.hpp>
 
 class MainWindow;
 class Panel;
 
-class GeneralSink : public gr_hier_block2
+class GeneralSink : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<GeneralSink> sptr;
@@ -18,7 +18,7 @@ class GeneralSink : public gr_hier_block2
 	private:
 		GeneralSink(int, int, Panel *);
 };
-class GeneralSource : public gr_hier_block2
+class GeneralSource : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<GeneralSource> sptr;
@@ -27,7 +27,7 @@ class GeneralSource : public gr_hier_block2
 	private:
 		GeneralSource(int, int, Panel *);
 };
-class GeneralFlip : public gr_hier_block2
+class GeneralFlip : public gr::hier_block2
 {
 	public:
 		typedef boost::shared_ptr<GeneralFlip> sptr;

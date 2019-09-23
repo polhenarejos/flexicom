@@ -11,10 +11,10 @@
 #include "bbRSDec.h"
 #include "LayoutVLC.h"
 #include "Parser.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 PHRDecoder::PHRDecoder(LayoutVLC *_ly) :
-	gr_sync_block("PHRDecoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(float))),
+	gr::sync_block("PHRDecoder", gr::io_signature::make(1, 1, sizeof(float)), gr::io_signature::make(1, 1, sizeof(float))),
 	cpd(0), phy_type((LayoutVLC::PHYType)_ly->vlc_var.phy_type), mod((LayoutVLC::Modulation)_ly->vlc_var.mod_type), ly(_ly),
 	CRCok(0), CRCnok(0)
 {
@@ -96,8 +96,8 @@ int PHRDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star 
 	float *optr = (float *)_o[0];
 	memcpy(optr, iptr, sizeof(float)*no);
 	const uint64_t nread = nitems_read(0);
-	std::vector<gr_tag_t> tags;
-	get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("SyncPeak"));
+	std::vector<gr::tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+no, pmt::string_to_symbol("SyncPeak"));
 	PHYHdr ph;
 	if (cpd) //previous
 	{
@@ -110,7 +110,7 @@ int PHRDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star 
 			{
 				if (ph.MCS < 5) //tail bits
 					offPSDU += 64;
-				add_item_tag(0, offPSDU, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(ph), pmt::pmt_string_to_symbol(name()));
+				add_item_tag(0, offPSDU, pmt::string_to_symbol("PSDU"), pmt::make_any(ph), pmt::string_to_symbol(name()));
 			}
 			b = buf;
 		}
@@ -131,7 +131,7 @@ int PHRDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_star 
 			{
 				if (ph.MCS < 5) //tail bits
 					offPSDU += 64;
-				add_item_tag(0, offPSDU, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(ph), pmt::pmt_string_to_symbol(name()));
+				add_item_tag(0, offPSDU, pmt::string_to_symbol("PSDU"), pmt::make_any(ph), pmt::string_to_symbol(name()));
 			}
 			b = buf;
 		}

@@ -1,9 +1,9 @@
 // $Id$
 #include "bbManchesterEnc.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 bbManchesterEnc::bbManchesterEnc(ModType mode):
-	gr_sync_interpolator("bbManchesterEnc", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)), 2),
+	gr::sync_interpolator("bbManchesterEnc", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int)), 2),
 	d_mode(mode)
 {
 }

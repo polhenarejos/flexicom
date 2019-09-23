@@ -2,7 +2,7 @@
 #ifndef _INC_BBVLC_FRAME_GENERATOR_H
 #define _INC_BBVLC_FRAME_GENERATOR_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 /*! \brief bbVLC_Frame_Generator is the block which adds the FLP (Fast Locking Pattern) and the IFS (Interframing Spacing) sequences to the unit constituted by: TDP (topology dependant pattern) + PHR + PSDU units according to the system configuration.
 
@@ -10,7 +10,7 @@ The FLP sequence is constructed according to the section 8.6.1 of IEEE 802.15.7.
 The IFS sequence is constructed according to the section 8.5.1.2 of IEEE 802.15.7. These patterns are interleaved to obtain different visibility level. 
 */
 
-class bbVLC_Frame_Generator : public gr_block
+class bbVLC_Frame_Generator : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bbVLC_Frame_Generator> sptr;

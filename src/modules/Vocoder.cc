@@ -1,7 +1,7 @@
 // $Id$
 
 #include "Vocoder.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <volk/volk.h>
 extern "C" {
 #include <gsm/gsm.h>
@@ -9,7 +9,7 @@ extern "C" {
 #include <malloc16.h>
 
 VocoderEncoder::VocoderEncoder() :
-	gr_sync_decimator("VocoderEncoder", gr_make_io_signature(1, 1, sizeof(float)), gr_make_io_signature(1, 1, sizeof(gsm_frame)), GSM_SAMPLES_PER_FRAME),
+	gr::sync_decimator("VocoderEncoder", gr::io_signature::make(1, 1, sizeof(float)), gr::io_signature::make(1, 1, sizeof(gsm_frame)), GSM_SAMPLES_PER_FRAME),
 	reset(0)
 {
 	dgsm = gsm_create();
@@ -39,7 +39,7 @@ int VocoderEncoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_s
 		{
 			gsm_destroy(dgsm);
 			dgsm = gsm_create();
-			add_item_tag(0, nitems_written(0)+n, pmt::pmt_string_to_symbol("VocoderReset"), pmt::PMT_T, pmt::pmt_string_to_symbol(name()));
+			add_item_tag(0, nitems_written(0)+n, pmt::string_to_symbol("VocoderReset"), pmt::T, pmt::string_to_symbol(name()));
 		}
 		gsm_encode(dgsm, const_cast<short *>(siptr), optr);
 		siptr += GSM_SAMPLES_PER_FRAME;
@@ -51,7 +51,7 @@ int VocoderEncoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_s
 }
 
 VocoderDecoder::VocoderDecoder() :
-	gr_sync_interpolator("VocoderDecoder", gr_make_io_signature(1, 1, sizeof(gsm_frame)), gr_make_io_signature(1, 1, sizeof(float)), GSM_SAMPLES_PER_FRAME)
+	gr::sync_interpolator("VocoderDecoder", gr::io_signature::make(1, 1, sizeof(gsm_frame)), gr::io_signature::make(1, 1, sizeof(float)), GSM_SAMPLES_PER_FRAME)
 {
 	dgsm = gsm_create();
 }
@@ -70,8 +70,8 @@ int VocoderDecoder::work(int no, gr_vector_const_void_star &_i, gr_vector_void_s
 	short *s = (short *)malloc16Align(sizeof(short)*no), *soptr = s;
 	float *optr = (float *)_o[0];
 	const uint64_t nread = nitems_read(0);
-	std::vector<gr_tag_t> tags;
-	get_tags_in_range(tags, 0, nread, nread+no/GSM_SAMPLES_PER_FRAME, pmt::pmt_string_to_symbol("VocoderReset"));
+	std::vector<gr::tag_t> tags;
+	get_tags_in_range(tags, 0, nread, nread+no/GSM_SAMPLES_PER_FRAME, pmt::string_to_symbol("VocoderReset"));
 	unsigned int o = 0;
 	for (int n = 0; n < no; n += GSM_SAMPLES_PER_FRAME)
 	{

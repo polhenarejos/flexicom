@@ -2,8 +2,8 @@
 #include "compat.h"
 #include "RxVLC.h"
 #include "LayoutVLC.h"
-#include <gr_io_signature.h>
-#include <gr_file_source.h>
+#include <gnuradio/io_signature.h>
+#include <gnuradio/blocks/file_source.h>
 #include "bbManchesterDec.h"
 #include "Parser.h"
 #include "Correlator.h"
@@ -11,22 +11,22 @@
 #include <vector>
 #include <QtGlobal>
 #include <iostream>
-#include <gr_null_sink.h>
+#include <gnuradio/blocks/null_sink.h>
 #include "bbMatlab.h"
-#include <gr_complex_to_xxx.h>
+#include <gnuradio/blocks/complex_to_float.h>
 #include "SNR.h"
 #include "BER.h"
-#include <gr_null_source.h>
-#include <gr_udp_sink.h>
+#include <gnuradio/blocks/null_source.h>
+#include <gnuradio/blocks/udp_sink.h>
 #include "PHRDecoder.h"
 #include "PSDUDecoder.h"
 
 RxVLC::RxVLC(LayoutVLC * _ly) :
-	gr_hier_block2("RxVLC", gr_make_io_signature(1, 1, sizeof(gr_complex)), gr_make_io_signature(0, 0, 0)),
+	gr::hier_block2("RxVLC", gr::io_signature::make(1, 1, sizeof(gr_complex)), gr::io_signature::make(0, 0, 0)),
 	ly(_ly)
 {
 	init_var();
-	gr_complex_to_float_sptr c2f = gr_make_complex_to_float();
+	gr::blocks::complex_to_float::sptr c2f = gr::blocks::complex_to_float::make();
 	///synchronization blocks are missing! bbVLC_Frame_Extractor assumes that the frame without the FLP patterns arrives
 	int ov = (ly->mw->panel->ch_ov->checkState() == Qt::Checked ? ly->mw->panel->sp_ov->value() : 1) ;
 	Correlator::sptr corr = Correlator::Create(ov, ly);
@@ -40,7 +40,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	Parser::sptr psdu_parser = Parser::Create(Parser::PSDU, ly);
 	bool media = ly->varVLC->ch_media->checkState() == Qt::Checked;
 	BER::sptr ber = BER::Create(sizeof(int), 1, ly->vlc_var.PSDU_raw_length-56, ly->vlc_var.PSDU_raw_length, 40);
-	gr_null_source_sptr nls = gr_make_null_source(sizeof(int));
+	gr::blocks::null_source::sptr nls = gr::blocks::null_source::make(sizeof(int));
 	PHRDecoder::sptr phr_dec = PHRDecoder::Create(ly);
 	PSDUDecoder::sptr psdu_dec = PSDUDecoder::Create(ly);
 	connect(tim,0,phr_dec,0);
@@ -48,7 +48,7 @@ RxVLC::RxVLC(LayoutVLC * _ly) :
 	connect(phr_dec, 0, psdu_dec, 0);
 	connect(psdu_dec, 0, psdu_parser, 0);
 	if (media)
-		connect(psdu_parser, 0, gr_make_udp_sink(sizeof(unsigned char), "127.0.0.1", 5005), 0);
+		connect(psdu_parser, 0, gr::blocks::udp_sink::make(sizeof(unsigned char), "127.0.0.1", 5005), 0);
 }
 RxVLC::sptr RxVLC::Create(LayoutVLC * _ly)
 {

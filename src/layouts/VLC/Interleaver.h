@@ -3,10 +3,10 @@
 #ifndef _INC_INTERLEAVER_H_
 #define _INC_INTERLEAVER_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 #include <vector>
 
-class Interleaver : public gr_sync_block
+class Interleaver : public gr::sync_block
 {
 	public:
 		typedef enum { INTERLEAVING, DEINTERLEAVING } Mode;

@@ -3,10 +3,10 @@
 #ifndef _INC_DATASOURCE_H_
 #define _INC_DATASOURCE_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 class LayoutVLC;
-class DataSource : public gr_block
+class DataSource : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<DataSource> sptr;

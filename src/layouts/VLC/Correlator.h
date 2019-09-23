@@ -2,7 +2,7 @@
 #ifndef _INC_CORRELATOR_H
 #define _INC_CORRELATOR_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 /*! \brief Correlator is the block which receives the incoming signal from the timing recovery block in order to determine when a frame starts.
 In principle, the detection mode could be made blind, but in order to save processing time, it is assumed that the topology is already known.
@@ -10,7 +10,7 @@ The output of this block is binary, indicating the beginning or not of a frame d
 */
 
 class LayoutVLC;
-class Correlator : public gr_block
+class Correlator : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<Correlator> sptr;

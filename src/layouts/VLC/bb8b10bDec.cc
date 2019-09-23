@@ -3,7 +3,7 @@
 #include "bb8b10bDec.h"
 #include "LayoutVLC.h"
 #include "De2Bi.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <math.h>
 
 int bits_3_RD_neg[] = { 0,0,1,0, 1,0,0,1, 1,0,1,0, 1,1,0,0,      
@@ -31,7 +31,7 @@ int bits_5_RD_pos[] = { 0,0,0,1,1,0, 0,1,0,0,0,1, 0,1,0,0,1,0, 1,0,0,0,1,1,
                         0,1,1,1,0,0, 1,0,0,0,1,0, 1,0,0,0,0,1, 0,0,1,0,1,0};   
 
 bb8b10bDec::bb8b10bDec(int _modulated_length):
-	gr_block("bb8b10bDec", gr_make_io_signature (1,1, sizeof(int)), gr_make_io_signature (1,1, sizeof(int)))
+	gr::block("bb8b10bDec", gr::io_signature::make (1,1, sizeof(int)), gr::io_signature::make (1,1, sizeof(int)))
 {
 	RD = 0;
 	words_processed = 0;

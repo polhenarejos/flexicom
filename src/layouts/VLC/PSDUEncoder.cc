@@ -11,10 +11,10 @@
 #include "bbCCEnc.h"
 #include "LayoutVLC.h"
 #include "Puncture.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 PSDUEncoder::PSDUEncoder() :
-	gr_block("PSDUEncoder", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr::block("PSDUEncoder", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int))),
 	cpd(0), buf(NULL), seq_num(0)
 {
 	set_tag_propagation_policy(TPP_DONT);
@@ -140,7 +140,7 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 		std::vector<int> pld = payloads[0];
 		if (phys[0].PL)
 		{
-			add_item_tag(0, nwrit+no-ocpd, pmt::pmt_string_to_symbol("PSDU"), pmt::pmt_make_any(phys[0]), pmt::pmt_string_to_symbol(name()));
+			add_item_tag(0, nwrit+no-ocpd, pmt::string_to_symbol("PSDU"), pmt::make_any(phys[0]), pmt::string_to_symbol(name()));
 			phys[0].PL = 0;
 		}
 		if (pld.size() <= ocpd) //pop and thats all
@@ -165,8 +165,8 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 	if (!payloads.size()) //only accept samples if the obuf is empty
 	{
 		const uint64_t nread = nitems_read(0);
-		std::vector<gr_tag_t> tags;
-		get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("PSDU"));
+		std::vector<gr::tag_t> tags;
+		get_tags_in_range(tags, 0, nread, nread+no, pmt::string_to_symbol("PSDU"));
 		if (cpd) //previous
 		{
 			int c = std::min(cpd, no);
@@ -179,7 +179,7 @@ int PSDUEncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_st
 		}
 		for (int t = 0; t < tags.size(); t++)
 		{
-			ph = boost::any_cast<PHYHdr>(pmt::pmt_any_ref(tags[t].value));
+			ph = boost::any_cast<PHYHdr>(pmt::any_ref(tags[t].value));
 			int MCSID = ph.MCS;
 			if (MCSID <= 8)
 			{

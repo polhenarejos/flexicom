@@ -3,10 +3,10 @@
 #ifndef _INC_PUNCTURE_H_
 #define _INC_PUNCTURE_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include <vector>
 
-class Puncture : public gr_block
+class Puncture : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<Puncture> sptr;

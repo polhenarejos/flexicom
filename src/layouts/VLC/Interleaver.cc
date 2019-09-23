@@ -1,10 +1,10 @@
 // $Id$
 
 #include "Interleaver.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 Interleaver::Interleaver(unsigned int _GF, unsigned int _N, unsigned int _K, unsigned int _raw_length, unsigned int _rs_length, Mode _mode) :
-	gr_sync_block("Interleaver", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr::sync_block("Interleaver", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int))),
 	GF(_GF), N(_N), K(_K), raw_length(_raw_length), rs_length(_rs_length), mode(_mode)
 {
 	unsigned int S_frame = ceil((double)raw_length/GF);

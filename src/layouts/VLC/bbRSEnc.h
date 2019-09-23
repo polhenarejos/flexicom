@@ -2,7 +2,7 @@
 #ifndef _INC_BBRSENC_H
 #define _INC_BBRSENC_H
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include "vlc_reed_solomon.h"
 
 /*! \brief bbRSEnc is the block in charge to perform the Reed Solomon encoding according to the sections 10.2 and 11.2 of IEEE 802.15.7
@@ -13,7 +13,7 @@ A systematic Reed-Solomon code operating on GF(256) shall be used for PHY II. Th
 
 */
 
-class bbRSEnc : public gr_block
+class bbRSEnc : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bbRSEnc> sptr;

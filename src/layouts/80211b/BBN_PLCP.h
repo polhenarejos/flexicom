@@ -2,9 +2,9 @@
 #ifndef _INC_BBN_PLCP_H_
 #define _INC_BBN_PLCP_H_
 
-#include <gr_block.h>
-#include <gr_sync_block.h>
-#include <gr_msg_queue.h>
+#include <gnuradio/block.h>
+#include <gnuradio/sync_block.h>
+#include <gnuradio/msg_queue.h>
 #include <QtGlobal>
 #include "compat.h"
 
@@ -23,11 +23,11 @@ struct oob_hdr_struct
 
 #define REVERSE_BITS(c) ( bit_reverse_table[(c) & 0xff])
 
-class BBN_PLCP : public gr_block 
+class BBN_PLCP : public gr::block 
 {
 	public:
 		typedef boost::shared_ptr<BBN_PLCP> sptr;
-		static sptr Create(gr_msg_queue_sptr, bool = true);
+		static sptr Create(gr::msg_queue::sptr, bool = true);
 		int general_work(int, gr_vector_int &, gr_vector_const_void_star &, gr_vector_void_star &);
 		void forecast(int, gr_vector_int &);
 		static uchar ReverseBits(uchar);
@@ -52,7 +52,7 @@ class BBN_PLCP : public gr_block
 		};
 		
 	private:
-		BBN_PLCP(gr_msg_queue_sptr, bool = true);
+		BBN_PLCP(gr::msg_queue::sptr, bool = true);
 		typedef struct scramble_data_struct 
 		{
 			uchar data;
@@ -61,7 +61,7 @@ class BBN_PLCP : public gr_block
 		long long d_symbol_count;
 		long long d_packet_rx_time;
 		long long d_packet_rate;
-		gr_msg_queue_sptr d_target_queue;
+		gr::msg_queue::sptr d_target_queue;
 		plcp_state_enum d_state;
 		bool crc_table_initialized;
 		uint d_data;

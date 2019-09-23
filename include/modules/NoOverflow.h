@@ -3,9 +3,9 @@
 #ifndef _INC_NOOVERFLOW_H_
 #define _INC_NOOVERFLOW_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 
-class NoOverflow : public gr_sync_block
+class NoOverflow : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<NoOverflow> sptr;

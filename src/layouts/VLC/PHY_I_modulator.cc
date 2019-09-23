@@ -9,11 +9,11 @@
 #include "bb4b6bEnc.h"
 #include "InterPunct.h"
 //#include "bbVLCInterleaver.h"
-#include <gr_io_signature.h>
-#include <gr_kludge_copy.h>
+#include <gnuradio/io_signature.h>
+#include <gnuradio/kludge_copy.h>
 
 PHY_I_modulator::PHY_I_modulator(unsigned int _phy_type, unsigned int _phy_modulation, unsigned int _rs_in, unsigned int _rs_out, unsigned int _gf, unsigned int _cc_in, unsigned int _cc_out, unsigned int _raw_length, unsigned int _data_rate) :
-	gr_hier_block2("PHY_I_modulator", gr_make_io_signature(1,1,sizeof(int)), gr_make_io_signature(1,1,sizeof(int))),
+	gr::hier_block2("PHY_I_modulator", gr::io_signature::make(1,1,sizeof(int)), gr::io_signature::make(1,1,sizeof(int))),
 	phy_type(_phy_type), phy_modulation(_phy_modulation), rs_in(_rs_in), rs_out(_rs_out), GF(_gf), cc_in(_cc_in), cc_out(_cc_out), raw_length(_raw_length), data_rate(_data_rate)
 {
 	poly[0]=0133; poly[1]=0171;	poly[2]=0165;

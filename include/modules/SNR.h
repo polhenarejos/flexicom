@@ -3,9 +3,9 @@
 #ifndef _INC_SNR_H_
 #define _INC_SNR_H_
 
-#include <gr_sync_block.h>
+#include <gnuradio/sync_block.h>
 
-class SNR : public gr_sync_block
+class SNR : public gr::sync_block
 {
 	public:
 		typedef boost::shared_ptr<SNR> sptr;

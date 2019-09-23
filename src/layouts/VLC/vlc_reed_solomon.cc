@@ -4,11 +4,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-extern "C"{
-	#include "rs.h"
-}
-
+extern "C" {
+#include <gnuradio/fec/rs.h>
+};
 
 vlc_reed_solomon::vlc_reed_solomon (unsigned int _symsize, unsigned int _gfpoly, unsigned int _fcr, unsigned int _prim, unsigned int _nroots) :
 				 rs_init_symsize(_symsize), rs_init_gfpoly(_gfpoly), rs_init_fcr (_fcr), rs_init_prim(_prim), rs_init_nroots(_nroots)

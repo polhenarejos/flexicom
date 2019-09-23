@@ -3,7 +3,7 @@
 #ifndef _INC_BB4B6BDEC_H_
 #define _INC_BB4B6BDEC_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 /*! \brief bb4b6bDec class defines the RLL decoding operation of the process defined in section 10.5.1 of IEEE 802.15.7.
 
@@ -11,7 +11,7 @@
   DC balance and returns its 4-bit representation. The decoding process is based in a correlation-distance measurement.
 */
 
-class bb4b6bDec : public gr_block
+class bb4b6bDec : public gr::block
 {
 	public:
 		typedef boost::shared_ptr<bb4b6bDec> sptr;

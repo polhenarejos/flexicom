@@ -2,12 +2,12 @@
 #ifndef _INC_BBN_DPSKDEMOD_H_
 #define _INC_BBN_DPSKDEMOD_H_
 
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 #define RSSI_AVE_COUNT 128
 #define RSSI_MAX 0
 
-class BBN_DPSKDemod : public gr_block 
+class BBN_DPSKDemod : public gr::block 
 {
 	public:
 		typedef boost::shared_ptr<BBN_DPSKDemod> sptr;

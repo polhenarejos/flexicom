@@ -27,7 +27,7 @@
 #endif
 
 #include "gr_symbols_to_chunks_cb.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <iostream>
 #include <string.h>
 
@@ -38,9 +38,9 @@ gr_make_symbols_to_chunks_cb (const std::vector<gr_complex> &symbol_table)
 }
 
 gr_symbols_to_chunks_cb::gr_symbols_to_chunks_cb (const std::vector<gr_complex> &symbol_table)
-  : gr_sync_block ("symbols_to_chunks_cb",
-			  gr_make_io_signature (1, -1, sizeof (gr_complex)),
-			  gr_make_io_signature (1, -1, sizeof (unsigned char))),
+  : gr::sync_block ("symbols_to_chunks_cb",
+			  gr::io_signature::make (1, -1, sizeof (gr_complex)),
+			  gr::io_signature::make (1, -1, sizeof (unsigned char))),
   d_symbol_table (symbol_table)
 {
 }

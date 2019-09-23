@@ -2,15 +2,15 @@
 
 #include "Audio.h"
 #include "Vocoder.h"
-#include <gr_vector_to_stream.h>
-#include <gr_stream_to_vector.h>
-#include <gr_sig_source_f.h>
-#include <gr_audio_source.h>
-#include <gr_audio_sink.h>
-#include <gr_io_signature.h>
+#include <gnuradio/vector_to_stream.h>
+#include <gnuradio/stream_to_vector.h>
+#include <gnuradio/sig_source_f.h>
+#include <gnuradio/audio_source.h>
+#include <gnuradio/audio_sink.h>
+#include <gnuradio/io_signature.h>
 
 AudioSource::AudioSource(unsigned int _freq) :
-	gr_hier_block2("AudioSource", gr_make_io_signature(0, 0, 0), gr_make_io_signature(1, 1, sizeof(unsigned char)))
+	gr::hier_block2("AudioSource", gr::io_signature::make(0, 0, 0), gr::io_signature::make(1, 1, sizeof(unsigned char)))
 {
 	VocoderEncoder::sptr vocoder = VocoderEncoder::Create();
 	gr_vector_to_stream_sptr v2s = gr_make_vector_to_stream(sizeof(unsigned char), 33);
@@ -24,7 +24,7 @@ AudioSource::sptr AudioSource::Create(unsigned int _freq)
 	return gnuradio::get_initial_sptr(new AudioSource(_freq));
 }
 AudioSink::AudioSink(unsigned int _freq) :
-	gr_hier_block2("AudioSink", gr_make_io_signature(1, 1, sizeof(unsigned char)), gr_make_io_signature(0, 0, 0))
+	gr::hier_block2("AudioSink", gr::io_signature::make(1, 1, sizeof(unsigned char)), gr::io_signature::make(0, 0, 0))
 {
 	VocoderDecoder::sptr vocoder = VocoderDecoder::Create();
 	gr_stream_to_vector_sptr s2v = gr_make_stream_to_vector(sizeof(unsigned char), 33);

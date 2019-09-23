@@ -3,9 +3,9 @@
 #ifndef _INC_BI2DE_H_                                                      
 #define _INC_BI2DE_H_                                                      
                                                                            
-#include <gr_sync_decimator.h>
+#include <gnuradio/sync_decimator.h>
                                                                                                                   
-class Bi2De : public gr_sync_decimator                    
+class Bi2De : public gr::sync_decimator                    
 {                                                                          
 	public:                                                                
 		typedef boost::shared_ptr<Bi2De> sptr;                             

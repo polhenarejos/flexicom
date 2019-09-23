@@ -10,7 +10,7 @@
 #include "bbRSEnc.h"
 #include "bbCCEnc.h"
 #include "LayoutVLC.h"
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 
 const int PHREncoder::_TDP[] = { 0,1,0,0,0,0,1,1,0,1,0,0,1,0,1,1,0,1,1,1,1,0,0,1,0,1,1,0,1,0,
 								 0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,0,0,0,0,1,1,0,0,1,1,
@@ -18,7 +18,7 @@ const int PHREncoder::_TDP[] = { 0,1,0,0,0,0,1,1,0,1,0,0,1,0,1,1,0,1,1,1,1,0,0,1
 	};
 
 PHREncoder::PHREncoder() :
-	gr_block("PHREncoder", gr_make_io_signature(1, 1, sizeof(int)), gr_make_io_signature(1, 1, sizeof(int))),
+	gr::block("PHREncoder", gr::io_signature::make(1, 1, sizeof(int)), gr::io_signature::make(1, 1, sizeof(int))),
 	cpd(0), buf(NULL)
 {
 	//PHR does not perform any puncture
@@ -120,8 +120,8 @@ int PHREncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 	if (!payloads.size()) //only accept samples if the obuf is empty
 	{
 		const uint64_t nread = nitems_read(0);
-		std::vector<gr_tag_t> tags;
-		get_tags_in_range(tags, 0, nread, nread+no, pmt::pmt_string_to_symbol("PSDU"));
+		std::vector<gr::tag_t> tags;
+		get_tags_in_range(tags, 0, nread, nread+no, pmt::string_to_symbol("PSDU"));
 		if (cpd) //previous
 		{
 			int c = std::min(cpd, no);
@@ -134,7 +134,7 @@ int PHREncoder::general_work(int no, gr_vector_int &ni, gr_vector_const_void_sta
 		}
 		for (int t = 0; t < tags.size(); t++)
 		{
-			ph = boost::any_cast<PHYHdr>(pmt::pmt_any_ref(tags[t].value));
+			ph = boost::any_cast<PHYHdr>(pmt::any_ref(tags[t].value));
 			int MCSID = ph.MCS;
 			if (MCSID <= 8)
 			{
